@@ -50,7 +50,7 @@
             where coffee, creativity, and community come together.
         </p>
 
-        <a href="#reservation" class="hero-btn">
+        <a href="reservation.php" class="hero-btn">
             RESERVE A TABLE
         </a>
 
@@ -119,7 +119,7 @@
     </div>
 
 
-    <div class="products-container">
+<div class="products-container" id="productsContainer">
 
     <div class="product-card">
         <img src="images/caramelmacchiato.png" alt="Caramel Macchiato">
@@ -138,19 +138,19 @@
     </div>
 
         <div class="product-card">
-        <img src="images/chocolatelatte.png" alt="Chocolate Latte">
-     <div class="product-info">
-         <h3>Chocolate Latte</h3>
-         <p>₱115</p>
-         </div>
-    </div>
-
-    <div class="product-card">
       <img src="images/bluberry.jpeg" alt="Blueberry Cheesecake">
         <div class="product-info">
             <h3>Blueberry Cheesecake</h3>
             <p>₱120</p>
         </div>
+    </div>
+
+
+        <div class="product-card chocolate-card">
+    <img src="images/chocolatelatte.png" alt="Chocolate Latte">
+    <div class="product-info">
+        <h3>Chocolate Latte</h3>
+        <p>₱115</p>
     </div>
 </div>
 

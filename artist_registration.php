@@ -53,10 +53,51 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             );
 
             if ($stmt->execute()) {
-                $success = "Artist registration submitted successfully!";
-            } else {
-                $error = "Something went wrong. Please try again.";
-            }
+
+    $artist_id = $stmt->insert_id;
+
+    // Get the active event
+    $event_query = $conn->query(
+        "SELECT event_id
+         FROM events
+         WHERE status = 'Active'
+         ORDER BY event_id ASC
+         LIMIT 1"
+    );
+
+    if ($event_query && $event_query->num_rows === 1) {
+
+        $event = $event_query->fetch_assoc();
+        $event_id = $event["event_id"];
+
+        // Connect the artist to the event
+        $event_stmt = $conn->prepare(
+            "INSERT INTO event_artists
+            (event_id, artist_id, status)
+            VALUES (?, ?, 'Pending')"
+        );
+
+        $event_stmt->bind_param(
+            "ii",
+            $event_id,
+            $artist_id
+        );
+
+        if ($event_stmt->execute()) {
+            $success = "Artist registration submitted successfully! Your application is now pending approval.";
+        } else {
+            $error = "Artist was registered, but the event application could not be submitted.";
+        }
+
+        $event_stmt->close();
+
+    } else {
+        $error = "No active event is currently available.";
+    }
+
+} else {
+    $error = "Something went wrong. Please try again.";
+}
 
             $stmt->close();
         }
