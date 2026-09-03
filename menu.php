@@ -13,7 +13,7 @@
 
 <body>
 
-    <!-- HEADER -->
+    <!HEADER>
     <header class="header">
 
         <div class="logo">
@@ -62,11 +62,11 @@
     </section>
 
 
-    <!-- COFFEE -->
+    <!COFFEE MENU>
     <section class="menu-section">
 
         <div class="menu-section-header">
-            <h2>COFFEE <span>♡</span></h2>
+            <h2>COFFEE</h2> <img src="images/orangeheart.png" alt="" class="heart-icon">
 
             <img src="images/line.png" alt="" class="menu-line">
         </div>
