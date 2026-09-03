@@ -2241,3 +2241,45 @@ body {
 .products-container .product-card-wrapper {
     flex-shrink: 0;
 }
+
+.login-success {
+    color: #267a3d;
+    background: #eaf7ed;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.login-success {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+
+    background: #eaf7ed;
+    color: #267a3d;
+
+    border-radius: 8px;
+
+    text-align: center;
+    font-size: 13px;
+}
+
+.login-error {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+
+    background: #fdeaea;
+    color: #a83232;
+
+    border-radius: 8px;
+
+    text-align: center;
+    font-size: 13px;
+}
+
+.logged-user {
+    margin-top: 20px !important;
+    font-size: 12px !important;
+}
