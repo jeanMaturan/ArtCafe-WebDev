@@ -1,0 +1,264 @@
+.about-page-hero {
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    align-items: center;
+    background: var(--pink);
+    overflow: hidden;
+}
+
+
+/* LEFT SIDE */
+.about-page-content {
+    width: 50%;
+    padding: 60px 50px 60px 80px;
+}
+
+.about-page-small {
+    color: var(--orange);
+    font-size: 14px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+}
+
+.about-page-content h1 {
+    color: var(--brown);
+    font-size: 75px;
+    line-height: 1;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+}
+
+.about-page-content h1 span {
+    color: var(--orange);
+}
+
+.about-page-description {
+    max-width: 400px;
+    color: var(--dark-text);
+    font-size: 15px;
+    line-height: 1.6;
+    letter-spacing: 0.5px;
+}
+
+
+/* RIGHT SIDE IMAGE */
+.about-page-image {
+    width: 50%;
+    height: 500px;
+    overflow: hidden;
+    border-radius: 40px 0 0 40px;
+}
+
+.about-page-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+/* =========================================
+   OUR STORY
+========================================= */
+
+.our-story {
+    width: 100%;
+    min-height: 450px;
+    display: flex;
+    align-items: center;
+    gap: 70px;
+    padding: 70px 8%;
+    background: var(--white);
+}
+
+.story-image {
+    width: 45%;
+    height: 350px;
+    overflow: hidden;
+    border-radius: 30px;
+}
+
+.story-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.story-content {
+    width: 55%;
+}
+
+.story-content h2 {
+    color: var(--brown);
+    font-size: 42px;
+    line-height: 1.2;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.story-content h2 span {
+    color: var(--orange);
+}
+
+.story-content p {
+    max-width: 500px;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.7;
+    letter-spacing: 0.5px;
+    margin-bottom: 15px;
+}
+
+
+/* =========================================
+   CAFE CONCEPT
+========================================= */
+
+.cafe-concept {
+    width: 100%;
+    padding: 70px 8%;
+    background: var(--beige);
+}
+
+.concept-content {
+    max-width: 600px;
+    margin-bottom: 40px;
+}
+
+.concept-content h2 {
+    color: var(--brown);
+    font-size: 42px;
+    line-height: 1.2;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.concept-content h2 span {
+    color: var(--orange);
+}
+
+.concept-content p {
+    max-width: 550px;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.concept-cards {
+    display: flex;
+    gap: 25px;
+}
+
+.concept-card {
+    flex: 1;
+    padding: 30px 25px;
+    background: var(--cream);
+    border-radius: 25px;
+    box-shadow: var(--shadow);
+}
+
+.concept-card h3 {
+    color: var(--orange);
+    font-size: 24px;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+}
+
+.concept-card p {
+    color: var(--dark-text);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   OUR VALUES
+========================================= */
+
+.our-values {
+    width: 100%;
+    padding: 70px 8%;
+    background: var(--pink);
+}
+
+.values-heading {
+    margin-bottom: 40px;
+}
+
+.values-heading h2 {
+    color: var(--brown);
+    font-size: 42px;
+    line-height: 1.2;
+    letter-spacing: 2px;
+}
+
+.values-heading h2 span {
+    color: var(--orange);
+}
+
+.values-container {
+    display: flex;
+    gap: 25px;
+}
+
+.value-card {
+    flex: 1;
+    padding: 30px;
+    background: var(--white);
+    border-radius: 25px;
+    box-shadow: var(--shadow);
+}
+
+.value-card h3 {
+    color: var(--brown);
+    font-size: 20px;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+}
+
+.value-card p {
+    color: var(--dark-text);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =========================================
+   ABOUT CTA
+========================================= */
+
+.about-cta {
+    width: 100%;
+    padding: 80px 30px;
+    text-align: center;
+    background: var(--white);
+}
+
+.about-cta h2 {
+    color: var(--brown);
+    font-size: 50px;
+    line-height: 1.1;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.about-cta h2 span {
+    color: var(--orange);
+}
+
+.about-cta p {
+    max-width: 500px;
+    margin: 0 auto 25px;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.about-cta .hero-btn {
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+}
