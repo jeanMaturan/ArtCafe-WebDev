@@ -120,13 +120,11 @@
                     <p>
                         📍 Maturan's Art Cafe
                     </p>
+                    <a href="artist_registration.php" class="reserve-btn">
+                        JOIN AS AN ARTIST
+                    </a>
 
                 </div>
-
-                <a href="index.php#contact"
-                   class="event-page-btn">
-                    JOIN NOW
-                </a>
 
             </div>
 

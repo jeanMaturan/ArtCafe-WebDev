@@ -2283,3 +2283,33 @@ body {
     margin-top: 20px !important;
     font-size: 12px !important;
 }
+
+/* =========================
+   LOGOUT BUTTON
+========================= */
+
+.logout-btn {
+    display: inline-block;
+    margin-top: 15px;
+    padding: 10px 24px;
+
+    background-color: var(--orange);
+    color: var(--white);
+
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: bold;
+
+    border: 2px solid var(--dark);
+    border-radius: 25px;
+
+    box-shadow: 3px 3px 0 var(--dark);
+
+    transition: all 0.2s ease;
+}
+
+.logout-btn:hover {
+    background-color: var(--orange-dark);
+    transform: translate(2px, 2px);
+    box-shadow: 1px 1px 0 var(--dark);
+}

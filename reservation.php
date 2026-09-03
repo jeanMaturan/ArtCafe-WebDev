@@ -222,6 +222,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         </p>
 
+        <a href="logout.php" class="reserve-btn">LOGOUT</a>
+
     </div>
 
 
