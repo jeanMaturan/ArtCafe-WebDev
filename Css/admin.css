@@ -1,0 +1,581 @@
+/* =========================
+   ADMIN DASHBOARD
+   ========================= */
+
+.admin-dashboard-page {
+    min-height: 100vh;
+
+    background: #f8f3ee;
+
+    color: var(--dark-text);
+}
+
+
+/* =========================
+   ADMIN HEADER
+   ========================= */
+
+.admin-header {
+    width: 100%;
+
+    min-height: 85px;
+
+    background: var(--brown);
+
+    padding: 15px 45px;
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: space-between;
+
+    color: var(--white);
+}
+
+.admin-header-left {
+    display: flex;
+
+    align-items: center;
+
+    gap: 15px;
+}
+
+.admin-header-logo {
+    width: 55px;
+
+    height: auto;
+}
+
+.admin-header-left h1 {
+    font-size: 18px;
+
+    letter-spacing: 2px;
+
+    margin-bottom: 3px;
+}
+
+.admin-header-left p {
+    font-size: 10px;
+
+    opacity: 0.8;
+
+    letter-spacing: 1px;
+}
+
+.admin-header-right {
+    display: flex;
+
+    align-items: center;
+
+    gap: 20px;
+
+    font-size: 11px;
+}
+
+.admin-logout-button {
+    display: inline-block;
+
+    padding: 10px 17px;
+
+    background: var(--orange);
+
+    color: var(--white);
+
+    text-decoration: none;
+
+    border-radius: 5px;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 1px;
+
+    transition: background 0.3s ease;
+}
+
+.admin-logout-button:hover {
+    background: var(--orange-dark);
+}
+
+
+/* =========================
+   ADMIN CONTENT
+   ========================= */
+
+.admin-content {
+    width: 100%;
+
+    max-width: 1150px;
+
+    margin: 0 auto;
+
+    padding: 55px 30px 80px;
+}
+
+
+/* PAGE TITLE */
+
+.admin-page-title {
+    margin-bottom: 30px;
+}
+
+.admin-page-title h2 {
+    color: var(--brown);
+
+    font-size: 28px;
+
+    letter-spacing: 1px;
+
+    margin-bottom: 8px;
+}
+
+.admin-page-title p {
+    color: #81736c;
+
+    font-size: 13px;
+}
+
+
+/* =========================
+   EVENT CARD
+   ========================= */
+
+.admin-event-card {
+    background: var(--white);
+
+    border-radius: 15px;
+
+    padding: 25px 30px;
+
+    display: flex;
+
+    justify-content: space-between;
+
+    align-items: center;
+
+    gap: 30px;
+
+    box-shadow: var(--shadow);
+
+    margin-bottom: 25px;
+}
+
+.admin-small-label {
+    display: block;
+
+    color: var(--orange);
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    letter-spacing: 1.5px;
+
+    margin-bottom: 7px;
+}
+
+.admin-event-card h3 {
+    color: var(--brown);
+
+    font-size: 21px;
+}
+
+.artist-slot-info {
+    display: flex;
+
+    gap: 35px;
+}
+
+.artist-slot-info div {
+    text-align: center;
+
+    min-width: 100px;
+}
+
+.artist-slot-info strong {
+    display: block;
+
+    color: var(--orange);
+
+    font-size: 22px;
+
+    margin-bottom: 4px;
+}
+
+.artist-slot-info span {
+    display: block;
+
+    color: #81736c;
+
+    font-size: 10px;
+
+    letter-spacing: 0.5px;
+}
+
+
+/* =========================
+   ADMIN MESSAGE
+   ========================= */
+
+.admin-message {
+    padding: 13px 16px;
+
+    border-radius: 7px;
+
+    font-size: 12px;
+
+    margin-bottom: 25px;
+}
+
+.admin-message.success {
+    background: #e5f4e8;
+
+    color: #2e6b3b;
+
+    border: 1px solid #b8ddbf;
+}
+
+.admin-message.error {
+    background: #ffe5df;
+
+    color: #b83219;
+
+    border: 1px solid #f4b5a7;
+}
+
+
+/* =========================
+   SECTION TITLE
+   ========================= */
+
+.admin-section-title {
+    margin-bottom: 18px;
+}
+
+.admin-section-title h3 {
+    color: var(--brown);
+
+    font-size: 17px;
+
+    letter-spacing: 1px;
+}
+
+
+/* =========================
+   ARTIST LIST
+   ========================= */
+
+.admin-artist-list {
+    display: flex;
+
+    flex-direction: column;
+
+    gap: 18px;
+}
+
+
+/* ARTIST CARD */
+
+.admin-artist-card {
+    background: var(--white);
+
+    border-radius: 12px;
+
+    padding: 25px 28px;
+
+    box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.05);
+
+    display: flex;
+
+    justify-content: space-between;
+
+    gap: 30px;
+}
+
+
+/* ARTIST INFO */
+
+.admin-artist-info {
+    flex: 1;
+}
+
+.admin-artist-top {
+    display: flex;
+
+    align-items: center;
+
+    gap: 12px;
+
+    margin-bottom: 15px;
+}
+
+.admin-artist-top h3 {
+    color: var(--brown);
+
+    font-size: 19px;
+}
+
+
+/* STATUS */
+
+.artist-status {
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 8px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.8px;
+}
+
+.artist-status.pending {
+    background: #fff1d6;
+
+    color: #9a6714;
+}
+
+.artist-status.approved {
+    background: #e5f4e8;
+
+    color: #2e6b3b;
+}
+
+.artist-status.rejected {
+    background: #ffe5df;
+
+    color: #b83219;
+}
+
+
+/* DETAILS */
+
+.artist-detail {
+    color: #665852;
+
+    font-size: 12px;
+
+    margin-bottom: 7px;
+}
+
+.artist-detail strong {
+    color: var(--dark-text);
+}
+
+
+/* BIO */
+
+.artist-bio {
+    margin-top: 15px;
+
+    color: #665852;
+
+    font-size: 12px;
+
+    line-height: 1.5;
+}
+
+.artist-bio strong {
+    color: var(--dark-text);
+}
+
+.artist-bio p {
+    margin-top: 5px;
+}
+
+
+/* =========================
+   ARTIST ACTIONS
+   ========================= */
+
+.admin-artist-actions {
+    display: flex;
+
+    align-items: center;
+
+    gap: 8px;
+
+    flex-shrink: 0;
+}
+
+.admin-artist-actions form {
+    margin: 0;
+}
+
+
+/* APPROVE */
+
+.approve-button {
+    border: none;
+
+    background: #4f9d5d;
+
+    color: var(--white);
+
+    padding: 11px 16px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.8px;
+
+    cursor: pointer;
+
+    transition: background 0.3s ease;
+}
+
+.approve-button:hover {
+    background: #3c8149;
+}
+
+
+/* REJECT */
+
+.reject-button {
+    border: none;
+
+    background: #d9533f;
+
+    color: var(--white);
+
+    padding: 11px 16px;
+
+    border-radius: 5px;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.8px;
+
+    cursor: pointer;
+
+    transition: background 0.3s ease;
+}
+
+.reject-button:hover {
+    background: #b83f2e;
+}
+
+
+/* LABELS */
+
+.approved-label {
+    color: #3c8149;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.5px;
+}
+
+.rejected-label {
+    color: #b83f2e;
+
+    font-size: 10px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.5px;
+}
+
+.full-label {
+    color: #9a6714;
+
+    font-size: 9px;
+
+    font-weight: bold;
+
+    letter-spacing: 0.8px;
+}
+
+
+/* =========================
+   EMPTY STATE
+   ========================= */
+
+.admin-empty {
+    background: var(--white);
+
+    border-radius: 12px;
+
+    padding: 50px 30px;
+
+    text-align: center;
+
+    box-shadow: var(--shadow);
+}
+
+.admin-empty h3 {
+    color: var(--brown);
+
+    font-size: 18px;
+
+    margin-bottom: 8px;
+}
+
+.admin-empty p {
+    color: #81736c;
+
+    font-size: 12px;
+}
+
+
+/* =========================
+   ADMIN MOBILE
+   ========================= */
+
+@media (max-width: 700px) {
+
+    .admin-header {
+        padding: 15px 20px;
+
+        flex-direction: column;
+
+        align-items: flex-start;
+
+        gap: 15px;
+    }
+
+    .admin-header-right {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+    .admin-content {
+        padding: 40px 20px 60px;
+    }
+
+    .admin-event-card {
+        flex-direction: column;
+
+        align-items: flex-start;
+    }
+
+    .artist-slot-info {
+        width: 100%;
+
+        justify-content: space-between;
+    }
+
+    .admin-artist-card {
+        flex-direction: column;
+    }
+
+    .admin-artist-actions {
+        width: 100%;
+
+        justify-content: flex-start;
+
+        flex-wrap: wrap;
+    }
+
+}

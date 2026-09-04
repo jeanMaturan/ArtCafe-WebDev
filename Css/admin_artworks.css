@@ -1,0 +1,256 @@
+/* =====================================
+   CLEAN ARTWORK MANAGEMENT
+===================================== */
+
+.admin-nav-button {
+    display: inline-block;
+    padding: 10px 15px;
+    color: var(--white);
+    border: 1px solid rgba(255,255,255,0.4);
+    border-radius: 5px;
+    text-decoration: none;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+}
+
+.admin-nav-button:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+
+/* =====================================
+   SECTIONS
+===================================== */
+
+.clean-admin-section {
+    background: var(--white);
+    border-radius: 10px;
+    padding: 22px 25px;
+    box-shadow: 3px 4px 0 rgba(0,0,0,0.04);
+    margin-bottom: 25px;
+}
+
+.clean-section-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee7e2;
+}
+
+.clean-section-heading h3 {
+    color: var(--brown);
+    font-size: 14px;
+    letter-spacing: 1px;
+    margin: 0;
+}
+
+.clean-section-heading span {
+    color: #998c85;
+    font-size: 10px;
+}
+
+
+/* =====================================
+   APPROVED ARTISTS
+===================================== */
+
+.approved-artist-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.approved-artist-row {
+    min-height: 58px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid #f0ebe7;
+}
+
+.approved-artist-row:last-child {
+    border-bottom: none;
+}
+
+.approved-artist-name {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.approved-artist-name strong {
+    color: var(--dark-text);
+    font-size: 13px;
+}
+
+.artist-circle {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--cream);
+    color: var(--orange);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: bold;
+}
+
+.add-artwork-button {
+    display: inline-block;
+    padding: 8px 12px;
+    background: var(--orange);
+    color: var(--white);
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 0.7px;
+    transition: background 0.2s ease;
+}
+
+.add-artwork-button:hover {
+    background: var(--orange-dark);
+}
+
+
+/* =====================================
+   EMPTY
+===================================== */
+
+.clean-empty {
+    padding: 25px 10px;
+    text-align: center;
+}
+
+.clean-empty p {
+    margin: 0;
+    color: #998c85;
+    font-size: 11px;
+}
+
+
+/* =====================================
+   ARTWORK GRID
+===================================== */
+
+.artwork-section {
+    margin-top: 5px;
+}
+
+.clean-artwork-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+}
+
+.clean-artwork-card {
+    border: 1px solid #eee7e2;
+    border-radius: 7px;
+    overflow: hidden;
+    background: var(--white);
+}
+
+.clean-artwork-image,
+.clean-no-image {
+    width: 100%;
+    height: 180px;
+    display: block;
+    object-fit: cover;
+}
+
+.clean-no-image {
+    background: #f1ebe6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #998c85;
+    font-size: 9px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.clean-artwork-info {
+    padding: 13px 14px;
+}
+
+.clean-artist-name {
+    display: block;
+    color: var(--orange);
+    font-size: 8px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.clean-artwork-info h4 {
+    color: var(--brown);
+    font-size: 14px;
+    margin: 0 0 12px;
+}
+
+.clean-artwork-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.clean-artwork-bottom strong {
+    color: var(--dark-text);
+    font-size: 12px;
+}
+
+.artwork-status {
+    padding: 4px 7px;
+    border-radius: 10px;
+    background: #e5f4e8;
+    color: #3c8149;
+    font-size: 7px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 800px) {
+
+    .clean-artwork-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .clean-admin-section {
+        padding: 18px;
+    }
+
+    .approved-artist-row {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 13px 0;
+    }
+
+    .add-artwork-button {
+        margin-left: 44px;
+    }
+
+    .clean-artwork-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-header-right {
+        flex-wrap: wrap;
+    }
+
+}
