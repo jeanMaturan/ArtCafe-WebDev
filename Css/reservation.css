@@ -47,23 +47,6 @@
     line-height: 1.7;
 }
 
-
-/* =====================================
-   LOGGED IN USER
-===================================== */
-
-.logged-user {
-    margin-top: 25px;
-    margin-bottom: 12px;
-    color: var(--dark-text);
-    font-size: 12px;
-}
-
-.logged-user strong {
-    color: var(--orange);
-}
-
-
 /* =====================================
    RESERVATION FORM
 ===================================== */
@@ -258,4 +241,14 @@
         border-radius: 20px;
     }
 
+}
+
+.logged-user {
+    margin: 0 0 25px;
+    color: var(--dark-text);
+    font-size: 12px;
+}
+
+.logged-user strong {
+    color: var(--orange);
 }

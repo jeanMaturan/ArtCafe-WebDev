@@ -171,13 +171,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     </nav>
 
+    <div class="user-status">
 
-    <a
-        href="reservation.php"
-        class="reserve-btn"
-    >
-        RESERVE A TABLE
+    <a href="logout.php" class="reserve-btn">
+        LOGOUT
     </a>
+
+</div>
 
 </header>
 
@@ -191,6 +191,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     <div class="reservation-content">
+
+        <p class="logged-user">
+            Logged in as:
+            <strong>
+                <?= htmlspecialchars($_SESSION["user_email"]) ?>
+            </strong>
+        </p>
 
         <p class="contact-small">
             PLAN YOUR VISIT
@@ -207,19 +214,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             Reserve your table ahead of time and
             we'll have a cozy spot ready for you.
         </p>
-
-
-        <p class="logged-user">
-
-            Logged in as:
-
-            <strong>
-                <?= htmlspecialchars($_SESSION["user_email"]) ?>
-            </strong>
-
-        </p>
-
-        <a href="logout.php" class="reserve-btn">LOGOUT</a>
 
     </div>
 
@@ -510,33 +504,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             </h3>
 
 
-            <a href="index.php">
-                Home
-            </a>
-
-
-            <a href="about.php">
-                About
-            </a>
-
-
-            <a href="menu.php">
-                Menu
-            </a>
-
-
-            <a href="events.php">
-                Events
-            </a>
-
-
-            <a href="contact.php">
-                Contact
-            </a>
+            <a href="index.php">Home</a>
+            <a href="about.php">About</a>
+            <a href="menu.php">Menu</a>
+            <a href="events.php">Events</a>
+            <a href="contact.php">Contact</a>
 
         </div>
-
-
 
         <!-- CONTACT -->
 

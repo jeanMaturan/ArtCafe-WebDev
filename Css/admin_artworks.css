@@ -1,25 +1,4 @@
 /* =====================================
-   CLEAN ARTWORK MANAGEMENT
-===================================== */
-
-.admin-nav-button {
-    display: inline-block;
-    padding: 10px 15px;
-    color: var(--white);
-    border: 1px solid rgba(255,255,255,0.4);
-    border-radius: 5px;
-    text-decoration: none;
-    font-size: 9px;
-    font-weight: bold;
-    letter-spacing: 0.8px;
-}
-
-.admin-nav-button:hover {
-    background: rgba(255,255,255,0.1);
-}
-
-
-/* =====================================
    SECTIONS
 ===================================== */
 
