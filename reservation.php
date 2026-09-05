@@ -262,36 +262,50 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     ========================== -->
 
     <form
-        class="reservation-form"
-        method="POST"
-    >
+    class="reservation-form"
+    method="POST"
+>
+
+    <?php if (!empty($message)): ?>
+
+        <p class="login-success">
+            <?= htmlspecialchars($message) ?>
+        </p>
+
+    <?php endif; ?>
 
 
-        <!-- NAME + PHONE -->
+    <?php if (!empty($error)): ?>
 
-        <div class="form-row">
+        <p class="login-error">
+            <?= htmlspecialchars($error) ?>
+        </p>
 
-
-            <div class="form-group">
-
-                <label for="reservation-name">
-                    NAME
-                </label>
+    <?php endif; ?>
 
 
-                <input
-                    type="text"
-                    id="reservation-name"
-                    name="reservation_name"
-                    placeholder="Your name"
-                    value="<?= htmlspecialchars($_SESSION["user_name"]) ?>"
-                    required
-                >
+    <!-- NAME + PHONE -->
 
-            </div>
+    <div class="form-row">
 
+        <div class="form-group">
 
+            <label for="reservation-name">
+                NAME
+            </label>
 
+            <input
+                type="text"
+                id="reservation-name"
+                name="reservation_name"
+                placeholder="Your name"
+                value="<?= htmlspecialchars($_SESSION["user_name"]) ?>"
+                required
+            >
+
+        </div>
+
+        
             <div class="form-group">
 
                 <label for="reservation-phone">
