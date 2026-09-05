@@ -287,9 +287,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <form
             class="contact-form"
-            action="#"
+            action="contact.php"
             method="POST"
         >
+
+            <?php if ($success !== ""): ?>
+
+                 <div class="contact-success">
+                      <?php echo htmlspecialchars($success); ?>
+                 </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($error !== ""): ?>
+
+                <div class="contact-error">
+                  <?php echo htmlspecialchars($error); ?>
+                </div>
+
+            <?php endif; ?>
+
+
 
             <!-- NAME + EMAIL -->
 

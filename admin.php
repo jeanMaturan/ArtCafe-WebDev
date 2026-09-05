@@ -314,7 +314,7 @@ if ($event_id !== null) {
         Admin Dashboard | Maturan's Art Cafe
     </title>
 
-    <link rel="stylesheet"href="Css/style.css">
+    <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/admin.css">
 
 </head>
@@ -329,49 +329,70 @@ if ($event_id !== null) {
 
     <header class="admin-header">
 
-        <div class="admin-header-left">
+    <div class="admin-header-left">
 
-            <img
-                src="images/logo.png"
-                alt="Maturan's Art Cafe Logo"
-                class="admin-header-logo"
-            >
+        <img
+            src="images/logo.png"
+            alt="Maturan's Art Cafe Logo"
+            class="admin-header-logo"
+        >
 
-            <div>
+        <div>
 
-                <h1>
-                    ADMIN PANEL
-                </h1>
+            <h1>
+                ADMIN PANEL
+            </h1>
 
-                <p>
-                    Maturan's Art Cafe
-                </p>
-
-            </div>
+            <p>
+                Maturan's Art Cafe
+            </p>
 
         </div>
 
+    </div>
 
-        <div class="admin-header-right">
 
-            <span>
-                Welcome, <?php
-                echo htmlspecialchars(
-                    $_SESSION["admin_username"]
-                );
-                ?>
-            </span>
+    <div class="admin-header-right">
 
-            <a
-                href="admin_logout.php"
-                class="admin-logout-button"
-            >
-                LOGOUT
-            </a>
+        <a
+            href="admin.php"
+            class="admin-nav-button"
+        >
+            ARTISTS
+        </a>
 
-        </div>
+        <a
+            href="admin_artworks.php"
+            class="admin-nav-button"
+        >
+            ARTWORKS
+        </a>
 
-    </header>
+        <a
+            href="admin_messages.php"
+            class="admin-nav-button"
+        >
+            MESSAGES
+        </a>
+
+        <span>
+            Welcome, <?php
+            echo htmlspecialchars(
+                $_SESSION["admin_username"]
+            );
+            ?>
+        </span>
+
+        <a
+            href="admin_logout.php"
+            class="admin-logout-button"
+        >
+            LOGOUT
+        </a>
+
+    </div>
+
+</header>
 
 
 
@@ -407,9 +428,7 @@ if ($event_id !== null) {
 
                 <div>
 
-                    <span class="admin-small-label">
-                        ACTIVE EVENT
-                    </span>
+                    <span class="admin-small-label"> ACTIVE EVENT </span>
 
                     <h3>
                         <?php
@@ -421,7 +440,6 @@ if ($event_id !== null) {
 
                 </div>
 
-
                 <div class="artist-slot-info">
 
                     <div>
@@ -431,12 +449,9 @@ if ($event_id !== null) {
                             / <?php echo $max_artists; ?>
                         </strong>
 
-                        <span>
-                            Approved Artists
-                        </span>
+                        <span> Approved Artists </span>
 
                     </div>
-
 
                     <div>
 
