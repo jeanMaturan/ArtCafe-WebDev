@@ -252,6 +252,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             CONTACT
         </a>
 
+        <?php if (isset($_SESSION["user_id"])): ?>
+             <a href="my_messages.php">MY MESSAGES</a>
+            <?php endif; ?>
+
+            <?php if (
+                isset($_SESSION["user_logged_in"]) &&
+                $_SESSION["user_logged_in"] === true
+                ): ?>
+
+                <a href="profile.php">MY PROFILE</a>
+            <?php endif; ?>
+
     </nav>
 
     <div class="user-status">

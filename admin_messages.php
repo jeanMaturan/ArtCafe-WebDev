@@ -376,6 +376,7 @@ if (!$result) {
                 ARTWORKS
             </a>
 
+            <a href="admin_reviews.php" class="admin-nav-button">REVIEWS</a>
 
             <a
                 href="admin_messages.php"

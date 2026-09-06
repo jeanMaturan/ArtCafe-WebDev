@@ -1,0 +1,132 @@
+/* ================================
+   PROFILE PAGE
+================================ */
+
+.profile-page {
+    width: 100%;
+    min-height: calc(100vh - 150px);
+    padding: 60px 30px 80px;
+    background: var(--cream);
+
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.profile-box {
+    width: 100%;
+    max-width: 600px;
+
+    background: var(--white);
+    padding: 40px;
+
+    border-radius: 12px;
+    box-shadow: var(--shadow);
+
+    text-align: center;
+}
+
+
+/* ================================
+   PROFILE PICTURE
+================================ */
+
+.profile-picture,
+.profile-letter {
+    width: 120px;
+    height: 120px;
+
+    margin: 0 auto 20px;
+
+    border-radius: 50%;
+}
+
+.profile-picture {
+    display: block;
+    object-fit: cover;
+}
+
+.profile-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: var(--orange);
+    color: var(--white);
+
+    font-size: 42px;
+    font-weight: bold;
+}
+
+
+/* ================================
+   PROFILE TEXT
+================================ */
+
+.profile-box h1 {
+    margin-bottom: 8px;
+
+    font-family: var(--heading-font);
+    color: var(--dark);
+}
+
+.profile-box p {
+    color: var(--dark-text);
+}
+
+
+/* ================================
+   UPLOAD FORM
+================================ */
+
+.profile-upload {
+    margin-top: 30px;
+}
+
+.profile-upload input {
+    margin-bottom: 20px;
+}
+
+.profile-upload button {
+    background: var(--orange);
+    color: var(--white);
+
+    border: none;
+    padding: 14px 24px;
+
+    border-radius: 7px;
+
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.profile-upload button:hover {
+    background: var(--orange-dark);
+}
+
+
+/* ================================
+   MESSAGES
+================================ */
+
+.profile-success {
+    background: #e8f5e9;
+    color: #256029;
+
+    padding: 14px;
+
+    border-radius: 7px;
+
+    margin-top: 20px;
+}
+
+.profile-error {
+    background: #ffebee;
+    color: #b71c1c;
+
+    padding: 14px;
+
+    border-radius: 7px;
+
+    margin-top: 20px;
+}

@@ -165,8 +165,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <?php if (isset($_SESSION["user_id"])): ?>
              <a href="my_messages.php">MY MESSAGES</a>
             <?php endif; ?>
-        </nav>
 
+             <?php if (
+        isset($_SESSION["user_logged_in"]) &&
+        $_SESSION["user_logged_in"] === true
+    ): ?>
+
+        <a href="profile.php">MY PROFILE</a>
+
+    <?php endif; ?>
+
+        </nav>
 
         <a
             href="login.php"
