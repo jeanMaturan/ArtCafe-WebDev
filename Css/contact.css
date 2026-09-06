@@ -247,3 +247,14 @@
     font-size: 12px;
     font-weight: bold;
 }
+
+.logged-user-name {
+    width: 100%;
+    padding: 14px 16px;
+    background: #f8f3ee;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    color: var(--dark-text);
+    font-size: 14px;
+    box-sizing: border-box;
+}

@@ -268,37 +268,6 @@ session_start();
 
             </div>
 
-
-            <div class="footer-subscribe">
-
-                <h3>STAY CONNECTED</h3>
-
-                <p>
-                    Subscribe for updates, events,
-                    and special offers.
-                </p>
-
-                <form class="subscribe-form" action="#" method="POST">
-
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Your email"
-                        required
-                    >
-
-                    <button type="submit">→</button>
-
-                </form>
-
-                <img
-                    src="images/heart.png"
-                    alt=""
-                    class="heart-small"
-                >
-
-            </div>
-
         </div>
 
     </footer>

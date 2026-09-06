@@ -12,7 +12,72 @@ if (
     exit();
 }
 
-/* GET ALL SUBSCRIBERS */
+/* ================================
+   DELETE SELECTED SUBSCRIBERS
+================================ */
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $subscriber_ids = $_POST["subscriber_ids"] ?? [];
+
+    if (!empty($subscriber_ids)) {
+
+        $subscriber_ids = array_map("intval", $subscriber_ids);
+
+        $subscriber_ids = array_filter(
+            $subscriber_ids,
+            function ($id) {
+                return $id > 0;
+            }
+        );
+
+        if (!empty($subscriber_ids)) {
+
+            $placeholders = implode(
+                ",",
+                array_fill(0, count($subscriber_ids), "?")
+            );
+
+            $types = str_repeat("i", count($subscriber_ids));
+
+            $stmt = $conn->prepare(
+                "DELETE FROM newsletter_subscribers
+                 WHERE subscriber_id IN ($placeholders)"
+            );
+
+            $stmt->bind_param(
+                $types,
+                ...$subscriber_ids
+            );
+
+            $stmt->execute();
+            $stmt->close();
+        }
+
+
+        /* CHECK IF TABLE IS EMPTY */
+
+        $check = $conn->query(
+            "SELECT COUNT(*) AS total
+             FROM newsletter_subscribers"
+        );
+
+        $row = $check->fetch_assoc();
+
+        if ((int)$row["total"] === 0) {
+
+            $conn->query(
+                "TRUNCATE TABLE newsletter_subscribers"
+            );
+        }
+    }
+}
+
+
+/* ================================
+   GET ALL SUBSCRIBERS
+================================ */
+
 $result = $conn->query(
     "SELECT subscriber_id, email, subscribed_at
      FROM newsletter_subscribers
@@ -100,58 +165,90 @@ $result = $conn->query(
 
     </div>
 
-
     <div class="admin-card">
 
-        <?php if ($result && $result->num_rows > 0): ?>
+    <form
+        method="POST"
+        onsubmit="return confirm('Are you sure you want to delete the selected subscribers?');"
+    >
+       
+        <table class="admin-table">
 
-            <table class="admin-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>EMAIL</th>
+                    <th>SUBSCRIBED AT</th>
+                     <th>
+        <button
+            type="submit"
+            class="delete-selected-btn"
+        >
+            DELETE SELECTED
+        </button>
+        </th>
+                </tr>
+            </thead>
 
-                <thead>
+            <tbody>
+
+                <?php while ($row = $result->fetch_assoc()): ?>
+
                     <tr>
-                        <th>#</th>
-                        <th>EMAIL</th>
-                        <th>SUBSCRIBED AT</th>
+
+                        <td>
+                            <?php echo $row["subscriber_id"]; ?>
+                        </td>
+
+                        <td>
+                            <?php echo htmlspecialchars($row["email"]); ?>
+                        </td>
+
+                        <td>
+                            <?php echo $row["subscribed_at"]; ?>
+                        </td>
+
+                        <td>
+                            <input
+                                type="checkbox"
+                                name="subscriber_ids[]"
+                                value="<?php echo $row["subscriber_id"]; ?>"
+                                class="subscriber-checkbox"
+                            >
+                        </td>
+
                     </tr>
-                </thead>
 
-                <tbody>
+                <?php endwhile; ?>
 
-                    <?php while ($row = $result->fetch_assoc()): ?>
+            </tbody>
 
-                        <tr>
+        </table>
 
-                            <td>
-                                <?php echo htmlspecialchars($row["subscriber_id"]); ?>
-                            </td>
+    </form>
 
-                            <td>
-                                <?php echo htmlspecialchars($row["email"]); ?>
-                            </td>
-
-                            <td>
-                                <?php echo htmlspecialchars($row["subscribed_at"]); ?>
-                            </td>
-
-                        </tr>
-
-                    <?php endwhile; ?>
-
-                </tbody>
-
-            </table>
-
-        <?php else: ?>
-
-            <div class="no-messages">
-                No subscribers yet.
-            </div>
-
-        <?php endif; ?>
-
-    </div>
+</div>
+    
 
 </main>
+<script>
 
+const selectAll = document.getElementById("selectAll");
+
+const subscriberCheckboxes =
+    document.querySelectorAll(".subscriber-checkbox");
+
+
+selectAll.addEventListener("change", function () {
+
+    subscriberCheckboxes.forEach(function (checkbox) {
+
+        checkbox.checked = selectAll.checked;
+
+    });
+
+});
+
+</script>
 </body>
 </html>

@@ -3,42 +3,36 @@
 session_start();
 require_once "db.php";
 
-
 /* USER MUST BE LOGGED IN */
 if (
     !isset($_SESSION["user_logged_in"]) ||
     $_SESSION["user_logged_in"] !== true
 ) {
-    header("Location: login.php");
+    header("Location: login.php?from=contact");
     exit();
 }
-
 
 $success = "";
 $error = "";
 
-
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
+    /* GET USER INFORMATION FROM SESSION */
     $user_id = $_SESSION["user_id"];
+    $name = $_SESSION["user_name"];
+    $email = $_SESSION["user_email"];
 
-    $name = trim($_POST["name"] ?? "");
-    $email = trim($_POST["email"] ?? "");
+    /* GET ONLY FORM INPUTS */
     $subject = trim($_POST["subject"] ?? "");
     $message = trim($_POST["message"] ?? "");
 
+
     if (
-        $name === "" ||
-        $email === "" ||
         $subject === "" ||
         $message === ""
     ) {
 
         $error = "Please complete all fields.";
-
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-
-        $error = "Please enter a valid email address.";
 
     } else {
 
@@ -279,151 +273,113 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <section class="contact-form-section">
 
-        <div class="contact-form-content">
+    <div class="contact-form-content">
 
-            <p class="section-label">
-                WE'D LOVE TO HEAR FROM YOU
-            </p>
+        <p class="section-label">
+            WE'D LOVE TO HEAR FROM YOU
+        </p>
+
+        <h2>
+            SEND US A <span>MESSAGE.</span>
+        </h2>
+
+        <p>
+            Have a question, suggestion, or want to
+            know more about our events? Send us a message.
+        </p>
+
+    </div>
 
 
-            <h2>
-                SEND US A <span>MESSAGE.</span>
-            </h2>
+    <form
+        class="contact-form"
+        action="contact.php"
+        method="POST"
+    >
+
+        <?php if ($success !== ""): ?>
+
+            <div class="contact-success">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+
+        <?php endif; ?>
 
 
-            <p>
-                Have a question, suggestion, or want to
-                know more about our events? Send us a message.
-            </p>
+        <?php if ($error !== ""): ?>
+
+            <div class="contact-error">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+
+        <?php endif; ?>
+
+
+        <!-- LOGGED-IN USER -->
+
+        <div class="form-group">
+
+            <label>
+                NAME
+            </label>
+
+            <div class="logged-user-name">
+                <?php echo htmlspecialchars($_SESSION["user_name"]); ?>
+            </div>
 
         </div>
 
 
+        <!-- SUBJECT -->
 
-        <form
-            class="contact-form"
-            action="contact.php"
-            method="POST"
-        >
+        <div class="form-group">
 
-            <?php if ($success !== ""): ?>
+            <label for="subject">
+                SUBJECT
+            </label>
 
-                 <div class="contact-success">
-                      <?php echo htmlspecialchars($success); ?>
-                 </div>
-
-            <?php endif; ?>
-
-
-            <?php if ($error !== ""): ?>
-
-                <div class="contact-error">
-                  <?php echo htmlspecialchars($error); ?>
-                </div>
-
-            <?php endif; ?>
-
-
-
-            <!-- NAME + EMAIL -->
-
-            <div class="form-row">
-
-
-                <div class="form-group">
-
-                    <label for="name">
-                        NAME
-                    </label>
-
-
-                    <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        placeholder="Your name"
-                        required
-                    >
-
-                </div>
-
-
-
-                <div class="form-group">
-
-                    <label for="email">
-                        EMAIL
-                    </label>
-
-
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        placeholder="Your email"
-                        required
-                    >
-
-                </div>
-
-            </div>
-
-
-
-            <!-- SUBJECT -->
-
-            <div class="form-group">
-
-                <label for="subject">
-                    SUBJECT
-                </label>
-
-
-                <input
-                    type="text"
-                    id="subject"
-                    name="subject"
-                    placeholder="What is this about?"
-                    required
-                >
-
-            </div>
-
-
-
-            <!-- MESSAGE -->
-
-            <div class="form-group">
-
-                <label for="message">
-                    MESSAGE
-                </label>
-
-
-                <textarea
-                    id="message"
-                    name="message"
-                    rows="6"
-                    placeholder="Write your message..."
-                    required
-                ></textarea>
-
-            </div>
-
-
-
-            <!-- SEND BUTTON -->
-
-            <button
-                type="submit"
-                class="contact-submit"
+            <input
+                type="text"
+                id="subject"
+                name="subject"
+                placeholder="Subject"
+                required
             >
-                SEND MESSAGE
-            </button>
 
-        </form>
+        </div>
 
-    </section>
+
+        <!-- MESSAGE -->
+
+        <div class="form-group">
+
+            <label for="message">
+                MESSAGE
+            </label>
+
+            <textarea
+                id="message"
+                name="message"
+                rows="6"
+                placeholder="Write your message..."
+                required
+            ></textarea>
+
+        </div>
+
+
+        <!-- SEND BUTTON -->
+
+        <button
+            type="submit"
+            class="contact-submit"
+        >
+            SEND MESSAGE
+        </button>
+
+    </form>
+
+</section>
 
 
 
@@ -517,52 +473,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <p>
                     ✉ &nbsp; maturansartcafe@gmail.com
                 </p>
-
-            </div>
-
-
-
-            <!-- SUBSCRIBE -->
-
-            <div class="footer-subscribe">
-
-                <h3>
-                    STAY CONNECTED
-                </h3>
-
-
-                <p>
-                    Subscribe to get updates on
-                    new events and promos!
-                </p>
-
-
-                <form
-                    class="subscribe-form"
-                    action="#"
-                    method="POST"
-                >
-
-                    <input
-                        type="email"
-                        name="email"
-                        placeholder="Your email"
-                        required
-                    >
-
-
-                    <button type="submit">
-                        →
-                    </button>
-
-                </form>
-
-
-                <img
-                    src="images/whiteheart.png"
-                    alt=""
-                    class="heart-small"
-                >
 
             </div>
 

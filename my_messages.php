@@ -150,23 +150,59 @@ $result = $stmt->get_result();
     </main>
 
 
-    <!-- FOOTER -->
-    <footer class="footer">
+    <footer id="contact" class="footer">
+
         <div class="footer-content">
 
-            <div class="footer-logo">
-                <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
+            <div class="footer-brand">
+
+                <img src="images/logo.png"
+                     alt="Maturan's Art Cafe"
+                     class="footer-logo">
+
+                <p class="footer-tagline">
+                    Sip. Create. Relax.
+                </p>
+
+                <p class="footer-description">
+                    A cozy art cafe inspiring creativity,
+                    connection, and community.
+                </p>
+
+                <div class="social-icons">
+                    <a href="#">●</a>
+                    <a href="#">◎</a>
+                    <a href="#">✉</a>
+                </div>
+
             </div>
 
+
             <div class="footer-links">
-                <a href="index.php">HOME</a>
-                <a href="about.php">ABOUT</a>
-                <a href="menu.php">MENU</a>
-                <a href="events.php">EVENTS</a>
-                <a href="contact.php">CONTACT</a>
+
+                <h3>QUICK LINKS</h3>
+
+                <a href="index.php">Home</a>
+                <a href="about.php">About</a>
+                <a href="menu.php">Menu</a>
+                <a href="events.php">Events</a>
+                <a href="contact.php">Contact</a>
+
+            </div>
+
+
+            <div class="footer-contact">
+
+                <h3>CONTACTS</h3>
+
+                <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
+                <p>☎ &nbsp; 0958 586 8934</p>
+                <p>✉ &nbsp; maturansartcafe@gmail.com</p>
+
             </div>
 
         </div>
+
     </footer>
 
 </body>

@@ -103,6 +103,26 @@
             box-shadow: var(--shadow);
         }
 
+        /* FIX FOOTER LAYOUT */
+.my-messages-page + .footer {
+    width: 100%;
+}
+
+.my-messages-page + .footer .footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 60px;
+}
+
+.my-messages-page + .footer .footer-brand {
+    flex: 1;
+}
+
+.my-messages-page + .footer .footer-links {
+    flex: 1;
+}
+
         @media (max-width: 768px) {
 
             .my-messages-page {
