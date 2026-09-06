@@ -268,3 +268,83 @@
 .header .navbar a:hover {
     color: var(--orange) !important;
 }
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    /* Hero */
+    .contact-page-hero {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .contact-hero-content {
+        width: 100%;
+        padding: 45px 25px 30px;
+    }
+
+    .contact-hero-content h1 {
+        font-size: 44px;
+    }
+
+    .contact-hero-content > p:last-child {
+        max-width: 100%;
+    }
+
+    .contact-hero-image {
+        width: 100%;
+        height: 260px;
+        border-radius: 0;
+    }
+
+    /* Contact Info */
+    .contact-info-section {
+        padding: 35px 6%;
+    }
+
+    .contact-info-heading {
+        margin-bottom: 25px;
+    }
+
+    .contact-info-heading h2 {
+        font-size: 28px;
+    }
+
+    .contact-info-container {
+        flex-direction: column;
+        gap: 18px;
+    }
+
+    /* Contact Form */
+    .contact-form-section {
+        flex-direction: column;
+        gap: 25px;
+        padding: 25px 6% 50px;
+    }
+
+    .contact-form-content {
+        width: 100%;
+    }
+
+    .contact-form-content h2 {
+        font-size: 28px;
+    }
+
+    .contact-form-content > p:last-child {
+        max-width: 100%;
+    }
+
+    .contact-form {
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .form-row {
+        flex-direction: column;
+        gap: 0;
+    }
+}

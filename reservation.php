@@ -222,10 +222,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <div class="logo">
 
-        <img
-            src="images/logo.png"
-            alt="Maturan's Art Cafe"
-        >
+        <a href="index.php">
+            <img
+                src="images/logo.png"
+                alt="Maturan's Art Cafe"
+            >
+        </a>
 
     </div>
 

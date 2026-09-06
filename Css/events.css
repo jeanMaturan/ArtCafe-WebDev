@@ -325,3 +325,111 @@
 .navbar a:hover {
     color: var(--orange);
 }
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    /* Hero */
+    .events-page-hero {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .events-hero-content {
+        width: 100%;
+        padding: 45px 25px 30px;
+    }
+
+    .events-hero-content h1 {
+        font-size: 44px;
+    }
+
+    .events-description {
+        max-width: 100%;
+    }
+
+    .events-hero-image {
+        width: 100%;
+        height: 260px;
+        border-radius: 0;
+    }
+
+    /* Upcoming Events */
+    .events-section {
+        padding: 45px 6% 50px;
+    }
+
+    .events-heading {
+        margin-bottom: 25px;
+    }
+
+    .events-heading h2 {
+        font-size: 28px;
+    }
+
+    .event-page-card {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .event-page-image {
+        width: 100%;
+        min-height: 220px;
+    }
+
+    .event-page-info {
+        width: 100%;
+        padding: 30px 25px;
+    }
+
+    .event-page-info h3 {
+        font-size: 34px;
+    }
+
+    .event-page-description {
+        max-width: 100%;
+    }
+
+    /* Special Offer */
+    .events-special {
+        flex-direction: column;
+        min-height: 0;
+        padding: 40px 0;
+    }
+
+    .special-page-content {
+        width: 100%;
+        padding: 0 8%;
+    }
+
+    .special-page-content h2 {
+        font-size: 44px;
+    }
+
+    .special-page-content > p {
+        max-width: 100%;
+    }
+
+    .special-page-image {
+        width: 100%;
+        height: 220px;
+        margin-top: 20px;
+    }
+
+    /* CTA */
+    .events-cta {
+        padding: 50px 25px;
+    }
+
+    .events-cta h2 {
+        font-size: 32px;
+    }
+
+    .events-cta p {
+        max-width: 100%;
+    }
+}

@@ -146,8 +146,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <header class="header">
 
         <div class="logo">
-
-            <img src="images/logo.png" alt="Maturan's Art Cafe"></div>
+            <a href="index.php">
+                <img src="images/logo.png" alt="Maturan's Art Cafe">
+            </a>
+        </div>
 
             <button class="menu-toggle" id="menuToggle">
             ☰

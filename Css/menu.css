@@ -283,3 +283,81 @@
     height: auto;
     display: block;
 }
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    /* Hero */
+    .menu-page-hero {
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .menu-hero-content {
+        width: 100%;
+        padding: 45px 25px 30px;
+    }
+
+    .menu-hero-content h1 {
+        font-size: 44px;
+    }
+
+    .menu-description {
+        max-width: 100%;
+    }
+
+    .menu-hero-image {
+        width: 100%;
+        height: 260px;
+        border-radius: 0;
+    }
+
+    /* Sections */
+    .menu-section {
+        padding: 45px 6% 50px;
+    }
+
+    .menu-section-header {
+        margin-bottom: 25px;
+    }
+
+    .menu-section-header h2 {
+        font-size: 26px;
+        white-space: normal;
+    }
+
+    .menu-products {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .menu-product-image {
+        height: 230px;
+    }
+
+    .menu-text-card {
+        min-height: 0;
+        padding: 35px 25px;
+    }
+
+    .menu-text-card h3 {
+        font-size: 30px;
+    }
+
+    /* CTA */
+    .menu-cta {
+        padding: 50px 25px;
+    }
+
+    .menu-cta h2 {
+        font-size: 32px;
+    }
+
+    .menu-cta p {
+        max-width: 100%;
+    }
+}

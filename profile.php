@@ -354,6 +354,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </section>
 
+    <script src="JS/script.js"></script>
+
 </body>
 
 </html>

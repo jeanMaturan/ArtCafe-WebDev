@@ -588,6 +588,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     </footer>
 
+    <script src="JS/script.js"></script>
 
 </body>
 
