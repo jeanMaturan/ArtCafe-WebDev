@@ -84,6 +84,9 @@ if (!$result) {
         <img src="images/logo.png" alt="Maturan's Art Cafe">
     </div>
 
+    <button class="menu-toggle" id="menuToggle">
+            ☰
+        </button>
 
     <nav class="navbar">
 

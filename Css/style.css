@@ -1079,3 +1079,135 @@ h5,
 h6 {
     font-family: var(--heading-font);
 }
+
+/* =========================================
+   MOBILE MENU
+========================================= */
+
+.menu-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 30px;
+    color: var(--dark);
+    cursor: pointer;
+}
+
+
+/* =========================================
+   MOBILE RESPONSIVE
+========================================= */
+
+@media (max-width: 768px) {
+
+    .header {
+        height: 90px;
+        padding: 10px 20px;
+        position: relative;
+    }
+
+    .logo {
+        width: 190px;
+    }
+
+    /* Hamburger button */
+    .menu-toggle {
+        display: block;
+        margin-left: auto;
+        z-index: 1001;
+    }
+
+    /* Hidden navigation */
+    .navbar {
+        display: none;
+
+        position: absolute;
+        top: 90px;
+        left: 0;
+
+        width: 100%;
+
+        margin: 0;
+        padding: 20px;
+
+        background: var(--white);
+
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+
+        z-index: 1000;
+    }
+
+    /* Show navigation when hamburger is clicked */
+    .navbar.show {
+        display: flex;
+    }
+
+    .navbar a {
+        font-size: 15px;
+    }
+
+    /* Hide reserve button on mobile */
+    .header > .reserve-btn {
+        display: none;
+    }
+}
+
+@media (max-width: 768px) {
+
+    .hero {
+        min-height: 650px;
+        position: relative;
+        overflow: hidden;
+        display: block;
+    }
+
+    .hero-content {
+        width: 100%;
+        padding: 45px 40px 60px;
+        position: relative;
+        z-index: 3;
+    }
+
+    .hero-content h1 {
+        font-size: 52px;
+        line-height: 1.15;
+        margin-bottom: 20px;
+    }
+
+    .hero-content p {
+        max-width: 190px;
+        font-size: 13px;
+        line-height: 1.7;
+        margin-bottom: 25px;
+    }
+
+    .hero-image {
+        position: absolute;
+        top: 120px;
+        right: -80px;
+        width: 125%;
+        height: 530px;
+        z-index: 1;
+    }
+
+    .hero-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        object-position: center;
+    }
+
+    .first-pattern {
+        width: 500px;
+        height: 500px;
+        left: -80px;
+        top: 20px;
+        opacity: 0.7;
+        z-index: 2;
+    }
+
+}

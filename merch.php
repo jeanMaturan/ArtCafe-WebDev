@@ -26,6 +26,10 @@ session_start();
             </a>
         </div>
 
+        <button class="menu-toggle" id="menuToggle">
+            ☰
+        </button>
+
         <nav class="navbar">
             <a href="index.php">HOME</a>
             <a href="about.php">ABOUT</a>
