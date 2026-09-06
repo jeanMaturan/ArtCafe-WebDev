@@ -194,6 +194,109 @@
     text-transform: uppercase;
 }
 
+/* =====================================
+   ARTWORK APPROVAL ACTIONS
+===================================== */
+
+.artwork-admin-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+}
+
+.artwork-admin-actions form {
+    margin: 0;
+    flex: 1;
+}
+
+.artwork-approve-button,
+.artwork-reject-button {
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+
+    font-family: var(--font);
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.artwork-approve-button {
+    background: #5b8c5a;
+    color: var(--white);
+}
+
+.artwork-approve-button:hover {
+    background: #477347;
+}
+
+.artwork-reject-button {
+    background: var(--orange);
+    color: var(--white);
+}
+
+.artwork-reject-button:hover {
+    background: var(--orange-dark);
+}
+
+
+/* =====================================
+   ARTWORK DESCRIPTION
+===================================== */
+
+.artwork-description {
+    margin: 12px 0;
+
+    color: var(--dark-text);
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+
+/* =====================================
+   ARTWORK STATUS
+===================================== */
+
+.pending-status {
+    background: #fff0c2;
+    color: #8a6500;
+}
+
+.approved-status {
+    background: #e2f2e2;
+    color: #477347;
+}
+
+.rejected-status {
+    background: #fde1dc;
+    color: #a8321b;
+}
+
+
+/* =====================================
+   PENDING CARD
+===================================== */
+
+.pending-artwork-card {
+    border: 2px solid #f1d8ce;
+}
+
+
+/* =====================================
+   RESPONSIVE
+===================================== */
+
+@media (max-width: 600px) {
+
+    .artwork-admin-actions {
+        flex-direction: column;
+    }
+
+}
 
 /* =====================================
    RESPONSIVE

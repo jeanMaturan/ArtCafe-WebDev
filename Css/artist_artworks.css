@@ -1,0 +1,154 @@
+.artist-artworks-page {
+    min-height: 80vh;
+    padding: 70px 8%;
+    background: #f8f3ee;
+}
+
+.artist-artworks-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.artist-artworks-header h1 {
+    color: var(--brown);
+    font-size: 45px;
+    letter-spacing: 2px;
+    margin: 10px 0 15px;
+}
+
+.artist-artworks-header h1 span {
+    color: var(--orange);
+}
+
+.artist-artworks-header p:not(.section-label) {
+    max-width: 650px;
+    margin: 0 auto;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.artist-artwork-form-card {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 35px;
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+}
+
+.form-group {
+    margin-bottom: 22px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--brown);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 14px 16px;
+    box-sizing: border-box;
+
+    border: 1px solid #ddd;
+    border-radius: 6px;
+
+    background: #f8f3ee;
+    color: var(--dark-text);
+
+    font-family: var(--font);
+    font-size: 14px;
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    outline: none;
+    border-color: var(--orange);
+}
+
+.form-group input[type="file"] {
+    background: var(--white);
+    padding: 12px;
+}
+
+.form-group small {
+    display: block;
+    margin-top: 7px;
+    color: #888;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.artist-submit-button {
+    width: 100%;
+    padding: 14px;
+
+    border: none;
+    border-radius: 6px;
+
+    background: var(--orange);
+    color: var(--white);
+
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.artist-submit-button:hover {
+    background: var(--orange-dark);
+}
+
+.artist-success {
+    margin-bottom: 25px;
+    padding: 15px;
+
+    background: #e7f5e8;
+    border-left: 4px solid #4caf50;
+    border-radius: 6px;
+
+    color: #2e6b32;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.artist-error {
+    margin-bottom: 25px;
+    padding: 15px;
+
+    background: #fde9e5;
+    border-left: 4px solid var(--orange);
+    border-radius: 6px;
+
+    color: #a8321b;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+
+    .artist-artworks-page {
+        padding: 50px 5%;
+    }
+
+    .artist-artworks-header h1 {
+        font-size: 35px;
+    }
+
+    .artist-artwork-form-card {
+        padding: 25px;
+    }
+}

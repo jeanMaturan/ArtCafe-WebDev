@@ -1,0 +1,213 @@
+/* =========================================
+   ARTIST REGISTRATION PAGE
+========================================= */
+
+.artist-registration-page {
+    width: 100%;
+    min-height: 75vh;
+    padding: 70px 30px;
+    background: var(--pink);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.artist-registration-box {
+    width: 100%;
+    max-width: 650px;
+    background: var(--white);
+    padding: 45px 50px;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    box-sizing: border-box;
+}
+
+.artist-registration-box h1 {
+    color: var(--brown);
+    font-size: 38px;
+    letter-spacing: 2px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.artist-description {
+    max-width: 500px;
+    margin: 0 auto 25px;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.6;
+    text-align: center;
+}
+
+
+/* =========================================
+   ARTIST CAPACITY
+========================================= */
+
+.artist-capacity {
+    width: fit-content;
+    margin: 0 auto 25px;
+    padding: 10px 18px;
+    background: var(--beige);
+    border-radius: 20px;
+    color: var(--brown);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+.artist-capacity strong {
+    color: var(--orange);
+}
+
+
+/* =========================================
+   SUCCESS / ERROR MESSAGES
+========================================= */
+
+.success-message,
+.error-message {
+    padding: 13px 16px;
+    margin-bottom: 20px;
+    border-radius: 7px;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.success-message {
+    background: #e5f4e8;
+    color: #2e6b3b;
+    border: 1px solid #b8ddbf;
+}
+
+.error-message {
+    background: #ffe5df;
+    color: #b83219;
+    border: 1px solid #f4b5a7;
+}
+
+
+/* =========================================
+   FORM
+========================================= */
+
+.artist-registration-box form {
+    width: 100%;
+}
+
+.artist-registration-box .login-group {
+    margin-bottom: 20px;
+}
+
+.artist-registration-box .login-label {
+    display: block;
+    color: var(--brown);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.artist-registration-box input,
+.artist-registration-box textarea {
+    width: 100%;
+    padding: 14px 15px;
+    border: 1px solid #ddd;
+    border-radius: 7px;
+    background: var(--white);
+    color: var(--dark-text);
+    font-family: var(--font);
+    font-size: 13px;
+    box-sizing: border-box;
+    outline: none;
+}
+
+.artist-registration-box input:focus,
+.artist-registration-box textarea:focus {
+    border-color: var(--orange);
+}
+
+.artist-registration-box input::placeholder,
+.artist-registration-box textarea::placeholder {
+    color: #aaa;
+}
+
+.artist-registration-box input:disabled {
+    background: #f5f1ed;
+    color: #777;
+    cursor: not-allowed;
+}
+
+.artist-registration-box textarea {
+    resize: vertical;
+    min-height: 120px;
+}
+
+
+/* =========================================
+   SUBMIT BUTTON
+========================================= */
+
+.artist-registration-box .login-button {
+    width: 100%;
+    padding: 15px 20px;
+    margin-top: 5px;
+    border: none;
+    border-radius: 7px;
+    background: var(--orange);
+    color: var(--white);
+    font-family: var(--font);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.artist-registration-box .login-button:hover {
+    background: var(--orange-dark);
+}
+
+
+/* =========================================
+   FOOTER
+========================================= */
+
+.artist-registration-page + .footer {
+    text-align: center;
+    padding: 30px;
+}
+
+.artist-registration-box input[type="file"] {
+    padding: 12px;
+    background: #f8f3ee;
+    cursor: pointer;
+}
+
+.file-note {
+    margin-top: 7px;
+    color: #888;
+    font-size: 11px;
+    line-height: 1.4;
+}
+
+
+/* =========================================
+   MOBILE
+========================================= */
+
+@media (max-width: 700px) {
+
+    .artist-registration-page {
+        padding: 45px 20px;
+    }
+
+    .artist-registration-box {
+        padding: 35px 25px;
+    }
+
+    .artist-registration-box h1 {
+        font-size: 30px;
+    }
+
+}

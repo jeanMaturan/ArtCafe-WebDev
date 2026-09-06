@@ -259,12 +259,11 @@ session_start();
 
             <div class="footer-contact">
 
-                <h3>CONTACT US</h3>
+                <h3>CONTACTS</h3>
 
-                <p>Dumaguete City</p>
-                <p>Philippines</p>
-                <p>0912 345 6789</p>
-                <p>hello@maturansartcafe.com</p>
+                <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
+                <p>☎ &nbsp; 0958 586 8934</p>
+                <p>✉ &nbsp; maturansartcafe@gmail.com</p>
 
             </div>
 

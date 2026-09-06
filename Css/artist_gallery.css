@@ -1,0 +1,209 @@
+.artist-gallery-hero {
+    min-height: 420px;
+    display: flex;
+    align-items: center;
+    padding: 70px 8%;
+    background: var(--cream);
+}
+
+.artist-gallery-hero-content {
+    max-width: 650px;
+}
+
+.artist-gallery-hero-content h1 {
+    color: var(--brown);
+    font-size: 58px;
+    line-height: 1;
+    letter-spacing: 2px;
+    margin: 15px 0 20px;
+}
+
+.artist-gallery-hero-content h1 span {
+    color: var(--orange);
+}
+
+.artist-gallery-hero-content p:last-child {
+    max-width: 520px;
+    color: var(--dark-text);
+    font-size: 15px;
+    line-height: 1.7;
+}
+
+
+.artist-gallery-section {
+    padding: 70px 8%;
+    background: #f8f3ee;
+}
+
+.artist-gallery-heading {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.artist-gallery-heading h2 {
+    color: var(--brown);
+    font-size: 38px;
+    letter-spacing: 2px;
+    margin: 10px 0;
+}
+
+.artist-gallery-heading h2 span {
+    color: var(--orange);
+}
+
+.artist-gallery-line {
+    width: 80px;
+    height: auto;
+}
+
+
+.artist-gallery-artist {
+    margin-bottom: 55px;
+}
+
+.artist-gallery-artist-info {
+    margin-bottom: 25px;
+}
+
+.artist-gallery-artist-info h3 {
+    color: var(--brown);
+    font-size: 28px;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+}
+
+.artist-gallery-artist-info p {
+    max-width: 700px;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+
+.artist-artworks-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+}
+
+
+.public-artwork-card {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: 0.3s ease;
+}
+
+.public-artwork-card:hover {
+    transform: translateY(-5px);
+}
+
+
+.public-artwork-image {
+    width: 100%;
+    height: 260px;
+    overflow: hidden;
+    background: #eee4dc;
+}
+
+.public-artwork-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+
+.no-artwork-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 12px;
+}
+
+
+.public-artwork-info {
+    padding: 20px;
+}
+
+.public-artwork-info h4 {
+    color: var(--brown);
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.public-artwork-info p {
+    color: var(--dark-text);
+    font-size: 13px;
+    line-height: 1.6;
+    margin-bottom: 15px;
+}
+
+.public-artwork-price {
+    color: var(--orange);
+    font-size: 17px;
+    font-weight: bold;
+}
+
+
+.no-artists-message {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 50px;
+    background: var(--white);
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: var(--shadow);
+}
+
+.no-artists-message h3 {
+    color: var(--brown);
+    font-size: 25px;
+    margin-bottom: 10px;
+}
+
+.no-artists-message p {
+    color: var(--dark-text);
+    font-size: 14px;
+}
+
+
+.artist-gallery-back {
+    padding: 50px 8%;
+    text-align: center;
+    background: var(--cream);
+}
+
+
+@media (max-width: 900px) {
+
+    .artist-artworks-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+}
+
+
+@media (max-width: 600px) {
+
+    .artist-gallery-hero {
+        padding: 50px 6%;
+    }
+
+    .artist-gallery-hero-content h1 {
+        font-size: 42px;
+    }
+
+    .artist-gallery-section {
+        padding: 50px 6%;
+    }
+
+    .artist-artworks-grid {
+        grid-template-columns: 1fr;
+    }
+
+}

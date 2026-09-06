@@ -118,22 +118,31 @@ session_start();
 
                 <div class="event-details">
 
-                    <p>
-                        📅 December 4, 2027
-                    </p>
+    <p>
+        📅 December 4, 2027
+    </p>
 
-                    <p>
-                        🕔 5:00 PM
-                    </p>
+    <p>
+        🕔 5:00 PM
+    </p>
 
-                    <p>
-                        📍 Maturan's Art Cafe
-                    </p>
-                    <a href="artist_registration.php" class="reserve-btn">
-                        JOIN AS AN ARTIST
-                    </a>
+    <p>
+        📍 Maturan's Art Cafe
+    </p>
 
-                </div>
+</div>
+
+            <div class="event-action-buttons">
+
+    <a href="artist_registration.php" class="reserve-btn artist-join-btn">
+        JOIN AS AN ARTIST
+    </a>
+
+    <a href="artist_gallery.php" class="reserve-btn artist-gallery-btn">
+         VIEW ARTISTS & ARTWORKS
+    </a>
+
+</div>
 
             </div>
 
@@ -236,7 +245,7 @@ session_start();
                 <a href="about.php">About</a>
                 <a href="menu.php">Menu</a>
                 <a href="events.php">Events</a>
-                <a href="index.php#contact">Contact</a>
+                <a href="contact.php">Contact</a>
 
             </div>
 

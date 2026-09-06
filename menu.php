@@ -74,10 +74,18 @@ session_start();
     <section class="menu-section">
 
         <div class="menu-section-header">
-            <h2>COFFEE</h2> <img src="images/orangeheart.png" alt="" class="heart-icon">
+    <h2>
+        COFFEE
+        <img src="images/orangeheart.png" alt="" class="heart-icon">
+    </h2>
 
-            <img src="images/line.png" alt="" class="menu-line">
-        </div>
+    <img
+        src="images/line.png"
+        alt=""
+        class="menu-line"
+    >
+
+</div>
 
 
         <div class="menu-products">
@@ -150,10 +158,18 @@ session_start();
     <section class="menu-section menu-pastries">
 
         <div class="menu-section-header">
-            <h2>PASTRIES <span>♡</span></h2>
+    <h2>
+        PASTRIES
+        <img src="images/orangeheart.png" alt="" class="heart-icon">
+    </h2>
 
-            <img src="images/line.png" alt="" class="menu-line">
-        </div>
+    <img
+        src="images/line.png"
+        alt=""
+        class="menu-line"
+    >
+
+</div>
 
 
         <div class="menu-products">
