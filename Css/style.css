@@ -647,18 +647,68 @@ body {
 
 .reviews-container {
     display: flex;
-    justify-content: center;
-    gap: 35px;
     width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    scroll-behavior: smooth;
+    scroll-snap-type: x mandatory;
+
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.reviews-container::-webkit-scrollbar {
+    display: none;
+}
+
+.review-group {
+    flex: 0 0 100%;
+    width: 100%;
+
+    display: flex;
+    gap: 35px;
+
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+}
+
+.review-dots {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 48px;
+    width: 100%;
+    position: relative;
+    z-index: 10;
+}
+
+.review-dot {
+    display: block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #d9d9d9;
+    cursor: pointer;
+}
+
+.review-dot.active {
+    background: var(--orange);
 }
 
 .review-card {
     position: relative;
-    width: 30%;
+
+    flex: 0 0 calc((100% - 70px) / 3);
+    width: calc((100% - 70px) / 3);
+
     height: 180px;
     padding: 20px 14px;
+
     background: #eadfda;
     border-radius: 8px;
+
     box-shadow: 9px 8px 0 #f1eeee;
 }
 
@@ -728,6 +778,7 @@ body {
     height: 7px;
     border-radius: 50%;
     background: #d9d9d9;
+    cursor: pointer;
 }
 
 .review-dot.active {
@@ -893,7 +944,27 @@ body {
     background: #df4c1c;
 }
 
+/* ================================
+   NEWSLETTER MESSAGE
+================================ */
 
+.subscribe-message {
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.subscribe-message.success {
+    color: var(--white);
+}
+
+.subscribe-message.exists {
+    color: var(--white);
+}
+
+.subscribe-message.error {
+    color: var(--white);
+}
 .footer .heart-small {
     width: 40px;
     height: auto;

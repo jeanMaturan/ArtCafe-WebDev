@@ -1,7 +1,3 @@
-<?php
-session_start();
-?>
-
 
 <!DOCTYPE html>
 <html lang="en">
@@ -291,115 +287,366 @@ session_start();
 
     <div class="reviews-container">
 
-        <!-- Review 1 -->
-        <div class="review-card">
 
-            <div class="review-top">
+        <!-- =========================
+             GROUP 1 — REVIEWS 1–3
+        ========================== -->
 
-                <img
-                    src="images/quote.png"
-                    alt=""
-                    class="quote-icon"
-                >
+        <div class="review-group">
 
-                <div class="stars">
-                    ★★★★★
+            <!-- Review 1 -->
+            <div class="review-card">
+
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    I love painting here! The staff are
+                    friendly and the food is delicious!
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/derpie.png"
+                        alt="Dirpie"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Dirpie</p>
+                        <p class="customer-location">Valencia</p>
+                    </div>
+
                 </div>
 
             </div>
 
-            <p class="review-text">
-                I love painting here! The staff are
-                friendly and the food is delicious!
-            </p>
 
-            <div class="customer">
+            <!-- Review 2 -->
+            <div class="review-card">
 
-                <img
-                    src="images/derpie.png"
-                    alt="Dirpie"
-                    class="customer-image"
-                >
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
 
-                <div>
-                    <p class="customer-name">Dirpie</p>
-                    <p class="customer-location">Valencia</p>
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    It felt like home. I highly
+                    recommend!
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/beam.png"
+                        alt="Beam"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Beam</p>
+                        <p class="customer-location">Dauin</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Review 3 -->
+            <div class="review-card">
+
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    Good coffee + cozy space?
+                    Amazing.
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/gordon.png"
+                        alt="Gordon"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Gordon</p>
+                        <p class="customer-location">Tanjay</p>
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
 
-        <div class="review-card">
 
-            <div class="review-top">
+        <!-- =========================
+             GROUP 2 — REVIEWS 4–6
+        ========================== -->
 
-                <img
-                    src="images/quote.png"
-                    alt=""
-                    class="quote-icon"
-                >
+        <div class="review-group">
 
-                <div class="stars">
-                    ★★★★★
+            <!-- Review 4 -->
+            <div class="review-card">
+
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    The atmosphere is so cozy and the coffee
+                    tastes amazing!
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/beam.png"
+                        alt="Mia"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Mia</p>
+                        <p class="customer-location">Dumaguete</p>
+                    </div>
+
                 </div>
 
             </div>
 
-            <p class="review-text">
-                It felt like home. I highly
-                recommend!
-            </p>
 
-            <div class="customer">
+            <!-- Review 5 -->
+            <div class="review-card">
 
-                <img
-                    src="images/beam.png"
-                    alt="Beam"
-                    class="customer-image"
-                >
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
 
-                <div>
-                    <p class="customer-name">Beam</p>
-                    <p class="customer-location">Dauin</p>
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    A beautiful place to relax, create,
+                    and enjoy good food.
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/gordon.png"
+                        alt="Kyle"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Kyle</p>
+                        <p class="customer-location">Bacong</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Review 6 -->
+            <div class="review-card">
+
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    Friendly staff, great coffee, and
+                    such a creative environment.
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/derpie.png"
+                        alt="Anna"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Anna</p>
+                        <p class="customer-location">Valencia</p>
+                    </div>
+
                 </div>
 
             </div>
 
         </div>
 
-        <div class="review-card">
 
-            <div class="review-top">
+        <!-- =========================
+             GROUP 3 — REVIEWS 7–9
+        ========================== -->
 
-                <img
-                    src="images/quote.png"
-                    alt=""
-                    class="quote-icon"
-                >
+        <div class="review-group">
 
-                <div class="stars">
-                    ★★★★★
+            <!-- Review 7 -->
+            <div class="review-card">
+
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    One of my favorite places to spend
+                    a quiet afternoon.
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/beam.png"
+                        alt="Lia"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Lia</p>
+                        <p class="customer-location">Dauin</p>
+                    </div>
+
                 </div>
 
             </div>
 
-            <p class="review-text">
-                Good coffee + cozy space?
-                Amazing.
-            </p>
 
-            <div class="customer">
+            <!-- Review 8 -->
+            <div class="review-card">
 
-                <img
-                    src="images/gordon.png"
-                    alt="Gordon"
-                    class="customer-image"
-                >
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
 
-                <div>
-                    <p class="customer-name">Gordon</p>
-                    <p class="customer-location">Tanjay</p>
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    The perfect combination of art,
+                    coffee, and good vibes.
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/gordon.png"
+                        alt="Mark"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">Mark</p>
+                        <p class="customer-location">Tanjay</p>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- Review 9 -->
+            <div class="review-card">
+
+                <div class="review-top">
+                    <img
+                        src="images/quote.png"
+                        alt=""
+                        class="quote-icon"
+                    >
+
+                    <div class="stars">
+                        ★★★★★
+                    </div>
+                </div>
+
+                <p class="review-text">
+                    Amazing experience every time.
+                    I'll definitely come back!
+                </p>
+
+                <div class="customer">
+
+                    <img
+                        src="images/derpie.png"
+                        alt="John"
+                        class="customer-image"
+                    >
+
+                    <div>
+                        <p class="customer-name">John</p>
+                        <p class="customer-location">Dumaguete</p>
+                    </div>
+
                 </div>
 
             </div>
@@ -407,6 +654,9 @@ session_start();
         </div>
 
     </div>
+
+
+    <!-- REVIEW DOTS -->
 
     <div class="review-dots">
 
@@ -470,28 +720,45 @@ session_start();
 
         </div>
 
-        <div class="footer-subscribe">
+       <div class="footer-subscribe">
 
-            <h3>STAY CONNECTED</h3>
+    <h3>STAY CONNECTED</h3>
 
-            <p>
-                Subscribe to get updates on
-                new events and promos!
-            </p>
+    <p>
+        Subscribe to get updates on
+        new events and promos!
+    </p>
 
-            <form class="subscribe-form" action="check_email.php" method="POST">
-                <input 
-                type="email" 
-                 name="email" 
-                 placeholder="Your email"
-                 required
-                >   
 
-                <button type="submit">→</button>
-            </form>
+    <form class="subscribe-form" id="subscribeForm">
 
-             <img src="images/whiteheart.png" alt="" class="heart-small">
+    <input
+        type="email"
+        name="email"
+        id="subscribeEmail"
+        placeholder="Your email"
+        required
+    >
 
+    <button type="submit">→</button>
+
+</form>
+
+<p
+    class="subscribe-message"
+    id="subscribeMessage"
+    style="display: none;"
+></p>
+
+
+    <img
+        src="images/whiteheart.png"
+        alt=""
+        class="heart-small">
+
+</div>
+
+</form>
         </div>
 
     </div>

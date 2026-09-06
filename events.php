@@ -28,7 +28,7 @@ session_start();
             <a href="index.php">HOME</a>
             <a href="about.php">ABOUT</a>
             <a href="menu.php">MENU</a>
-            <a href="events.php">EVENTS</a>
+            <a href="events.php" class="active" style="color: #ed542c !important;">EVENTS</a>
             <a href="contact.php">CONTACT</a>
 
             <?php if (isset($_SESSION["user_id"])): ?>

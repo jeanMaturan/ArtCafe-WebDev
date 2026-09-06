@@ -230,6 +230,12 @@ $result = $conn->query(
                 MESSAGES
             </a>
 
+            <a
+                href="admin_subscribers.php"
+                class="admin-nav-button"
+            >
+                SUBSCRIBERS
+            </a>
 
             <span>
                 Welcome,

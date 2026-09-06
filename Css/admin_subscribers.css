@@ -1,0 +1,113 @@
+/* ================================
+   ADMIN SUBSCRIBERS PAGE
+================================ */
+
+.admin-page {
+    min-height: 80vh;
+    padding: 50px 7%;
+    background: #f8f3ee;
+}
+
+.admin-title {
+    margin-bottom: 30px;
+}
+
+.admin-title h2 {
+    margin: 0 0 8px;
+    color: var(--brown);
+    font-size: 32px;
+    letter-spacing: 2px;
+}
+
+.admin-title h2 span {
+    color: var(--orange);
+}
+
+.admin-title p {
+    margin: 0;
+    color: var(--dark-text);
+    font-size: 14px;
+}
+
+
+/* ================================
+   SUBSCRIBER CARD
+================================ */
+
+.admin-card {
+    background: var(--white);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    overflow-x: auto;
+}
+
+
+/* ================================
+   TABLE
+================================ */
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    padding: 15px;
+    text-align: left;
+    background: var(--brown);
+    color: var(--white);
+    font-size: 11px;
+    letter-spacing: 1px;
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid #eee;
+    color: var(--dark-text);
+    font-size: 13px;
+}
+
+.admin-table tbody tr:hover {
+    background: #fff9df;
+}
+
+.admin-table th:first-child,
+.admin-table td:first-child {
+    width: 70px;
+    text-align: center;
+}
+
+.admin-table th:last-child,
+.admin-table td:last-child {
+    width: 220px;
+}
+
+
+/* ================================
+   NO SUBSCRIBERS
+================================ */
+
+.no-messages {
+    padding: 40px;
+    text-align: center;
+    color: #777;
+    font-size: 14px;
+}
+
+
+/* ================================
+   MOBILE
+================================ */
+
+@media (max-width: 768px) {
+
+    .admin-page {
+        padding: 40px 5%;
+    }
+
+    .admin-title h2 {
+        font-size: 26px;
+    }
+
+}
