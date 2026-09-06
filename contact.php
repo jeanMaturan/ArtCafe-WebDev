@@ -6,7 +6,9 @@ require_once "db.php";
 /* USER MUST BE LOGGED IN */
 if (
     !isset($_SESSION["user_logged_in"]) ||
-    $_SESSION["user_logged_in"] !== true
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"])
 ) {
     header("Location: login.php?from=contact");
     exit();
@@ -18,23 +20,66 @@ $error = "";
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     /* GET USER INFORMATION FROM SESSION */
-    $user_id = $_SESSION["user_id"];
-    $name = $_SESSION["user_name"];
-    $email = $_SESSION["user_email"];
+    $user_id = (int) $_SESSION["user_id"];
+    $name = trim($_SESSION["user_name"] ?? "");
+    $email = trim($_SESSION["user_email"] ?? "");
 
     /* GET ONLY FORM INPUTS */
     $subject = trim($_POST["subject"] ?? "");
     $message = trim($_POST["message"] ?? "");
 
 
-    if (
-        $subject === "" ||
-        $message === ""
-    ) {
+    /* =========================
+       VALIDATE SESSION DATA
+    ========================== */
 
-        $error = "Please complete all fields.";
+    if ($name === "" || $email === "") {
 
-    } else {
+        $error = "Your account information is incomplete. Please log in again.";
+
+    }
+
+    /* =========================
+       VALIDATE SUBJECT
+    ========================== */
+
+    elseif ($subject === "") {
+
+        $error = "Please enter a subject.";
+
+    } elseif (strlen($subject) < 3) {
+
+        $error = "Subject must be at least 3 characters.";
+
+    } elseif (strlen($subject) > 200) {
+
+        $error = "Subject must not exceed 200 characters.";
+
+    }
+
+    /* =========================
+       VALIDATE MESSAGE
+    ========================== */
+
+    elseif ($message === "") {
+
+        $error = "Please enter a message.";
+
+    } elseif (strlen($message) < 5) {
+
+        $error = "Message must be at least 5 characters.";
+
+    } elseif (strlen($message) > 5000) {
+
+        $error = "Message must not exceed 5000 characters.";
+
+    }
+
+    /* =========================
+       INSERT MESSAGE
+    ========================== */
+
+    else {
 
         $stmt = $conn->prepare(
             "INSERT INTO contact_messages
@@ -50,7 +95,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (!$stmt) {
 
-            $error = "Database error: " . $conn->error;
+            $error = "Something went wrong. Please try again.";
 
         } else {
 

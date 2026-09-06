@@ -10,12 +10,17 @@ require_once "db.php";
 
 if (
     !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true
+    $_SESSION["admin_logged_in"] !== true ||
+    !isset($_SESSION["admin_id"]) ||
+    !is_numeric($_SESSION["admin_id"]) ||
+    !isset($_SESSION["admin_username"]) ||
+    $_SESSION["admin_username"] === ""
 ) {
     header("Location: admin_login.php");
     exit();
 }
 
+$admin_id = (int) $_SESSION["admin_id"];
 
 $success = "";
 $error = "";
@@ -27,65 +32,94 @@ $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $artwork_id = (int)($_POST["artwork_id"] ?? 0);
-    $action = $_POST["action"] ?? "";
+    $artwork_id = filter_input(
+        INPUT_POST,
+        "artwork_id",
+        FILTER_VALIDATE_INT
+    );
+
+    $action = trim($_POST["action"] ?? "");
 
 
-    if ($artwork_id <= 0) {
+    /* =====================================
+       VALIDATE ARTWORK ID
+    ===================================== */
+
+    if ($artwork_id === false || $artwork_id === null || $artwork_id <= 0) {
 
         $error = "Invalid artwork.";
 
-    } elseif ($action === "approve") {
+    } elseif (!in_array($action, ["approve", "reject"], true)) {
+
+        $error = "Invalid action.";
+
+    } else {
+
+        /* =====================================
+           DETERMINE NEW STATUS
+        ===================================== */
+
+        $new_status = ($action === "approve")
+            ? "Available"
+            : "Rejected";
+
+
+        /* =====================================
+           UPDATE ONLY ARTWORKS BELONGING TO
+           APPROVED ARTISTS AND CURRENTLY PENDING
+        ===================================== */
 
         $stmt = $conn->prepare(
-            "UPDATE artworks
-             SET status = 'Available'
-             WHERE artwork_id = ?"
+            "UPDATE artworks aw
+             INNER JOIN artists a
+                ON aw.artist_id = a.artist_id
+             INNER JOIN event_artists ea
+                ON a.artist_id = ea.artist_id
+             SET aw.status = ?
+             WHERE aw.artwork_id = ?
+               AND aw.status = 'Pending'
+               AND ea.status = 'Approved'"
         );
 
-        $stmt->bind_param(
-            "i",
-            $artwork_id
-        );
+        if (!$stmt) {
 
-        if ($stmt->execute()) {
-
-            $success = "Artwork approved successfully.";
+            $error = "Something went wrong. Please try again.";
 
         } else {
 
-            $error = "Failed to approve artwork.";
+            $stmt->bind_param(
+                "si",
+                $new_status,
+                $artwork_id
+            );
 
+            if ($stmt->execute()) {
+
+                if ($stmt->affected_rows === 1) {
+
+                    if ($action === "approve") {
+
+                        $success = "Artwork approved successfully.";
+
+                    } else {
+
+                        $success = "Artwork rejected.";
+                    }
+
+                } else {
+
+                    $error =
+                        "The artwork could not be updated. " .
+                        "It may have already been reviewed or is no longer associated with an approved artist.";
+                }
+
+            } else {
+
+                $error = "Something went wrong. Please try again.";
+            }
+
+            $stmt->close();
         }
-
-        $stmt->close();
-
-
-    } elseif ($action === "reject") {
-
-        $stmt = $conn->prepare(
-            "UPDATE artworks
-             SET status = 'Rejected'
-             WHERE artwork_id = ?"
-        );
-
-        $stmt->bind_param(
-            "i",
-            $artwork_id
-        );
-
-        if ($stmt->execute()) {
-
-            $success = "Artwork rejected.";
-
-        } else {
-
-            $error = "Failed to reject artwork.";
-
-        }
-
-        $stmt->close();
-
     }
 }
 
@@ -109,24 +143,29 @@ $stmt = $conn->prepare(
      FROM artworks aw
      INNER JOIN artists a
         ON aw.artist_id = a.artist_id
-     INNER JOIN event_artists ea
-        ON a.artist_id = ea.artist_id
      WHERE aw.status = 'Pending'
-       AND ea.status = 'Approved'
+       AND EXISTS (
+           SELECT 1
+           FROM event_artists ea
+           WHERE ea.artist_id = a.artist_id
+             AND ea.status = 'Approved'
+       )
      ORDER BY aw.created_at DESC"
 );
 
-$stmt->execute();
+if ($stmt) {
 
-$result = $stmt->get_result();
+    if ($stmt->execute()) {
 
-while ($row = $result->fetch_assoc()) {
+        $result = $stmt->get_result();
 
-    $pending_artworks[] = $row;
+        while ($row = $result->fetch_assoc()) {
+            $pending_artworks[] = $row;
+        }
+    }
 
+    $stmt->close();
 }
-
-$stmt->close();
 
 
 /* =====================================
@@ -148,24 +187,29 @@ $stmt = $conn->prepare(
      FROM artworks aw
      INNER JOIN artists a
         ON aw.artist_id = a.artist_id
-     INNER JOIN event_artists ea
-        ON a.artist_id = ea.artist_id
      WHERE aw.status = 'Available'
-       AND ea.status = 'Approved'
+       AND EXISTS (
+           SELECT 1
+           FROM event_artists ea
+           WHERE ea.artist_id = a.artist_id
+             AND ea.status = 'Approved'
+       )
      ORDER BY aw.created_at DESC"
 );
 
-$stmt->execute();
+if ($stmt) {
 
-$result = $stmt->get_result();
+    if ($stmt->execute()) {
 
-while ($row = $result->fetch_assoc()) {
+        $result = $stmt->get_result();
 
-    $approved_artworks[] = $row;
+        while ($row = $result->fetch_assoc()) {
+            $approved_artworks[] = $row;
+        }
+    }
 
+    $stmt->close();
 }
-
-$stmt->close();
 
 
 /* =====================================
@@ -187,24 +231,29 @@ $stmt = $conn->prepare(
      FROM artworks aw
      INNER JOIN artists a
         ON aw.artist_id = a.artist_id
-     INNER JOIN event_artists ea
-        ON a.artist_id = ea.artist_id
      WHERE aw.status = 'Rejected'
-       AND ea.status = 'Approved'
+       AND EXISTS (
+           SELECT 1
+           FROM event_artists ea
+           WHERE ea.artist_id = a.artist_id
+             AND ea.status = 'Approved'
+       )
      ORDER BY aw.created_at DESC"
 );
 
-$stmt->execute();
+if ($stmt) {
 
-$result = $stmt->get_result();
+    if ($stmt->execute()) {
 
-while ($row = $result->fetch_assoc()) {
+        $result = $stmt->get_result();
 
-    $rejected_artworks[] = $row;
+        while ($row = $result->fetch_assoc()) {
+            $rejected_artworks[] = $row;
+        }
+    }
 
+    $stmt->close();
 }
-
-$stmt->close();
 
 ?>
 

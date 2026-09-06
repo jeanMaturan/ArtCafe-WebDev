@@ -1,7 +1,6 @@
 <?php
 
 session_start();
-
 require_once "db.php";
 
 
@@ -11,26 +10,63 @@ require_once "db.php";
 
 if (
     !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true
+    $_SESSION["admin_logged_in"] !== true ||
+    !isset($_SESSION["admin_id"]) ||
+    !is_numeric($_SESSION["admin_id"]) ||
+    !isset($_SESSION["admin_username"]) ||
+    $_SESSION["admin_username"] === ""
 ) {
     header("Location: admin_login.php");
     exit();
 }
 
+$admin_id = (int) $_SESSION["admin_id"];
+
 
 /* =====================================
-   SEND ADMIN REPLY
+   SEND ADMIN REPLY / UPDATE STATUS
 ===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $action = $_POST["action"] ?? "";
-    $message_id = (int)($_POST["message_id"] ?? 0);
+    $action = trim($_POST["action"] ?? "");
+
+    $message_id = filter_input(
+        INPUT_POST,
+        "message_id",
+        FILTER_VALIDATE_INT
+    );
 
 
-    /* ================================
+    /* =====================================
+       VALIDATE INPUT
+    ===================================== */
+
+    if (
+        $message_id === false ||
+        $message_id === null ||
+        $message_id <= 0
+    ) {
+
+        $_SESSION["admin_message_error"] = "Invalid message.";
+
+        header("Location: admin_messages.php");
+        exit();
+    }
+
+
+    if (!in_array($action, ["reply", "read", "replied"], true)) {
+
+        $_SESSION["admin_message_error"] = "Invalid action.";
+
+        header("Location: admin_messages.php");
+        exit();
+    }
+
+
+    /* =====================================
        SEND REPLY
-    ================================= */
+    ===================================== */
 
     if ($action === "reply") {
 
@@ -39,10 +75,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         );
 
 
-        if (
-            $message_id > 0 &&
-            $admin_reply !== ""
-        ) {
+        if ($admin_reply === "") {
+
+            $_SESSION["admin_message_error"] =
+                "Please enter a reply.";
+
+        } elseif (strlen($admin_reply) < 2) {
+
+            $_SESSION["admin_message_error"] =
+                "Reply must be at least 2 characters.";
+
+        } elseif (strlen($admin_reply) > 5000) {
+
+            $_SESSION["admin_message_error"] =
+                "Reply must not exceed 5000 characters.";
+
+        } else {
+
+            /*
+             * Only allow replying to an existing message.
+             */
 
             $stmt = $conn->prepare(
                 "UPDATE contact_messages
@@ -53,74 +105,147 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                  WHERE message_id = ?"
             );
 
+            if (!$stmt) {
 
-            $stmt->bind_param(
-                "si",
-                $admin_reply,
-                $message_id
-            );
+                $_SESSION["admin_message_error"] =
+                    "Something went wrong. Please try again.";
 
+            } else {
 
-            $stmt->execute();
+                $stmt->bind_param(
+                    "si",
+                    $admin_reply,
+                    $message_id
+                );
 
-            $stmt->close();
+                if ($stmt->execute()) {
+
+                    if ($stmt->affected_rows >= 1) {
+
+                        $_SESSION["admin_message_success"] =
+                            "Reply sent successfully.";
+
+                    } else {
+
+                        $_SESSION["admin_message_error"] =
+                            "The message could not be updated.";
+                    }
+
+                } else {
+
+                    $_SESSION["admin_message_error"] =
+                        "Something went wrong. Please try again.";
+                }
+
+                $stmt->close();
+            }
         }
     }
 
 
-    /* ================================
+    /* =====================================
        MARK AS READ
-    ================================= */
+    ===================================== */
 
     elseif ($action === "read") {
 
         $stmt = $conn->prepare(
             "UPDATE contact_messages
              SET status = 'Read'
-             WHERE message_id = ?"
+             WHERE message_id = ?
+               AND status = 'Unread'"
         );
 
+        if (!$stmt) {
 
-        $stmt->bind_param(
-            "i",
-            $message_id
-        );
+            $_SESSION["admin_message_error"] =
+                "Something went wrong. Please try again.";
 
+        } else {
 
-        $stmt->execute();
+            $stmt->bind_param(
+                "i",
+                $message_id
+            );
 
-        $stmt->close();
+            if ($stmt->execute()) {
+
+                if ($stmt->affected_rows === 1) {
+
+                    $_SESSION["admin_message_success"] =
+                        "Message marked as read.";
+
+                } else {
+
+                    $_SESSION["admin_message_error"] =
+                        "The message could not be updated.";
+                }
+
+            } else {
+
+                $_SESSION["admin_message_error"] =
+                    "Something went wrong. Please try again.";
+            }
+
+            $stmt->close();
+        }
     }
 
 
-    /* ================================
+    /* =====================================
        MARK AS REPLIED
-    ================================= */
+    ===================================== */
 
     elseif ($action === "replied") {
 
         $stmt = $conn->prepare(
             "UPDATE contact_messages
-             SET status = 'Replied'
-             WHERE message_id = ?"
+             SET
+                status = 'Replied',
+                replied_at = COALESCE(replied_at, NOW())
+             WHERE message_id = ?
+               AND status <> 'Replied'"
         );
 
+        if (!$stmt) {
 
-        $stmt->bind_param(
-            "i",
-            $message_id
-        );
+            $_SESSION["admin_message_error"] =
+                "Something went wrong. Please try again.";
 
+        } else {
 
-        $stmt->execute();
+            $stmt->bind_param(
+                "i",
+                $message_id
+            );
 
-        $stmt->close();
+            if ($stmt->execute()) {
+
+                if ($stmt->affected_rows === 1) {
+
+                    $_SESSION["admin_message_success"] =
+                        "Message marked as replied.";
+
+                } else {
+
+                    $_SESSION["admin_message_error"] =
+                        "The message could not be updated.";
+                }
+
+            } else {
+
+                $_SESSION["admin_message_error"] =
+                    "Something went wrong. Please try again.";
+            }
+
+            $stmt->close();
+        }
     }
 
 
-    /* ================================
+    /* =====================================
        REFRESH PAGE
-    ================================= */
+    ===================================== */
 
     header("Location: admin_messages.php");
     exit();
@@ -128,14 +253,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 /* =====================================
-   GET MESSAGES
+   DISPLAY ONE-TIME MESSAGES
+===================================== */
+
+$success = $_SESSION["admin_message_success"] ?? "";
+$error = $_SESSION["admin_message_error"] ?? "";
+
+unset($_SESSION["admin_message_success"]);
+unset($_SESSION["admin_message_error"]);
+
+
+/* =====================================
+   GET CUSTOMER MESSAGES
 ===================================== */
 
 $result = $conn->query(
-    "SELECT *
+    "SELECT
+        message_id,
+        name,
+        email,
+        subject,
+        message,
+        status,
+        admin_reply,
+        created_at,
+        replied_at
      FROM contact_messages
      ORDER BY created_at DESC"
 );
+
+if (!$result) {
+
+    $result = false;
+
+    if ($error === "") {
+        $error = "Unable to load customer messages.";
+    }
+}
 
 ?>
 

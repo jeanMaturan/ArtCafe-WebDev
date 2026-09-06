@@ -3,17 +3,29 @@
 session_start();
 require_once "db.php";
 
-if (!isset($_SESSION["user_logged_in"]) || $_SESSION["user_logged_in"] !== true) {
+/* =====================================
+   USER MUST BE LOGGED IN
+===================================== */
+
+if (
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"])
+) {
     header("Location: login.php?from=artist");
     exit();
-
 }
 
-// =====================================
-// CHECK IF USER IS ALREADY AN APPROVED ARTIST
-// =====================================
+$user_id = (int) $_SESSION["user_id"];
 
-$user_id = $_SESSION["user_id"];
+$success = "";
+$error = "";
+
+
+/* =====================================
+   CHECK IF USER IS ALREADY AN APPROVED ARTIST
+===================================== */
 
 $artist_check = $conn->prepare(
     "SELECT a.artist_id
@@ -25,12 +37,18 @@ $artist_check = $conn->prepare(
      LIMIT 1"
 );
 
+if (!$artist_check) {
+    die("Something went wrong. Please try again.");
+}
+
 $artist_check->bind_param("i", $user_id);
 $artist_check->execute();
 
 $artist_result = $artist_check->get_result();
 
 if ($artist_result->num_rows === 1) {
+
+    $artist_check->close();
 
     header("Location: artist_artworks.php");
     exit();
@@ -39,16 +57,12 @@ if ($artist_result->num_rows === 1) {
 
 $artist_check->close();
 
-$success = "";
-$error = "";
 
-
-// =====================================
-// CHECK ARTIST CAPACITY
-// =====================================
+/* =====================================
+   ARTIST CAPACITY
+===================================== */
 
 $max_artists = 5;
-
 $approved_count = 0;
 
 $capacity_query = $conn->query(
@@ -58,14 +72,16 @@ $capacity_query = $conn->query(
 );
 
 if ($capacity_query) {
+
     $capacity = $capacity_query->fetch_assoc();
-    $approved_count = (int)$capacity["approved_count"];
+
+    $approved_count = (int) $capacity["approved_count"];
 }
 
 
-// =====================================
-// CHECK IF USER SUBMITTED THE FORM
-// =====================================
+/* =====================================
+   FORM SUBMISSION
+===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -73,23 +89,38 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $bio = trim($_POST["bio"] ?? "");
     $contact = trim($_POST["contact"] ?? "");
 
-    $user_id = $_SESSION["user_id"];
 
+    /* =====================================
+       CHECK ARTIST CAPACITY AGAIN
+       IMPORTANT: DO NOT TRUST OLD COUNT
+    ===================================== */
 
-    // =====================================
-    // CHECK ARTIST CAPACITY
-    // =====================================
+    $capacity_check = $conn->query(
+        "SELECT COUNT(*) AS approved_count
+         FROM event_artists
+         WHERE status = 'Approved'"
+    );
 
-    if ($approved_count >= $max_artists) {
+    if ($capacity_check) {
 
-        $error = "Artist registration is currently full. The maximum of 5 approved artists has been reached.";
+        $capacity_data = $capacity_check->fetch_assoc();
+
+        $approved_count = (int) $capacity_data["approved_count"];
 
     }
 
 
-    // =====================================
-    // CHECK REQUIRED FIELDS
-    // =====================================
+    if ($approved_count >= $max_artists) {
+
+        $error =
+            "Artist registration is currently full. The maximum of 5 approved artists has been reached.";
+
+    }
+
+
+    /* =====================================
+       REQUIRED FIELDS
+    ===================================== */
 
     elseif ($artist_name === "" || $contact === "") {
 
@@ -98,61 +129,91 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
 
+    /* =====================================
+       VALIDATE ARTIST NAME
+    ===================================== */
+
+    elseif (strlen($artist_name) < 2) {
+
+        $error = "Artist name must be at least 2 characters.";
+
+    }
+
+    elseif (strlen($artist_name) > 100) {
+
+        $error = "Artist name must not exceed 100 characters.";
+
+    }
+
+    elseif (!preg_match('/[A-Za-z]/', $artist_name)) {
+
+        $error = "Artist name must contain at least one letter.";
+
+    }
+
+
+    /* =====================================
+       VALIDATE CONTACT NUMBER
+       PHILIPPINE FORMAT
+    ===================================== */
+
+    elseif (!preg_match('/^(09\d{9}|\+639\d{9})$/', $contact)) {
+
+        $error =
+            "Please enter a valid Philippine contact number (09XXXXXXXXX or +639XXXXXXXXX).";
+
+    }
+
+
+    /* =====================================
+       VALIDATE BIO
+    ===================================== */
+
+    elseif (strlen($bio) > 2000) {
+
+        $error = "Artist description must not exceed 2000 characters.";
+
+    }
+
+
     else {
 
-        // =====================================
-        // CHECK IF USER IS ALREADY AN ARTIST
-        // =====================================
+        /* =====================================
+           CHECK IF USER ALREADY HAS AN ARTIST RECORD
+        ===================================== */
 
         $check = $conn->prepare(
             "SELECT artist_id
              FROM artists
-             WHERE user_id = ?"
+             WHERE user_id = ?
+             LIMIT 1"
         );
 
-        $check->bind_param("i", $user_id);
-        $check->execute();
+        if (!$check) {
 
-        $result = $check->get_result();
+            $error = "Something went wrong. Please try again.";
 
+        } else {
 
-        if ($result->num_rows > 0) {
+            $check->bind_param("i", $user_id);
+            $check->execute();
 
-            $error = "You are already registered as an artist.";
-
-        }
-
-        else {
-
-            // =====================================
-            // INSERT ARTIST
-            // =====================================
-
-            $stmt = $conn->prepare(
-                "INSERT INTO artists
-                (user_id, artist_name, bio, contact)
-                VALUES (?, ?, ?, ?)"
-            );
-
-            $stmt->bind_param(
-                "isss",
-                $user_id,
-                $artist_name,
-                $bio,
-                $contact
-            );
+            $result = $check->get_result();
 
 
-            if ($stmt->execute()) {
+            if ($result->num_rows > 0) {
 
-                $artist_id = $stmt->insert_id;
+                $error = "You are already registered as an artist.";
 
+            }
 
-                // =====================================
-                // GET ACTIVE EVENT
-                // =====================================
+            else {
 
-                $event_query = $conn->query(
+                /* =====================================
+                   GET ACTIVE EVENT
+                ===================================== */
+
+                $event_stmt = $conn->prepare(
                     "SELECT event_id
                      FROM events
                      WHERE status = 'Active'
@@ -160,79 +221,116 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                      LIMIT 1"
                 );
 
+                if (!$event_stmt) {
 
-                if (
-                    $event_query &&
-                    $event_query->num_rows === 1
-                ) {
+                    $error = "Something went wrong. Please try again.";
 
-                    $event = $event_query->fetch_assoc();
+                } else {
 
-                    $event_id = $event["event_id"];
+                    $event_stmt->execute();
 
-
-                    // =====================================
-                    // CONNECT ARTIST TO EVENT
-                    // =====================================
-
-                    $event_stmt = $conn->prepare(
-                        "INSERT INTO event_artists
-                        (event_id, artist_id, status)
-                        VALUES (?, ?, 'Pending')"
-                    );
-
-                    $event_stmt->bind_param(
-                        "ii",
-                        $event_id,
-                        $artist_id
-                    );
+                    $event_result = $event_stmt->get_result();
 
 
-                    if ($event_stmt->execute()) {
+                    if ($event_result->num_rows !== 1) {
 
-                        $success =
-                            "Artist registration submitted successfully! Your application is now pending approval.";
+                        $error = "No active event is currently available.";
 
                     }
 
                     else {
 
-                        $error =
-                            "Artist was registered, but the event application could not be submitted.";
+                        $event = $event_result->fetch_assoc();
+                        $event_id = (int) $event["event_id"];
 
+
+                        /* =====================================
+                           INSERT ARTIST
+                        ===================================== */
+
+                        $stmt = $conn->prepare(
+                            "INSERT INTO artists
+                            (user_id, artist_name, bio, contact)
+                            VALUES (?, ?, ?, ?)"
+                        );
+
+                        if (!$stmt) {
+
+                            $error =
+                                "Something went wrong. Please try again.";
+
+                        } else {
+
+                            $stmt->bind_param(
+                                "isss",
+                                $user_id,
+                                $artist_name,
+                                $bio,
+                                $contact
+                            );
+
+
+                            if ($stmt->execute()) {
+
+                                $artist_id = $stmt->insert_id;
+
+
+                                /* =====================================
+                                   CONNECT ARTIST TO EVENT
+                                ===================================== */
+
+                                $event_artist_stmt = $conn->prepare(
+                                    "INSERT INTO event_artists
+                                    (event_id, artist_id, status)
+                                    VALUES (?, ?, 'Pending')"
+                                );
+
+                                if (!$event_artist_stmt) {
+
+                                    $error =
+                                        "Artist was registered, but the event application could not be submitted.";
+
+                                } else {
+
+                                    $event_artist_stmt->bind_param(
+                                        "ii",
+                                        $event_id,
+                                        $artist_id
+                                    );
+
+
+                                    if ($event_artist_stmt->execute()) {
+
+                                        $success =
+                                            "Artist registration submitted successfully! Your application is now pending approval.";
+
+                                    } else {
+
+                                        $error =
+                                            "Artist was registered, but the event application could not be submitted.";
+
+                                    }
+
+                                    $event_artist_stmt->close();
+                                }
+
+                            } else {
+
+                                $error =
+                                    "Something went wrong. Please try again.";
+                            }
+
+                            $stmt->close();
+                        }
                     }
 
-
                     $event_stmt->close();
-
                 }
-
-                else {
-
-                    $error =
-                        "No active event is currently available.";
-
-                }
-
             }
 
-            else {
-
-                $error =
-                    "Something went wrong. Please try again.";
-
-            }
-
-
-            $stmt->close();
-
+            $check->close();
         }
-
-
-        $check->close();
-
     }
-
 }
 
 ?>

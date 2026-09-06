@@ -1,23 +1,32 @@
 <?php
+
 session_start();
 require_once "db.php";
 
-/* USER MUST BE LOGGED IN */
+/* =====================================
+   USER MUST BE LOGGED IN
+===================================== */
+
 if (
     !isset($_SESSION["user_logged_in"]) ||
-    $_SESSION["user_logged_in"] !== true
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"])
 ) {
     header("Location: login.php");
     exit();
 }
 
-$user_id = $_SESSION["user_id"];
+$user_id = (int) $_SESSION["user_id"];
 
 $error = "";
 $success = "";
 
 
-/* CHECK IF USER IS AN APPROVED ARTIST */
+/* =====================================
+   CHECK IF USER IS AN APPROVED ARTIST
+===================================== */
+
 $stmt = $conn->prepare(
     "SELECT
         a.artist_id,
@@ -32,165 +41,342 @@ $stmt = $conn->prepare(
      LIMIT 1"
 );
 
+if (!$stmt) {
+    die("Something went wrong. Please try again.");
+}
+
 $stmt->bind_param("i", $user_id);
-$stmt->execute();
+
+if (!$stmt->execute()) {
+    $stmt->close();
+    die("Something went wrong. Please try again.");
+}
 
 $result = $stmt->get_result();
 
 if ($result->num_rows !== 1) {
+
     $stmt->close();
 
     echo "<script>
         alert('Your artist application has not been approved yet.');
         window.location.href = 'events.php';
     </script>";
+
     exit();
 }
 
 $artist = $result->fetch_assoc();
-$artist_id = $artist["artist_id"];
+$artist_id = (int) $artist["artist_id"];
 
 $stmt->close();
 
 
-/* HANDLE ARTWORK SUBMISSION */
+/* =====================================
+   HANDLE ARTWORK SUBMISSION
+===================================== */
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $title = trim($_POST["title"] ?? "");
     $description = trim($_POST["description"] ?? "");
-    $price = trim($_POST["price"] ?? "");
+    $price_input = trim($_POST["price"] ?? "");
 
-    /* VALIDATE TEXT FIELDS */
-    if ($title === "" || $description === "" || $price === "") {
 
-        $error = "Please complete all artwork fields.";
+    /* =====================================
+       VALIDATE ARTWORK NAME
+    ===================================== */
 
-    } elseif (!is_numeric($price) || $price < 0) {
+    if ($title === "") {
+
+        $error = "Please enter an artwork name.";
+
+    } elseif (strlen($title) < 2) {
+
+        $error = "Artwork name must be at least 2 characters.";
+
+    } elseif (strlen($title) > 150) {
+
+        $error = "Artwork name must not exceed 150 characters.";
+
+    } elseif (!preg_match('/[A-Za-z]/', $title)) {
+
+        $error = "Artwork name must contain at least one letter.";
+    }
+
+
+    /* =====================================
+       VALIDATE DESCRIPTION
+    ===================================== */
+
+    elseif ($description === "") {
+
+        $error = "Please enter an artwork description.";
+
+    } elseif (strlen($description) < 5) {
+
+        $error = "Artwork description must be at least 5 characters.";
+
+    } elseif (strlen($description) > 5000) {
+
+        $error = "Artwork description must not exceed 5000 characters.";
+    }
+
+
+    /* =====================================
+       VALIDATE PRICE
+    ===================================== */
+
+    elseif ($price_input === "") {
+
+        $error = "Please enter an artwork price.";
+
+    } elseif (!preg_match('/^\d+(\.\d{1,2})?$/', $price_input)) {
 
         $error = "Please enter a valid artwork price.";
 
-    } elseif (!isset($_FILES["artwork_image"]) ||
-              $_FILES["artwork_image"]["error"] !== UPLOAD_ERR_OK) {
-
-        $error = "Please select an artwork image.";
-
     } else {
 
-        $file = $_FILES["artwork_image"];
+        $price = (float) $price_input;
 
-        $file_name = $file["name"];
-        $file_tmp = $file["tmp_name"];
-        $file_size = $file["size"];
+        if ($price < 0) {
 
-        /* GET FILE EXTENSION */
-        $extension = strtolower(
-            pathinfo($file_name, PATHINFO_EXTENSION)
-        );
+            $error = "Artwork price cannot be negative.";
 
-        /* ALLOWED IMAGE TYPES */
-        $allowed_extensions = [
-            "jpg",
-            "jpeg",
-            "png",
-            "webp"
-        ];
+        } elseif ($price > 99999999.99) {
 
-        if (!in_array($extension, $allowed_extensions)) {
+            $error = "Artwork price is too high.";
+        }
+    }
 
-            $error = "Only JPG, JPEG, PNG, and WEBP images are allowed.";
 
-        } elseif ($file_size > 5 * 1024 * 1024) {
+    /* =====================================
+       VALIDATE IMAGE
+    ===================================== */
 
-            $error = "Artwork image must be 5MB or smaller.";
+    if ($error === "") {
+
+        if (
+            !isset($_FILES["artwork_image"]) ||
+            !isset($_FILES["artwork_image"]["error"]) ||
+            $_FILES["artwork_image"]["error"] !== UPLOAD_ERR_OK
+        ) {
+
+            $error = "Please select an artwork image.";
 
         } else {
 
-            /* CREATE UNIQUE FILE NAME */
-            $new_file_name =
-                "artwork_" .
-                $artist_id .
-                "_" .
-                time() .
-                "_" .
-                uniqid() .
-                "." .
-                $extension;
+            $file = $_FILES["artwork_image"];
 
-            $upload_folder = "artwork_images/";
+            $file_name = $file["name"] ?? "";
+            $file_tmp = $file["tmp_name"] ?? "";
+            $file_size = (int) ($file["size"] ?? 0);
 
-            /* CREATE FOLDER IF IT DOES NOT EXIST */
-            if (!is_dir($upload_folder)) {
-                mkdir($upload_folder, 0777, true);
+
+            /* =====================================
+               CHECK FILE SIZE
+            ===================================== */
+
+            if ($file_size <= 0) {
+
+                $error = "The uploaded image is invalid.";
+
+            } elseif ($file_size > 5 * 1024 * 1024) {
+
+                $error = "Artwork image must be 5MB or smaller.";
             }
 
-            $upload_path = $upload_folder . $new_file_name;
 
-            /* MOVE IMAGE */
-            if (move_uploaded_file($file_tmp, $upload_path)) {
+            /* =====================================
+               CHECK FILE EXTENSION
+            ===================================== */
 
-                /* INSERT ARTWORK AS PENDING */
-                $stmt = $conn->prepare(
-                    "INSERT INTO artworks
-                    (
-                        artist_id,
-                        title,
-                        description,
-                        price,
-                        image,
-                        status
-                    )
-                    VALUES (?, ?, ?, ?, ?, 'Pending')"
+            else {
+
+                $extension = strtolower(
+                    pathinfo($file_name, PATHINFO_EXTENSION)
                 );
 
-                if (!$stmt) {
+                $allowed_extensions = [
+                    "jpg",
+                    "jpeg",
+                    "png",
+                    "webp"
+                ];
 
-                    $error = "Database error: " . $conn->error;
+                if (!in_array($extension, $allowed_extensions, true)) {
 
-                    /* DELETE UPLOADED FILE IF DATABASE INSERT FAILS */
-                    if (file_exists($upload_path)) {
-                        unlink($upload_path);
-                    }
+                    $error =
+                        "Only JPG, JPEG, PNG, and WEBP images are allowed.";
 
                 } else {
 
-                    $price = (float)$price;
 
-                    $stmt->bind_param(
-                        "issds",
-                        $artist_id,
-                        $title,
-                        $description,
-                        $price,
-                        $new_file_name
-                    );
+                    /* =====================================
+                       CHECK ACTUAL MIME TYPE
+                    ===================================== */
 
-                    if ($stmt->execute()) {
+                    $finfo = finfo_open(FILEINFO_MIME_TYPE);
 
-                        $success =
-                            "Your artwork has been submitted successfully! " .
-                            "It is now waiting for admin approval.";
+                    if (!$finfo) {
+
+                        $error =
+                            "The uploaded image could not be verified.";
 
                     } else {
 
-                        $error =
-                            "Something went wrong while saving your artwork.";
+                        $mime_type = finfo_file(
+                            $finfo,
+                            $file_tmp
+                        );
 
-                        if (file_exists($upload_path)) {
-                            unlink($upload_path);
+                        finfo_close($finfo);
+
+                        $allowed_mime_types = [
+                            "image/jpeg",
+                            "image/png",
+                            "image/webp"
+                        ];
+
+                        if (
+                            !in_array(
+                                $mime_type,
+                                $allowed_mime_types,
+                                true
+                            )
+                        ) {
+
+                            $error =
+                                "The uploaded file is not a valid image.";
                         }
                     }
+                }
+            }
+        }
+    }
 
-                    $stmt->close();
+
+    /* =====================================
+       CREATE UPLOAD FOLDER
+    ===================================== */
+
+    if ($error === "") {
+
+        $upload_folder = "artwork_images/";
+
+        if (!is_dir($upload_folder)) {
+
+            if (!mkdir($upload_folder, 0755, true)) {
+
+                $error =
+                    "The artwork image folder could not be created.";
+            }
+        }
+    }
+
+
+    /* =====================================
+       GENERATE RANDOM FILE NAME
+    ===================================== */
+
+    if ($error === "") {
+
+        try {
+
+            $random_name = bin2hex(random_bytes(16));
+
+        } catch (Exception $e) {
+
+            $error =
+                "Something went wrong while processing the image.";
+        }
+    }
+
+
+    /* =====================================
+       MOVE IMAGE AND SAVE ARTWORK
+    ===================================== */
+
+    if ($error === "") {
+
+        $new_file_name =
+            "artwork_" .
+            $artist_id .
+            "_" .
+            $random_name .
+            "." .
+            $extension;
+
+        $upload_path =
+            $upload_folder . $new_file_name;
+
+
+        if (!move_uploaded_file($file_tmp, $upload_path)) {
+
+            $error =
+                "The artwork image could not be uploaded. Please try again.";
+
+        } else {
+
+            /* =====================================
+               INSERT ARTWORK AS PENDING
+            ===================================== */
+
+            $stmt = $conn->prepare(
+                "INSERT INTO artworks
+                (
+                    artist_id,
+                    title,
+                    description,
+                    price,
+                    image,
+                    status
+                )
+                VALUES (?, ?, ?, ?, ?, 'Pending')"
+            );
+
+            if (!$stmt) {
+
+                $error =
+                    "Something went wrong. Please try again.";
+
+                if (file_exists($upload_path)) {
+                    unlink($upload_path);
                 }
 
             } else {
 
-                $error =
-                    "The artwork image could not be uploaded. Please try again.";
+                $stmt->bind_param(
+                    "issds",
+                    $artist_id,
+                    $title,
+                    $description,
+                    $price,
+                    $new_file_name
+                );
+
+                if ($stmt->execute()) {
+
+                    $success =
+                        "Your artwork has been submitted successfully! " .
+                        "It is now waiting for admin approval.";
+
+                } else {
+
+                    $error =
+                        "Something went wrong while saving your artwork.";
+
+                    if (file_exists($upload_path)) {
+                        unlink($upload_path);
+                    }
+                }
+
+                $stmt->close();
             }
         }
     }
 }
+
 ?>
 
 <!DOCTYPE html>

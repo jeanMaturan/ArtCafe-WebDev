@@ -2,9 +2,44 @@
 
 session_start();
 
-unset($_SESSION["admin_logged_in"]);
-unset($_SESSION["admin_id"]);
-unset($_SESSION["admin_username"]);
+
+/* =====================================
+   CLEAR ALL SESSION DATA
+===================================== */
+
+$_SESSION = [];
+
+
+/* =====================================
+   REMOVE SESSION COOKIE
+===================================== */
+
+if (ini_get("session.use_cookies")) {
+
+    $params = session_get_cookie_params();
+
+    setcookie(
+        session_name(),
+        "",
+        time() - 42000,
+        $params["path"],
+        $params["domain"],
+        $params["secure"],
+        $params["httponly"]
+    );
+}
+
+
+/* =====================================
+   DESTROY ADMIN SESSION
+===================================== */
+
+session_destroy();
+
+
+/* =====================================
+   RETURN TO ADMIN LOGIN
+===================================== */
 
 header("Location: admin_login.php");
 exit();
