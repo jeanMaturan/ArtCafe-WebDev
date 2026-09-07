@@ -245,9 +245,9 @@ session_start();
                 </p>
 
                 <div class="social-icons">
-                    <a href="#">●</a>
-                    <a href="#">◎</a>
-                    <a href="#">✉</a>
+                    <a href="#" aria-label="Facebook"><img src="images/fb.png" alt="Facebook"></a>
+                    <a href="#" aria-label="Instagram"><img src="images/insta.png" alt="Instagram"></a>
+                    <a href="#" aria-label="Email"><img src="images/email.png" alt="Email"></a>
                 </div>
 
             </div>
@@ -270,9 +270,9 @@ session_start();
 
                 <h3>CONTACTS</h3>
 
-                <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
-                <p>☎ &nbsp; 0958 586 8934</p>
-                <p>✉ &nbsp; maturansartcafe@gmail.com</p>
+                <p><img src="images/map.png" alt="" class="footer-contact-icon"> Jawa, Valencia Negros Oriental</p>
+                <p><img src="images/tele.png" alt="" class="footer-contact-icon"> 0958 586 8934</p>
+                <p><img src="images/email.png" alt="" class="footer-contact-icon"> maturansartcafe@gmail.com</p>
 
             </div>
 

@@ -22,7 +22,9 @@ session_start();
     <header class="header">
 
     <div class="logo">
-        <img src="images/logo.png" alt="Maturan's Art Cafe">
+        <a href="index.php">
+            <img src="images/logo.png" alt="Maturan's Art Cafe">
+        </a>
     </div>
 
         <button class="menu-toggle" id="menuToggle">
@@ -246,7 +248,7 @@ session_start();
     <div class="special-card">
 
         <div class="special-text">
-            <div class="special-label1"
+            <div class="special-label1">
                 <p class="special-label">OPENING SPECIAL ! ! !</p>
             </div> 
 
@@ -448,7 +450,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/beam.png"
+                        src="images/Mia.png"
                         alt="Mia"
                         class="customer-image"
                     >
@@ -486,7 +488,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/gordon.png"
+                        src="images/Kyle.png"
                         alt="Kyle"
                         class="customer-image"
                     >
@@ -524,7 +526,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/derpie.png"
+                        src="images/Anna.png"
                         alt="Anna"
                         class="customer-image"
                     >
@@ -570,7 +572,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/beam.png"
+                        src="images/Lia.png"
                         alt="Lia"
                         class="customer-image"
                     >
@@ -608,7 +610,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/gordon.png"
+                        src="images/Mark.png"
                         alt="Mark"
                         class="customer-image"
                     >
@@ -616,44 +618,6 @@ session_start();
                     <div>
                         <p class="customer-name">Mark</p>
                         <p class="customer-location">Tanjay</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Review 9 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    Amazing experience every time.
-                    I'll definitely come back!
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="John"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">John</p>
-                        <p class="customer-location">Dumaguete</p>
                     </div>
 
                 </div>
@@ -698,9 +662,9 @@ session_start();
             </p>
 
             <div class="social-icons">
-                <a href="#">●</a>
-                <a href="#">◎</a>
-                <a href="#">✉</a>
+                <a href="#" aria-label="Facebook"><img src="images/fb.png" alt="Facebook"></a>
+                <a href="#" aria-label="Instagram"><img src="images/insta.png" alt="Instagram"></a>
+                <a href="#" aria-label="Email"><img src="images/email.png" alt="Email"></a>
             </div>
 
         </div>
@@ -721,11 +685,11 @@ session_start();
 
             <h3>CONTACTS</h3>
 
-            <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
+            <p><img src="images/map.png" alt="" class="footer-contact-icon"> Jawa, Valencia Negros Oriental</p>
 
-            <p>☎ &nbsp; 0958 586 8934</p>
+            <p><img src="images/tele.png" alt="" class="footer-contact-icon"> 0958 586 8934</p>
 
-            <p>✉ &nbsp; maturansartcafe@gmail.com</p>
+            <p><img src="images/email.png" alt="" class="footer-contact-icon"> maturansartcafe@gmail.com</p>
 
         </div>
 
@@ -778,4 +742,4 @@ session_start();
 
 </body>
 
-</html> 
+</html>

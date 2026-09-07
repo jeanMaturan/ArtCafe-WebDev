@@ -577,16 +577,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="social-icons">
 
-                <a href="#">
-                    ●
+                <a href="#" aria-label="Facebook">
+                    <img src="images/fb.png" alt="Facebook">
                 </a>
 
-                <a href="#">
-                    ◎
+                <a href="#" aria-label="Instagram">
+                    <img src="images/insta.png" alt="Instagram">
                 </a>
 
-                <a href="#">
-                    ✉
+                <a href="#" aria-label="Email">
+                    <img src="images/email.png" alt="Email">
                 </a>
 
             </div>
@@ -622,17 +622,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
             <p>
-                ◈ &nbsp; Jawa, Valencia Negros Oriental
+                <img src="images/map.png" alt="" class="footer-contact-icon"> Jawa, Valencia Negros Oriental
             </p>
 
 
             <p>
-                ☎ &nbsp; 0958 586 8934
+                <img src="images/tele.png" alt="" class="footer-contact-icon"> 0958 586 8934
             </p>
 
 
             <p>
-                ✉ &nbsp; maturansartcafe@gmail.com
+                <img src="images/email.png" alt="" class="footer-contact-icon"> maturansartcafe@gmail.com
             </p>
 
         </div>
