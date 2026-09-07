@@ -878,6 +878,7 @@ body {
     text-decoration: none;
     transition: 0.2s ease;
     overflow: hidden;
+    cursor: default;
 }
 
 .social-icons a img {
@@ -887,7 +888,7 @@ body {
 }
 
 .social-icons a:hover {
-    transform: translateY(-3px);
+    transform: none;
 }
 
 .footer-links,
