@@ -73,18 +73,16 @@
     font-size: 11px;
 }
 
-.admin-logout-button {
+/* =========================
+   ADMIN NAVIGATION
+   ========================= */
+
+.admin-header .admin-header-right > a.admin-nav-button {
     display: inline-block;
 
-    padding: 10px 17px;
+    color: #ffffff !important;
 
-    background: var(--orange);
-
-    color: var(--white);
-
-    text-decoration: none;
-
-    border-radius: 5px;
+    text-decoration: none !important;
 
     font-size: 10px;
 
@@ -92,6 +90,43 @@
 
     letter-spacing: 1px;
 
+    background: transparent !important;
+
+    border: none !important;
+
+    padding: 0 !important;
+
+    margin: 0 !important;
+}
+
+.admin-header .admin-header-right > a.admin-nav-button:link {
+    color: #ffffff !important;
+}
+
+.admin-header .admin-header-right > a.admin-nav-button:visited {
+    color: #ffffff !important;
+}
+
+.admin-header .admin-header-right > a.admin-nav-button:hover {
+    color: var(--orange) !important;
+
+    text-decoration: none !important;
+}
+
+.admin-header .admin-header-right > a.admin-nav-button:active {
+    color: #ffffff !important;
+}
+
+.admin-logout-button {
+    display: inline-block;
+    padding: 10px 17px;
+    background: var(--orange);
+    color: var(--white);
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
     transition: background 0.3s ease;
 }
 
@@ -526,6 +561,7 @@
 
     font-size: 12px;
 }
+
 
 
 /* =========================

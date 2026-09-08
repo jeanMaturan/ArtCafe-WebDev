@@ -227,3 +227,23 @@
 .reservation-submit:hover {
     background: var(--orange-dark);
 }
+
+.contact-success {
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background: #e7f5e9;
+    color: #2f6b3a;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.contact-error {
+    margin-bottom: 20px;
+    padding: 12px 15px;
+    border-radius: 8px;
+    background: #fde8e8;
+    color: #a33a3a;
+    font-size: 12px;
+    font-weight: bold;
+}
