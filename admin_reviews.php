@@ -294,6 +294,13 @@ if (!$result) {
 
 
         <a
+            href="admin_dashboard.php"
+            class="admin-nav-button"
+        >
+            DASHBOARD
+        </a>
+
+        <a
             href="admin.php"
             class="admin-nav-button"
         >
@@ -708,103 +715,6 @@ if (!$result) {
 
 
 </main>
-
-
-
-<!-- =====================================
-     FOOTER
-===================================== -->
-
-<footer class="footer">
-
-
-    <div class="footer-content">
-
-
-        <!-- BRAND -->
-
-        <div class="footer-brand">
-
-
-            <img
-                src="images/logo.png"
-                alt="Maturan's Art Cafe"
-                class="footer-logo"
-            >
-
-
-            <p class="footer-tagline">
-                Sip. Create. Relax.
-            </p>
-
-
-            <p class="footer-description">
-                A cozy art cafe inspiring creativity,
-                connection, and community.
-            </p>
-
-
-        </div>
-
-
-
-        <!-- QUICK LINKS -->
-
-        <div class="footer-links">
-
-            <h3>
-                QUICK LINKS
-            </h3>
-
-
-            <div class="admin-header-right">
-
-   <div class="admin-header-right">
-    <a href="admin.php" class="admin-nav-button">ARTISTS</a>
-    <a href="admin_artworks.php" class="admin-nav-button">ARTWORKS</a>
-    <a href="admin_reviews.php" class="admin-nav-button">REVIEWS</a>
-    <a href="admin_messages.php" class="admin-nav-button">MESSAGES</a>
-    <a href="admin_subscribers.php" class="admin-nav-button">SUBSCRIBERS</a>
-    <span>Welcome, <?php echo htmlspecialchars($_SESSION["admin_username"]); ?></span>
-    <a href="admin_logout.php" class="admin-logout-button">LOGOUT</a>
-</div>
-
-</div>
-
-        </div>
-
-
-
-        <!-- ADMIN CONTACT -->
-
-        <div class="footer-contact">
-
-            <h3>
-                ADMIN PANEL
-            </h3>
-
-
-            <p>
-                Maturan's Art Cafe
-            </p>
-
-
-            <p>
-                Jawa, Valencia, Negros Oriental
-            </p>
-
-
-            <p>
-                Admin Management System
-            </p>
-
-        </div>
-
-
-    </div>
-
-
-</footer>
 
 
 

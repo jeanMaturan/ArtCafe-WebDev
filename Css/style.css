@@ -1039,15 +1039,6 @@ body {
 }
 
 .login-success {
-    color: #267a3d;
-    background: #eaf7ed;
-    padding: 12px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.login-success {
     width: 100%;
     padding: 12px 15px;
     margin-bottom: 20px;

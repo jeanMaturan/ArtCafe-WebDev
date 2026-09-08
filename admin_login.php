@@ -91,7 +91,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     $stmt->close();
 
-                    header("Location: admin.php");
+                    header("Location: admin_dashboard.php");
                     exit();
 
                 } else {

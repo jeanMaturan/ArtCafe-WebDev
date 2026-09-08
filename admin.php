@@ -458,6 +458,13 @@ if ($event_id !== null) {
     <div class="admin-header-right">
 
     <a
+        href="admin_dashboard.php"
+        class="admin-nav-button"
+    >
+        DASHBOARD
+    </a>
+
+    <a
         href="admin.php"
         class="admin-nav-button"
     >
