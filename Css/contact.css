@@ -66,7 +66,7 @@
 
 .contact-info-section {
     width: 100%;
-    padding: 30px 8%;
+    padding: 70px 8%;
     background: var(--white);
 }
 
@@ -123,9 +123,9 @@
 
 .contact-form-section {
     width: 100%;
-    padding: 20px 8%;
+    padding: 70px 8%;
     display: flex;
-    gap: 40px;
+    gap: 70px;
     background: var(--beige);
 }
 
@@ -158,7 +158,7 @@
 .contact-form {
     width: 60%;
     background: var(--white);
-    padding: 20px;
+    padding: 35px;
     border-radius: 25px;
     box-shadow: var(--shadow);
 }
@@ -226,125 +226,4 @@
 .contact-submit:hover,
 .reservation-submit:hover {
     background: var(--orange-dark);
-}
-
-.contact-success {
-    margin-bottom: 20px;
-    padding: 12px 15px;
-    border-radius: 8px;
-    background: #e7f5e9;
-    color: #2f6b3a;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.contact-error {
-    margin-bottom: 20px;
-    padding: 12px 15px;
-    border-radius: 8px;
-    background: #fde8e8;
-    color: #a33a3a;
-    font-size: 12px;
-    font-weight: bold;
-}
-
-.logged-user-name {
-    width: 100%;
-    padding: 14px 16px;
-    background: #f8f3ee;
-    border: 1px solid #ddd;
-    border-radius: 6px;
-    color: var(--dark-text);
-    font-size: 14px;
-    box-sizing: border-box;
-}
-
-/* FIX NAVBAR PROFILE LINK */
-.header .navbar a {
-    color: #24150f !important;
-    text-decoration: none !important;
-}
-
-.header .navbar a:hover {
-    color: var(--orange) !important;
-}
-
-
-/* =========================================
-   MOBILE RESPONSIVE
-========================================= */
-
-@media (max-width: 768px) {
-
-    /* Hero */
-    .contact-page-hero {
-        flex-direction: column;
-        min-height: 0;
-    }
-
-    .contact-hero-content {
-        width: 100%;
-        padding: 45px 25px 30px;
-    }
-
-    .contact-hero-content h1 {
-        font-size: 44px;
-    }
-
-    .contact-hero-content > p:last-child {
-        max-width: 100%;
-    }
-
-    .contact-hero-image {
-        width: 100%;
-        height: 260px;
-        border-radius: 0;
-    }
-
-    /* Contact Info */
-    .contact-info-section {
-        padding: 35px 6%;
-    }
-
-    .contact-info-heading {
-        margin-bottom: 25px;
-    }
-
-    .contact-info-heading h2 {
-        font-size: 28px;
-    }
-
-    .contact-info-container {
-        flex-direction: column;
-        gap: 18px;
-    }
-
-    /* Contact Form */
-    .contact-form-section {
-        flex-direction: column;
-        gap: 25px;
-        padding: 25px 6% 50px;
-    }
-
-    .contact-form-content {
-        width: 100%;
-    }
-
-    .contact-form-content h2 {
-        font-size: 28px;
-    }
-
-    .contact-form-content > p:last-child {
-        max-width: 100%;
-    }
-
-    .contact-form {
-        width: 100%;
-        box-sizing: border-box;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
 }

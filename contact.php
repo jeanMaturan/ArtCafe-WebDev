@@ -9,6 +9,7 @@
     <title>Contact - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/contact.css">
 
 </head>
 

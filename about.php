@@ -8,6 +8,7 @@
     <title>About Us | Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/about.css">
 </head>
 
 <body>

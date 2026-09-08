@@ -123,11 +123,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         Reserve a Table - Maturan's Art Cafe
     </title>
 
-    <link
-        rel="stylesheet"
-        href="Css/style.css"
-    >
-
+    <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/reservation.css">
 </head>
 
 

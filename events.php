@@ -8,6 +8,7 @@
     <title>Events - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/events.css">
 </head>
 
 <body>

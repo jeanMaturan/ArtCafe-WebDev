@@ -1,8 +1,42 @@
-/* =====================================
-   RESERVATION PAGE
-===================================== */
-
 .reservation-section {
+    width: 100%;
+    padding: 70px 8%;
+    display: flex;
+    gap: 70px;
+    background: var(--pink);
+}
+
+.reservation-content {
+    width: 40%;
+}
+
+.reservation-content h2 {
+    color: var(--brown);
+    font-size: 48px;
+    line-height: 1.1;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.reservation-content h2 span {
+    color: var(--orange);
+}
+
+.reservation-content > p:last-child {
+    max-width: 400px;
+    color: var(--dark-text);
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.reservation-form {
+    width: 60%;
+    background: var(--white);
+    padding: 35px;
+    border-radius: 25px;
+    box-shadow: var(--shadow);
+}
+.reservation-page {
     width: 100%;
     min-height: 650px;
     display: flex;
@@ -13,45 +47,30 @@
     box-sizing: border-box;
 }
 
-
-/* =====================================
-   LEFT CONTENT
-===================================== */
-
-.reservation-content {
+.reservation-page-content {
     width: 40%;
 }
 
-.reservation-content .contact-small {
-    margin-bottom: 8px;
-    color: var(--dark-text);
-    font-size: 14px;
-}
-
-.reservation-content h2 {
-    margin: 0 0 25px;
+.reservation-page-content h1 {
     color: var(--brown);
     font-size: 65px;
     line-height: 0.95;
     letter-spacing: 2px;
+    margin-bottom: 25px;
 }
 
-.reservation-content h2 span {
+.reservation-page-content h1 span {
     color: var(--orange);
 }
 
-.reservation-content > p {
+.reservation-page-content > p:last-child {
     max-width: 400px;
     color: var(--dark-text);
     font-size: 14px;
     line-height: 1.7;
 }
 
-/* =====================================
-   RESERVATION FORM
-===================================== */
-
-.reservation-form {
+.reservation-page-form {
     width: 60%;
     padding: 40px;
     background: var(--white);
@@ -60,195 +79,46 @@
     box-sizing: border-box;
 }
 
-
-/* =====================================
-   FORM ROW
-===================================== */
-
-.form-row {
-    display: flex;
-    gap: 20px;
-    width: 100%;
+.reservation-page-form h2 {
+    color: var(--brown);
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
 }
 
-
-/* =====================================
-   FORM GROUP
-===================================== */
-
-.reservation-form .form-group {
-    flex: 1;
-    margin-bottom: 20px;
+.reservation-page-form h2 span {
+    color: var(--orange);
 }
 
-.reservation-form .form-group label {
-    display: block;
-    margin-bottom: 7px;
+.logged-user {
     color: var(--dark-text);
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
+    font-size: 12px;
+    margin-bottom: 25px;
 }
 
+.logged-user strong {
+    color: var(--orange);
+}
 
-/* =====================================
-   INPUTS
-===================================== */
-
-.reservation-form input,
-.reservation-form select,
-.reservation-form textarea {
+.reservation-page-form .form-group input,
+.reservation-page-form .form-group select,
+.reservation-page-form .form-group textarea {
     width: 100%;
-    height: 43px;
-    padding: 0 13px;
     box-sizing: border-box;
-    border: 1px solid #ddd2cb;
-    border-radius: 5px;
-    background: var(--white);
-    color: var(--dark-text);
-    font-family: var(--font);
-    font-size: 13px;
-    outline: none;
 }
 
-.reservation-form input:focus,
-.reservation-form select:focus,
-.reservation-form textarea:focus {
-    border-color: var(--orange);
-}
-
-.reservation-form input::placeholder {
-    color: #aaa09a;
-}
-
-
-/* =====================================
-   SELECT
-===================================== */
-
-.reservation-form select {
-    cursor: pointer;
-}
-
-
-/* =====================================
-   DATE + TIME
-===================================== */
-
-.reservation-form input[type="date"],
-.reservation-form input[type="time"] {
-    color: var(--dark-text);
-}
-
-
-/* =====================================
-   SUBMIT BUTTON
-===================================== */
-
-.reservation-submit {
-    margin-top: 5px;
+.reservation-page-button {
     padding: 14px 28px;
     border: none;
     border-radius: 7px;
     background: var(--orange);
     color: var(--white);
-    font-family: var(--font);
-    font-size: 11px;
+    font-size: 12px;
     font-weight: bold;
     letter-spacing: 1px;
     cursor: pointer;
-    transition: background 0.3s ease,
-                transform 0.2s ease;
 }
 
-.reservation-submit:hover {
+.reservation-page-button:hover {
     background: var(--orange-dark);
-    transform: translateY(-1px);
-}
-
-
-/* =====================================
-   SUCCESS / ERROR
-===================================== */
-
-.login-success {
-    width: 100%;
-    padding: 12px 15px;
-    box-sizing: border-box;
-    background: #e5f4e8;
-    border: 1px solid #b8ddbf;
-    border-radius: 6px;
-    color: #2e6b3b;
-    font-size: 12px;
-    margin-bottom: 20px;
-}
-
-.login-error {
-    width: 100%;
-    padding: 12px 15px;
-    box-sizing: border-box;
-    background: #ffe5df;
-    border: 1px solid #f4b5a7;
-    border-radius: 6px;
-    color: #b83219;
-    font-size: 12px;
-    margin-bottom: 20px;
-}
-
-
-/* =====================================
-   MOBILE
-===================================== */
-
-@media (max-width: 800px) {
-
-    .reservation-section {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 40px;
-        padding: 60px 6%;
-    }
-
-    .reservation-content,
-    .reservation-form {
-        width: 100%;
-    }
-
-    .reservation-content h2 {
-        font-size: 52px;
-    }
-
-}
-
-
-@media (max-width: 600px) {
-
-    .reservation-section {
-        padding: 45px 20px;
-    }
-
-    .reservation-content h2 {
-        font-size: 42px;
-    }
-
-    .form-row {
-        flex-direction: column;
-        gap: 0;
-    }
-
-    .reservation-form {
-        padding: 25px 20px;
-        border-radius: 20px;
-    }
-
-}
-
-.logged-user {
-    margin: 0 0 25px;
-    color: var(--dark-text);
-    font-size: 12px;
-}
-
-.logged-user strong {
-    color: var(--orange);
 }

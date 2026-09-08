@@ -4,38 +4,33 @@ session_start();
 require_once "db.php";
 
 
-/* =====================================
-   ADMIN LOGIN CHECK
-===================================== */
+// =====================================
+// CHECK ADMIN LOGIN
+// =====================================
 
 if (
     !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true ||
-    !isset($_SESSION["admin_id"]) ||
-    !is_numeric($_SESSION["admin_id"]) ||
-    !isset($_SESSION["admin_username"]) ||
-    $_SESSION["admin_username"] === ""
+    $_SESSION["admin_logged_in"] !== true
 ) {
     header("Location: admin_login.php");
     exit();
 }
 
-$admin_id = (int) $_SESSION["admin_id"];
+
+$success = "";
+$error = "";
 
 
-/* =====================================
-   SETTINGS
-===================================== */
+// =====================================
+// MAXIMUM APPROVED ARTISTS
+// =====================================
 
 $max_artists = 5;
 
-$message = "";
-$message_type = "";
 
-
-/* =====================================
-   GET ACTIVE EVENT
-===================================== */
+// =====================================
+// GET ACTIVE EVENT
+// =====================================
 
 $event_id = null;
 $event_name = "";
@@ -52,68 +47,40 @@ if ($event_query && $event_query->num_rows === 1) {
 
     $event = $event_query->fetch_assoc();
 
-    $event_id = (int) $event["event_id"];
+    $event_id = $event["event_id"];
     $event_name = $event["event_name"];
 }
 
 
-/* =====================================
-   APPROVE / REJECT ARTIST
-===================================== */
+// =====================================
+// APPROVE / REJECT ARTIST
+// =====================================
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $action = trim($_POST["action"] ?? "");
-    $event_artist_id = filter_input(
-        INPUT_POST,
-        "event_artist_id",
-        FILTER_VALIDATE_INT
-    );
+    $event_artist_id = (int)($_POST["event_artist_id"] ?? 0);
+    $action = $_POST["action"] ?? "";
 
 
-    /* =====================================
-       VALIDATE POST DATA
-    ===================================== */
+    if ($event_artist_id <= 0) {
 
-    if (
-        !in_array(
-            $action,
-            ["approve", "reject"],
-            true
-        )
-    ) {
-
-        $message = "Invalid action.";
-        $message_type = "error";
-
-    } elseif (
-        $event_artist_id === false ||
-        $event_artist_id === null ||
-        $event_artist_id <= 0
-    ) {
-
-        $message = "Invalid artist application.";
-        $message_type = "error";
+        $error = "Invalid artist application.";
 
     } elseif ($event_id === null) {
 
-        $message = "No active event is currently available.";
-        $message_type = "error";
+        $error = "No active event is currently available.";
 
     } else {
 
 
-        /* =====================================
-           APPROVE
-        ===================================== */
+        // =====================================
+        // APPROVE ARTIST
+        // =====================================
 
         if ($action === "approve") {
 
 
-            /* =====================================
-               COUNT APPROVED ARTISTS
-            ===================================== */
-
+            // Count currently approved artists
             $count_stmt = $conn->prepare(
                 "SELECT COUNT(*) AS approved_count
                  FROM event_artists
@@ -121,234 +88,163 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                  AND status = 'Approved'"
             );
 
-
-            if (!$count_stmt) {
-
-                $message =
-                    "Something went wrong. Please try again.";
-
-                $message_type = "error";
-
-            } else {
-
-                $count_stmt->bind_param(
-                    "i",
-                    $event_id
-                );
-
-                $count_stmt->execute();
-
-                $count_result =
-                    $count_stmt->get_result();
-
-                $count_data =
-                    $count_result->fetch_assoc();
-
-                $approved_count =
-                    (int) $count_data["approved_count"];
-
-                $count_stmt->close();
-
-
-                /* =====================================
-                   CHECK EVENT CAPACITY
-                ===================================== */
-
-                if ($approved_count >= $max_artists) {
-
-                    $message =
-                        "The event already has 5 approved artists. You cannot approve another artist.";
-
-                    $message_type = "error";
-
-                } else {
-
-
-                    /* =====================================
-                       APPROVE ONLY PENDING APPLICATION
-                       FROM ACTIVE EVENT
-                    ===================================== */
-
-                    $approve_stmt = $conn->prepare(
-                        "UPDATE event_artists
-                         SET status = 'Approved'
-                         WHERE event_artist_id = ?
-                         AND event_id = ?
-                         AND status = 'Pending'"
-                    );
-
-
-                    if (!$approve_stmt) {
-
-                        $message =
-                            "Something went wrong. Please try again.";
-
-                        $message_type = "error";
-
-                    } else {
-
-                        $approve_stmt->bind_param(
-                            "ii",
-                            $event_artist_id,
-                            $event_id
-                        );
-
-
-                        if ($approve_stmt->execute()) {
-
-                            if (
-                                $approve_stmt->affected_rows > 0
-                            ) {
-
-                                $message =
-                                    "Artist approved successfully.";
-
-                                $message_type = "success";
-
-                            } else {
-
-                                $message =
-                                    "The artist could not be approved. The application may no longer be pending.";
-
-                                $message_type = "error";
-                            }
-
-                        } else {
-
-                            $message =
-                                "Something went wrong while approving the artist.";
-
-                            $message_type = "error";
-                        }
-
-                        $approve_stmt->close();
-                    }
-                }
-            }
-        }
-
-
-        /* =====================================
-           REJECT
-        ===================================== */
-
-        elseif ($action === "reject") {
-
-
-            /* =====================================
-               REJECT PENDING OR APPROVED ARTIST
-               ONLY FROM ACTIVE EVENT
-            ===================================== */
-
-            $reject_stmt = $conn->prepare(
-                "UPDATE event_artists
-                 SET status = 'Rejected'
-                 WHERE event_artist_id = ?
-                 AND event_id = ?
-                 AND status IN ('Pending', 'Approved')"
+            $count_stmt->bind_param(
+                "i",
+                $event_id
             );
 
+            $count_stmt->execute();
 
-            if (!$reject_stmt) {
+            $count_result = $count_stmt->get_result();
 
-                $message =
-                    "Something went wrong. Please try again.";
+            $count_data = $count_result->fetch_assoc();
 
-                $message_type = "error";
+            $approved_count = (int)$count_data["approved_count"];
+
+            $count_stmt->close();
+
+
+            // Check if already at maximum
+            if ($approved_count >= $max_artists) {
+
+                $error =
+                    "Cannot approve this artist. The maximum of 5 approved artists has already been reached.";
 
             } else {
 
-                $reject_stmt->bind_param(
+
+                // Make sure application belongs to active event
+                $approve_stmt = $conn->prepare(
+                    "UPDATE event_artists
+                     SET status = 'Approved'
+                     WHERE event_artist_id = ?
+                     AND event_id = ?
+                     AND status = 'Pending'"
+                );
+
+                $approve_stmt->bind_param(
                     "ii",
                     $event_artist_id,
                     $event_id
                 );
 
 
-                if ($reject_stmt->execute()) {
+                if ($approve_stmt->execute()) {
 
-                    if ($reject_stmt->affected_rows > 0) {
+                    if ($approve_stmt->affected_rows > 0) {
 
-                        $message =
-                            "Artist application rejected.";
-
-                        $message_type = "success";
+                        $success =
+                            "Artist application approved successfully.";
 
                     } else {
 
-                        $message =
-                            "The artist could not be rejected. The application may already be rejected.";
-
-                        $message_type = "error";
+                        $error =
+                            "This artist application could not be approved. It may already have been processed.";
                     }
 
                 } else {
 
-                    $message =
-                        "Something went wrong while rejecting the artist.";
-
-                    $message_type = "error";
+                    $error =
+                        "Something went wrong while approving the artist.";
                 }
 
-                $reject_stmt->close();
+
+                $approve_stmt->close();
             }
+        }
+
+
+        // =====================================
+        // REJECT ARTIST
+        // =====================================
+
+        elseif ($action === "reject") {
+
+            $reject_stmt = $conn->prepare(
+                "UPDATE event_artists
+                 SET status = 'Rejected'
+                 WHERE event_artist_id = ?
+                 AND event_id = ?
+                 AND status = 'Pending'"
+            );
+
+            $reject_stmt->bind_param(
+                "ii",
+                $event_artist_id,
+                $event_id
+            );
+
+
+            if ($reject_stmt->execute()) {
+
+                if ($reject_stmt->affected_rows > 0) {
+
+                    $success =
+                        "Artist application rejected.";
+
+                } else {
+
+                    $error =
+                        "This artist application could not be rejected. It may already have been processed.";
+                }
+
+            } else {
+
+                $error =
+                    "Something went wrong while rejecting the artist.";
+            }
+
+
+            $reject_stmt->close();
         }
     }
 }
 
 
-/* =====================================
-   COUNT APPROVED ARTISTS
-===================================== */
+// =====================================
+// COUNT APPROVED ARTISTS
+// =====================================
 
 $approved_count = 0;
 
 if ($event_id !== null) {
 
-    $approved_stmt = $conn->prepare(
+    $approved_query = $conn->prepare(
         "SELECT COUNT(*) AS approved_count
          FROM event_artists
          WHERE event_id = ?
          AND status = 'Approved'"
     );
 
+    $approved_query->bind_param(
+        "i",
+        $event_id
+    );
 
-    if ($approved_stmt) {
+    $approved_query->execute();
 
-        $approved_stmt->bind_param(
-            "i",
-            $event_id
-        );
+    $approved_result = $approved_query->get_result();
 
-        $approved_stmt->execute();
+    $approved_data = $approved_result->fetch_assoc();
 
-        $approved_result =
-            $approved_stmt->get_result();
+    $approved_count = (int)$approved_data["approved_count"];
 
-        $approved_data =
-            $approved_result->fetch_assoc();
-
-        $approved_count =
-            (int) $approved_data["approved_count"];
-
-        $approved_stmt->close();
-    }
+    $approved_query->close();
 }
 
 
-$remaining_slots =
-    max(0, $max_artists - $approved_count);
+$remaining_slots = $max_artists - $approved_count;
 
 
-/* =====================================
-   GET ARTIST APPLICATIONS
-===================================== */
+// =====================================
+// GET ARTIST APPLICATIONS
+// =====================================
 
 $artists = [];
 
 if ($event_id !== null) {
 
-    $artist_stmt = $conn->prepare(
+    $artist_query = $conn->prepare(
         "SELECT
             ea.event_artist_id,
             ea.status,
@@ -364,10 +260,10 @@ if ($event_id !== null) {
          FROM event_artists ea
 
          INNER JOIN artists a
-             ON ea.artist_id = a.artist_id
+            ON ea.artist_id = a.artist_id
 
          INNER JOIN users u
-             ON a.user_id = u.user_id
+            ON a.user_id = u.user_id
 
          WHERE ea.event_id = ?
 
@@ -380,26 +276,21 @@ if ($event_id !== null) {
             ea.joined_at ASC"
     );
 
+    $artist_query->bind_param(
+        "i",
+        $event_id
+    );
 
-    if ($artist_stmt) {
+    $artist_query->execute();
 
-        $artist_stmt->bind_param(
-            "i",
-            $event_id
-        );
+    $artist_result = $artist_query->get_result();
 
-        $artist_stmt->execute();
+    while ($row = $artist_result->fetch_assoc()) {
 
-        $artist_result =
-            $artist_stmt->get_result();
-
-        while ($row = $artist_result->fetch_assoc()) {
-
-            $artists[] = $row;
-        }
-
-        $artist_stmt->close();
+        $artists[] = $row;
     }
+
+    $artist_query->close();
 }
 
 ?>
@@ -416,280 +307,669 @@ if ($event_id !== null) {
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>
-        Admin Dashboard | Maturan's Art Cafe
-    </title>
+    <title>Admin | Maturan's Art Cafe</title>
 
-    <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/admin.css">
+    <link
+        rel="stylesheet"
+        href="Css/style.css"
+    >
+
+    <style>
+
+        /* =========================
+           ADMIN PAGE
+           ========================= */
+
+        .admin-page {
+            min-height: calc(100vh - 90px);
+
+            background: #fff9df;
+
+            padding: 50px 45px;
+        }
+
+
+        .admin-container {
+            max-width: 1100px;
+
+            margin: 0 auto;
+        }
+
+
+        .admin-header {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            margin-bottom: 30px;
+        }
+
+
+        .admin-header h1 {
+            color: #4a2819;
+
+            font-size: 32px;
+
+            letter-spacing: 1px;
+        }
+
+
+        .admin-logout {
+            background: #ed542c;
+
+            color: white;
+
+            text-decoration: none;
+
+            padding: 11px 18px;
+
+            border-radius: 5px;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+        }
+
+
+        .admin-event {
+            color: #4a2819;
+
+            font-size: 20px;
+
+            margin-bottom: 25px;
+        }
+
+
+        /* =========================
+           CAPACITY BOX
+           ========================= */
+
+        .capacity-box {
+            background: white;
+
+            border-radius: 15px;
+
+            padding: 25px;
+
+            margin-bottom: 30px;
+
+            box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.08);
+
+            display: flex;
+
+            gap: 50px;
+
+            flex-wrap: wrap;
+        }
+
+
+        .capacity-item {
+            display: flex;
+
+            flex-direction: column;
+
+            gap: 5px;
+        }
+
+
+        .capacity-label {
+            color: #998c85;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+        }
+
+
+        .capacity-number {
+            color: #4a2819;
+
+            font-size: 25px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           MESSAGES
+           ========================= */
+
+        .admin-success {
+            background: #e5f5e5;
+
+            color: #286628;
+
+            padding: 14px 18px;
+
+            border-radius: 7px;
+
+            margin-bottom: 20px;
+
+            font-size: 13px;
+        }
+
+
+        .admin-error {
+            background: #ffe8e3;
+
+            color: #a52e1c;
+
+            padding: 14px 18px;
+
+            border-radius: 7px;
+
+            margin-bottom: 20px;
+
+            font-size: 13px;
+        }
+
+
+        /* =========================
+           APPLICATIONS
+           ========================= */
+
+        .applications-title {
+            color: #4a2819;
+
+            font-size: 24px;
+
+            margin-bottom: 20px;
+        }
+
+
+        .artist-application {
+            background: white;
+
+            border-radius: 15px;
+
+            padding: 25px;
+
+            margin-bottom: 20px;
+
+            box-shadow: 5px 6px 0 rgba(0, 0, 0, 0.08);
+        }
+
+
+        .artist-top {
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: flex-start;
+
+            gap: 20px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .artist-name {
+            color: #4a2819;
+
+            font-size: 20px;
+
+            font-weight: bold;
+        }
+
+
+        /* =========================
+           STATUS
+           ========================= */
+
+        .artist-status {
+            display: inline-block;
+
+            padding: 6px 12px;
+
+            border-radius: 20px;
+
+            font-size: 10px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+        }
+
+
+        .status-pending {
+            background: #fff0d8;
+
+            color: #9a6100;
+        }
+
+
+        .status-approved {
+            background: #e2f4e2;
+
+            color: #287128;
+        }
+
+
+        .status-rejected {
+            background: #ffe4df;
+
+            color: #a83221;
+        }
+
+
+        /* =========================
+           ARTIST DETAILS
+           ========================= */
+
+        .artist-details {
+            display: grid;
+
+            grid-template-columns: repeat(2, 1fr);
+
+            gap: 12px;
+
+            margin-bottom: 15px;
+        }
+
+
+        .artist-detail {
+            font-size: 13px;
+
+            color: #5e514b;
+        }
+
+
+        .artist-detail strong {
+            color: #3d2116;
+        }
+
+
+        .artist-bio {
+            background: #fff9df;
+
+            padding: 15px;
+
+            border-radius: 8px;
+
+            margin-bottom: 20px;
+
+            font-size: 13px;
+
+            line-height: 1.6;
+
+            color: #5e514b;
+        }
+
+
+        /* =========================
+           BUTTONS
+           ========================= */
+
+        .artist-actions {
+            display: flex;
+
+            gap: 10px;
+        }
+
+
+        .approve-btn,
+        .reject-btn {
+            border: none;
+
+            padding: 10px 18px;
+
+            border-radius: 5px;
+
+            color: white;
+
+            font-size: 11px;
+
+            font-weight: bold;
+
+            letter-spacing: 1px;
+
+            cursor: pointer;
+        }
+
+
+        .approve-btn {
+            background: #4b8f4b;
+        }
+
+
+        .approve-btn:hover {
+            background: #397439;
+        }
+
+
+        .reject-btn {
+            background: #d94b35;
+        }
+
+
+        .reject-btn:hover {
+            background: #b83b28;
+        }
+
+
+        /* =========================
+           NO APPLICATIONS
+           ========================= */
+
+        .no-applications {
+            background: white;
+
+            padding: 35px;
+
+            text-align: center;
+
+            border-radius: 15px;
+
+            color: #998c85;
+
+            font-size: 14px;
+        }
+
+
+        /* =========================
+           MOBILE
+           ========================= */
+
+        @media (max-width: 650px) {
+
+            .admin-page {
+                padding: 35px 20px;
+            }
+
+
+            .admin-header {
+                align-items: flex-start;
+
+                gap: 15px;
+
+                flex-direction: column;
+            }
+
+
+            .admin-header h1 {
+                font-size: 27px;
+            }
+
+
+            .capacity-box {
+                gap: 25px;
+            }
+
+
+            .artist-top {
+                flex-direction: column;
+            }
+
+
+            .artist-details {
+                grid-template-columns: 1fr;
+            }
+
+
+            .artist-actions {
+                flex-direction: column;
+            }
+
+
+            .approve-btn,
+            .reject-btn {
+                width: 100%;
+            }
+
+        }
+
+    </style>
 
 </head>
 
 
-<body class="admin-dashboard-page">
+<body>
 
 
     <!-- =====================================
-         ADMIN HEADER
+         HEADER
     ====================================== -->
 
-    <header class="admin-header">
+    <header class="header">
 
-    <div class="admin-header-left">
+        <div class="logo">
 
-        <div class="admin-logo-wrapper">
-    <img src="images/logo.png" alt="Maturan's Art Cafe Logo" class="admin-header-logo">
-</div>
-        <div>
-
-            <h1>
-                ADMIN PANEL
-            </h1>
-
-            <p>
-                Maturan's Art Cafe
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="admin-header-right">
-
-    <a
-        href="admin.php"
-        class="admin-nav-button"
-    >
-        ARTISTS
-    </a>
-
-    <a
-        href="admin_artworks.php"
-        class="admin-nav-button"
-    >
-        ARTWORKS
-    </a>
-
-    <!-- REVIEWS -->
-    <a
-        href="admin_reviews.php"
-        class="admin-nav-button"
-    >
-        REVIEWS
-    </a>
-
-    <a
-        href="admin_messages.php"
-        class="admin-nav-button"
-    >
-        MESSAGES
-    </a>
-
-    <a
-        href="admin_subscribers.php"
-        class="admin-nav-button"
-    >
-        SUBSCRIBERS
-    </a>
-
-    <span>
-        Welcome, <?php
-        echo htmlspecialchars(
-            $_SESSION["admin_username"]
-        );
-        ?>
-    </span>
-
-    <a
-        href="admin_logout.php"
-        class="admin-logout-button"
-    >
-        LOGOUT
-    </a>
-
-</div>
-
-</header>
-
-
-
-    <!-- =====================================
-         ADMIN CONTENT
-    ====================================== -->
-
-    <main class="admin-content">
-
-
-        <div class="admin-page-title">
-
-            <h2>
-                ARTIST APPLICATIONS
-            </h2>
-
-            <p>
-                Manage artists who want to participate
-                in the upcoming event.
-            </p>
-
-        </div>
-
-
-
-        <!-- =====================================
-             EVENT INFORMATION
-        ====================================== -->
-
-        <?php if ($event_id !== null): ?>
-
-            <div class="admin-event-card">
-
-                <div>
-
-                    <span class="admin-small-label"> ACTIVE EVENT </span>
-
-                    <h3>
-                        <?php
-                        echo htmlspecialchars(
-                            $event_name
-                        );
-                        ?>
-                    </h3>
-
-                </div>
-
-                <div class="artist-slot-info">
-
-                    <div>
-
-                        <strong>
-                            <?php echo $approved_count; ?>
-                            / <?php echo $max_artists; ?>
-                        </strong>
-
-                        <span> Approved Artists </span>
-
-                    </div>
-
-                    <div>
-
-                        <strong>
-                            <?php echo $remaining_slots; ?>
-                        </strong>
-
-                        <span>
-                            Slots Remaining
-                        </span>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-
-        <?php else: ?>
-
-            <div class="admin-message error">
-
-                No active event is currently available.
-
-            </div>
-
-        <?php endif; ?>
-
-
-
-        <!-- =====================================
-             MESSAGE
-        ====================================== -->
-
-        <?php if ($message !== ""): ?>
-
-            <div
-                class="admin-message <?php echo $message_type; ?>"
+            <img
+                src="images/logo.png"
+                alt="Maturan's Art Cafe Logo"
             >
 
-                <?php
-                echo htmlspecialchars($message);
-                ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-
-        <!-- =====================================
-             ARTIST LIST
-        ====================================== -->
-
-        <div class="admin-section-title">
-
-            <h3>
-                REGISTERED ARTISTS
-            </h3>
-
         </div>
 
 
-        <?php if (count($artists) === 0): ?>
+        <nav class="navbar">
 
-            <div class="admin-empty">
+            <a href="index.php">HOME</a>
 
-                <h3>
-                    No artist applications yet.
-                </h3>
+            <a href="about.php">ABOUT</a>
 
-                <p>
-                    Artists who register for the event
-                    will appear here.
-                </p>
+            <a href="menu.php">MENU</a>
+
+            <a href="events.php">EVENTS</a>
+
+            <a href="contact.php">CONTACT</a>
+
+        </nav>
+
+
+        <a
+            href="admin_logout.php"
+            class="reserve-btn"
+        >
+            LOGOUT
+        </a>
+
+    </header>
+
+
+
+    <!-- =====================================
+         ADMIN PAGE
+    ====================================== -->
+
+    <section class="admin-page">
+
+        <div class="admin-container">
+
+
+            <!-- HEADER -->
+
+            <div class="admin-header">
+
+                <h1>
+                    ADMIN PANEL
+                </h1>
 
             </div>
 
-        <?php else: ?>
+
+            <?php if ($event_id !== null): ?>
+
+                <div class="admin-event">
+
+                    <?php
+                    echo htmlspecialchars($event_name);
+                    ?>
+
+                </div>
+
+            <?php else: ?>
+
+                <div class="admin-error">
+
+                    No active event is currently available.
+
+                </div>
+
+            <?php endif; ?>
 
 
-            <div class="admin-artist-list">
+            <!-- =====================================
+                 MESSAGES
+            ====================================== -->
+
+            <?php if ($success !== ""): ?>
+
+                <div class="admin-success">
+
+                    <?php
+                    echo htmlspecialchars($success);
+                    ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+            <?php if ($error !== ""): ?>
+
+                <div class="admin-error">
+
+                    <?php
+                    echo htmlspecialchars($error);
+                    ?>
+
+                </div>
+
+            <?php endif; ?>
+
+
+
+            <!-- =====================================
+                 CAPACITY
+            ====================================== -->
+
+            <div class="capacity-box">
+
+
+                <div class="capacity-item">
+
+                    <span class="capacity-label">
+                        APPROVED ARTISTS
+                    </span>
+
+                    <span class="capacity-number">
+
+                        <?php echo $approved_count; ?>
+                        / <?php echo $max_artists; ?>
+
+                    </span>
+
+                </div>
+
+
+                <div class="capacity-item">
+
+                    <span class="capacity-label">
+                        AVAILABLE SLOTS
+                    </span>
+
+                    <span class="capacity-number">
+
+                        <?php echo max(0, $remaining_slots); ?>
+
+                    </span>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =====================================
+                 APPLICATIONS
+            ====================================== -->
+
+            <h2 class="applications-title">
+
+                ARTIST APPLICATIONS
+
+            </h2>
+
+
+            <?php if (count($artists) > 0): ?>
 
 
                 <?php foreach ($artists as $artist): ?>
 
 
-                    <div class="admin-artist-card">
+                    <div class="artist-application">
 
 
-                        <!-- ARTIST INFORMATION -->
+                        <!-- ARTIST NAME + STATUS -->
 
-                        <div class="admin-artist-info">
-
-                            <div class="admin-artist-top">
-
-                                <h3>
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $artist["artist_name"]
-                                    );
-                                    ?>
-                                </h3>
+                        <div class="artist-top">
 
 
-                                <span
-                                    class="artist-status <?php
-                                    echo strtolower(
-                                        $artist["status"]
-                                    );
-                                    ?>"
-                                >
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $artist["status"]
-                                    );
-                                    ?>
-                                </span>
+                            <div class="artist-name">
+
+                                <?php
+                                echo htmlspecialchars(
+                                    $artist["artist_name"]
+                                );
+                                ?>
 
                             </div>
+
+
+                            <?php
+
+                            $status_class =
+                                "status-pending";
+
+                            if (
+                                $artist["status"]
+                                === "Approved"
+                            ) {
+
+                                $status_class =
+                                    "status-approved";
+
+                            } elseif (
+                                $artist["status"]
+                                === "Rejected"
+                            ) {
+
+                                $status_class =
+                                    "status-rejected";
+                            }
+
+                            ?>
+
+                            <span
+                                class="artist-status <?php echo $status_class; ?>"
+                            >
+
+                                <?php
+                                echo htmlspecialchars(
+                                    strtoupper(
+                                        $artist["status"]
+                                    )
+                                );
+                                ?>
+
+                            </span>
+
+
+                        </div>
+
+
+
+                        <!-- ARTIST DETAILS -->
+
+                        <div class="artist-details">
 
 
                             <div class="artist-detail">
@@ -722,94 +1002,96 @@ if ($event_id !== null) {
                             </div>
 
 
-                            <?php if (
-                                !empty($artist["bio"])
-                            ): ?>
-
-                                <div class="artist-bio">
-
-                                    <strong>
-                                        About the Artist:
-                                    </strong>
-
-                                    <p>
-                                        <?php
-                                        echo nl2br(
-                                            htmlspecialchars(
-                                                $artist["bio"]
-                                            )
-                                        );
-                                        ?>
-                                    </p>
-
-                                </div>
-
-                            <?php endif; ?>
-
-
                         </div>
 
 
 
-                        <!-- ACTIONS -->
+                        <!-- BIO -->
 
-                        <div class="admin-artist-actions">
+                        <?php if (
+                            !empty($artist["bio"])
+                        ): ?>
+
+                            <div class="artist-bio">
+
+                                <strong>
+                                    About Their Art:
+                                </strong>
+
+                                <br>
+
+                                <?php
+                                echo nl2br(
+                                    htmlspecialchars(
+                                        $artist["bio"]
+                                    )
+                                );
+                                ?>
+
+                            </div>
+
+                        <?php endif; ?>
 
 
-                            <?php if (
-                                $artist["status"] === "Pending"
-                            ): ?>
+
+                        <!-- =====================================
+                             ACTION BUTTONS
+                        ====================================== -->
+
+                        <?php if (
+                            $artist["status"]
+                            === "Pending"
+                        ): ?>
+
+                            <div class="artist-actions">
 
 
-                                <?php if (
-                                    $approved_count < $max_artists
-                                ): ?>
+                                <!-- APPROVE -->
 
-                                    <form method="POST">
+                                <form
+                                    method="POST"
+                                >
 
-                                        <input
-                                            type="hidden"
-                                            name="event_artist_id"
-                                            value="<?php
+                                    <input
+                                        type="hidden"
+                                        name="event_artist_id"
+                                        value="<?php
                                             echo $artist[
                                                 "event_artist_id"
                                             ];
-                                            ?>"
-                                        >
+                                        ?>"
+                                    >
 
-                                        <input
-                                            type="hidden"
-                                            name="action"
-                                            value="approve"
-                                        >
+                                    <input
+                                        type="hidden"
+                                        name="action"
+                                        value="approve"
+                                    >
 
-                                        <button
-                                            type="submit"
-                                            class="approve-button"
-                                        >
-                                            APPROVE
-                                        </button>
+                                    <button
+                                        type="submit"
+                                        class="approve-btn"
+                                    >
+                                        APPROVE
+                                    </button>
 
-                                    </form>
-
-                                <?php else: ?>
-
-                                    <span class="full-label">
-                                        EVENT FULL
-                                    </span>
-
-                                <?php endif; ?>
+                                </form>
 
 
-                                <form method="POST">
+
+                                <!-- REJECT -->
+
+                                <form
+                                    method="POST"
+                                >
 
                                     <input
                                         type="hidden"
                                         name="event_artist_id"
                                         value="<?php
-                                        echo $artist[
-                                            "event_artist_id"
-                                        ];
+                                            echo $artist[
+                                                "event_artist_id"
+                                            ];
                                         ?>"
                                     >
 
@@ -821,7 +1103,7 @@ if ($event_id !== null) {
 
                                     <button
                                         type="submit"
-                                        class="reject-button"
+                                        class="reject-btn"
                                     >
                                         REJECT
                                     </button>
@@ -829,25 +1111,29 @@ if ($event_id !== null) {
                                 </form>
 
 
-                            <?php elseif (
-                                $artist["status"] === "Approved"
-                            ): ?>
+                            </div>
 
 
-                                <span class="approved-label">
-                                    ✓ APPROVED
-                                </span>
+                        <?php elseif (
+                            $artist["status"]
+                            === "Approved"
+                        ): ?>
 
+                            <!-- APPROVED ARTIST -->
 
-                                <form method="POST">
+                            <div class="artist-actions">
+
+                                <form
+                                    method="POST"
+                                >
 
                                     <input
                                         type="hidden"
                                         name="event_artist_id"
                                         value="<?php
-                                        echo $artist[
-                                            "event_artist_id"
-                                        ];
+                                            echo $artist[
+                                                "event_artist_id"
+                                            ];
                                         ?>"
                                     >
 
@@ -859,26 +1145,17 @@ if ($event_id !== null) {
 
                                     <button
                                         type="submit"
-                                        class="reject-button"
+                                        class="reject-btn"
                                     >
                                         REJECT
                                     </button>
 
                                 </form>
 
-
-                            <?php else: ?>
-
-
-                                <span class="rejected-label">
-                                    REJECTED
-                                </span>
+                            </div>
 
 
-                            <?php endif; ?>
-
-
-                        </div>
+                        <?php endif; ?>
 
 
                     </div>
@@ -887,13 +1164,37 @@ if ($event_id !== null) {
                 <?php endforeach; ?>
 
 
-            </div>
+            <?php else: ?>
 
 
-        <?php endif; ?>
+                <div class="no-applications">
+
+                    No artist applications yet.
+
+                </div>
 
 
-    </main>
+            <?php endif; ?>
+
+
+        </div>
+
+    </section>
+
+
+
+    <!-- FOOTER -->
+
+    <footer class="footer">
+
+        <p>
+
+            © 2027 Maturan's Art Cafe.
+            All Rights Reserved.
+
+        </p>
+
+    </footer>
 
 
 </body>

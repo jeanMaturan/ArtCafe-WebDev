@@ -8,6 +8,7 @@
     <title>Menu - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/menu.css">
 </head>
 
 <body>
