@@ -3,8 +3,20 @@
 session_start();
 require_once "db.php";
 
+
+/* USER MUST BE LOGGED IN */
+if (
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true
+) {
+    header("Location: login.php");
+    exit();
+}
+
+
 $success = "";
 $error = "";
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -59,20 +71,17 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if ($stmt->execute()) {
 
-                $success =
-                    "Your message has been sent successfully!";
+                $success = "Your message has been sent successfully!";
 
             } else {
 
-                $error =
-                    "Something went wrong. Please try again.";
+                $error = "Something went wrong. Please try again.";
             }
 
             $stmt->close();
         }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -112,7 +121,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <a href="about.php">ABOUT</a>
             <a href="menu.php">MENU</a>
             <a href="events.php">EVENTS</a>
-            <a href="contact.php">CONTACT</a>
+            <a href="contact.php" class="active" style="color: #ed542c !important;">CONTACT</a>
 
             <?php if (isset($_SESSION["user_id"])): ?>
              <a href="my_messages.php">MY MESSAGES</a>

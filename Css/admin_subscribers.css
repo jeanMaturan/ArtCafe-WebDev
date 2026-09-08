@@ -95,52 +95,6 @@
     font-size: 14px;
 }
 
-.delete-subscriber-btn {
-    padding: 8px 14px;
-    border: none;
-    border-radius: 6px;
-    background: var(--orange);
-    color: var(--white);
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
-    cursor: pointer;
-}
-
-.delete-subscriber-btn:hover {
-    background: var(--orange-dark);
-}
-
-.subscriber-checkbox {
-    width: 16px;
-    height: 16px;
-    cursor: pointer;
-    accent-color: var(--orange);
-}
-
-.delete-selected-btn {
-    display: block;
-    margin-left: 20;
-    margin-bottom: -5px;
-
-    padding: 10px 18px;
-    border: none;
-    border-radius: 6px;
-
-    background: var(--orange);
-    color: var(--white);
-
-    font-size: 10px;
-    font-weight: bold;
-    letter-spacing: 1px;
-
-    cursor: pointer;
-}
-
-.delete-selected-btn:hover {
-    background: var(--orange-dark);
-}
-
 
 /* ================================
    MOBILE
@@ -155,4 +109,5 @@
     .admin-title h2 {
         font-size: 26px;
     }
+
 }

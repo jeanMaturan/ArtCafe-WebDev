@@ -28,7 +28,7 @@ session_start();
 
         <nav class="navbar">
             <a href="index.php">HOME</a>
-            <a href="about.php">ABOUT</a>
+            <a href="about.php" class="active" style="color: #ed542c !important;">ABOUT</a>
             <a href="menu.php">MENU</a>
             <a href="events.php">EVENTS</a>
             <a href="contact.php">CONTACT</a>

@@ -31,6 +31,8 @@ $stmt->execute();
 $result = $stmt->get_result();
 ?>
 
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -42,8 +44,6 @@ $result = $stmt->get_result();
 
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/my_messages.css">
-    <link rel="stylesheet" href="Css/admin.css">
-    <link rel="stylesheet" href="Css/admin_messages.css">
 
 </head>
 
@@ -62,7 +62,7 @@ $result = $stmt->get_result();
             <a href="menu.php">MENU</a>
             <a href="events.php">EVENTS</a>
             <a href="contact.php">CONTACT</a>
-            <a href="my_messages.php">MY MESSAGES</a>
+            <a href="my_messages.php" class="active" style="color: #ed542c !important;">MY MESSAGES</a>
         </nav>
 
         <a href="reservation.php" class="reserve-btn">
