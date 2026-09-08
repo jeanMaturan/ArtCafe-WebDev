@@ -1,191 +1,15 @@
 <?php
 
 session_start();
-require_once "db.php";
 
+/* Prevent users from accessing the reservation
+   page without logging in */
 
-/* =========================
-   CHECK IF USER IS LOGGED IN
-========================= */
+if (!isset($_SESSION["user_logged_in"]) || $_SESSION["user_logged_in"] !== true) {
 
-if (
-    !isset($_SESSION["user_logged_in"]) ||
-    $_SESSION["user_logged_in"] !== true ||
-    !isset($_SESSION["user_id"]) ||
-    !is_numeric($_SESSION["user_id"])
-) {
     header("Location: login.php");
     exit();
-}
 
-
-/* Make sure the session ID is an integer */
-$user_id = (int) $_SESSION["user_id"];
-
-
-$message = "";
-$error = "";
-
-
-/* =========================
-   HANDLE RESERVATION
-========================= */
-
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-
-    $name = trim($_POST["reservation_name"] ?? "");
-    $phone = trim($_POST["reservation_phone"] ?? "");
-    $date = trim($_POST["date"] ?? "");
-    $time = trim($_POST["time"] ?? "");
-    $guests = filter_input(
-        INPUT_POST,
-        "guests",
-        FILTER_VALIDATE_INT
-    );
-
-
-    /* =========================
-       CHECK REQUIRED FIELDS
-    ========================= */
-
-    if (
-        $name === "" ||
-        $phone === "" ||
-        $date === "" ||
-        $time === "" ||
-        $guests === false ||
-        $guests === null
-    ) {
-
-        $error = "Please complete all required fields.";
-
-    }
-
-
-    /* =========================
-       VALIDATE NAME
-    ========================= */
-
-    elseif (!preg_match("/[A-Za-z]/", $name)) {
-
-        $error = "Please enter a valid name.";
-
-    }
-
-
-    /* =========================
-       VALIDATE PHILIPPINE PHONE
-    ========================= */
-
-    elseif (!preg_match("/^(09\d{9}|\+639\d{9})$/", $phone)) {
-
-        $error = "Please enter a valid Philippine mobile number.";
-
-    }
-
-
-    /* =========================
-       VALIDATE NUMBER OF GUESTS
-    ========================= */
-
-    elseif ($guests < 1 || $guests > 10) {
-
-        $error = "Number of guests must be between 1 and 10.";
-
-    }
-
-
-    /* =========================
-       VALIDATE DATE
-    ========================= */
-
-    elseif (
-        !DateTime::createFromFormat("Y-m-d", $date) ||
-        DateTime::createFromFormat("Y-m-d", $date)->format("Y-m-d") !== $date
-    ) {
-
-        $error = "Please enter a valid reservation date.";
-
-    }
-
-
-    /* =========================
-       PREVENT PAST DATES
-    ========================= */
-
-    elseif ($date < date("Y-m-d")) {
-
-        $error = "You cannot reserve a table for a past date.";
-
-    }
-
-
-    /* =========================
-       VALIDATE TIME
-    ========================= */
-
-    elseif (
-        !DateTime::createFromFormat("H:i", $time) &&
-        !DateTime::createFromFormat("H:i:s", $time)
-    ) {
-
-        $error = "Please enter a valid reservation time.";
-
-    }
-
-
-    /* =========================
-       INSERT RESERVATION
-    ========================= */
-
-    else {
-
-        $stmt = $conn->prepare(
-            "INSERT INTO reservations
-            (
-                user_id,
-                reservation_name,
-                reservation_phone,
-                reservation_date,
-                reservation_time,
-                guests
-            )
-            VALUES (?, ?, ?, ?, ?, ?)"
-        );
-
-
-        if (!$stmt) {
-
-            $error = "Unable to process your reservation.";
-
-        } else {
-
-            $stmt->bind_param(
-                "issssi",
-                $user_id,
-                $name,
-                $phone,
-                $date,
-                $time,
-                $guests
-            );
-
-
-            if ($stmt->execute()) {
-
-                $message =
-                    "Your table has been reserved successfully!";
-
-            } else {
-
-                $error =
-                    "Unable to save your reservation. Please try again.";
-            }
-
-
-            $stmt->close();
-        }
-    }
 }
 
 ?>
@@ -196,299 +20,166 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
 
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
-    <title>
-        Reserve a Table - Maturan's Art Cafe
-    </title>
+    <title>Reserve a Table - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/reservation.css">
-</head>
 
+</head>
 
 <body>
 
+    <header class="header">
 
-<!-- =========================
-     HEADER
-========================= -->
+        <div class="logo">
+            <img src="images/logo.png" alt="Maturan's Art Cafe">
+        </div>
 
-<?php include "header.php"; ?>
+        <nav class="navbar">
 
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
 
+        </nav>
 
-<!-- =========================
-     RESERVATION SECTION
-========================= -->
-
-<section class="reservation-section reservation-page">
-
-
-    <div class="reservation-content">
-
-        <p class="logged-user">
-            Logged in as:
-            <strong>
-                <?= htmlspecialchars($_SESSION["user_email"]) ?>
-            </strong>
-        </p>
-
-        <p class="contact-small">
-            PLAN YOUR VISIT
-        </p>
+    </header>
 
 
-        <h2>
-            RESERVE A <span>TABLE.</span>
-        </h2>
+    <section class="reservation-page">
+
+        <div class="reservation-page-content">
+
+            <p class="contact-small">
+                PLAN YOUR VISIT
+            </p>
+
+            <h1>
+                RESERVE A<br>
+                <span>TABLE.</span>
+            </h1>
+
+            <p>
+                Welcome back! Choose your preferred date,
+                time, and number of guests below.
+            </p>
+
+        </div>
 
 
-        <p>
-            Planning to visit with friends or family?
-            Reserve your table ahead of time and
-            we'll have a cozy spot ready for you.
-        </p>
+        <form class="reservation-page-form"
+              action="#"
+              method="POST">
 
-    </div>
+            <h2>
+                TABLE <span>RESERVATION</span>
+            </h2>
 
-
-
-    <!-- =========================
-         SUCCESS MESSAGE
-    ========================== -->
-
-    <?php if (!empty($message)): ?>
-
-        <p class="login-success">
-
-            <?= htmlspecialchars($message) ?>
-
-        </p>
-
-    <?php endif; ?>
+            <p class="logged-user">
+                Logged in as:
+                <strong>
+                    <?php echo htmlspecialchars($_SESSION["user_email"]); ?>
+                </strong>
+            </p>
 
 
+            <div class="form-row">
 
-    <!-- =========================
-         ERROR MESSAGE
-    ========================== -->
+                <div class="form-group">
 
-    <?php if (!empty($error)): ?>
+                    <label for="reservation_date">
+                        DATE
+                    </label>
 
-        <p class="login-error">
+                    <input
+                        type="date"
+                        id="reservation_date"
+                        name="reservation_date"
+                        required
+                    >
 
-            <?= htmlspecialchars($error) ?>
-
-        </p>
-
-    <?php endif; ?>
-
-
-
-    <!-- =========================
-         RESERVATION FORM
-    ========================== -->
-
-    <form
-    class="reservation-form"
-    method="POST"
->
-
-    <?php if (!empty($message)): ?>
-
-        <p class="login-success">
-            <?= htmlspecialchars($message) ?>
-        </p>
-
-    <?php endif; ?>
+                </div>
 
 
-    <?php if (!empty($error)): ?>
+                <div class="form-group">
 
-        <p class="login-error">
-            <?= htmlspecialchars($error) ?>
-        </p>
+                    <label for="reservation_time">
+                        TIME
+                    </label>
 
-    <?php endif; ?>
+                    <input
+                        type="time"
+                        id="reservation_time"
+                        name="reservation_time"
+                        required
+                    >
+
+                </div>
+
+            </div>
 
 
-    <!-- NAME + PHONE -->
+            <div class="form-group">
 
-    <div class="form-row">
+                <label for="guests">
+                    NUMBER OF GUESTS
+                </label>
 
-        <div class="form-group">
+                <select
+                    id="guests"
+                    name="guests"
+                    required
+                >
 
-            <label for="reservation-name">
-                NAME
-            </label>
+                    <option value="">
+                        Select guests
+                    </option>
 
-            <input
-                type="text"
-                id="reservation-name"
-                name="reservation_name"
-                placeholder="Your name"
-                value="<?= htmlspecialchars($_SESSION["user_name"]) ?>"
-                required
+                    <option value="1">1 Guest</option>
+                    <option value="2">2 Guests</option>
+                    <option value="3">3 Guests</option>
+                    <option value="4">4 Guests</option>
+                    <option value="5">5 Guests</option>
+                    <option value="6">6 Guests</option>
+                    <option value="7">7 Guests</option>
+                    <option value="8">8 Guests</option>
+                    <option value="9">9 Guests</option>
+                    <option value="10">10 Guests</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="special_request">
+                    SPECIAL REQUEST
+                </label>
+
+                <textarea
+                    id="special_request"
+                    name="special_request"
+                    rows="5"
+                    placeholder="Any special requests?"
+                ></textarea>
+
+            </div>
+
+
+            <button
+                type="submit"
+                class="reservation-page-button"
             >
+                RESERVE NOW
+            </button>
 
-        </div>
+        </form>
 
-        
-            <div class="form-group">
-
-                <label for="reservation-phone">
-                    PHONE
-                </label>
-
-
-                <input
-                    type="tel"
-                    id="reservation-phone"
-                    name="reservation_phone"
-                    placeholder="Your phone number"
-                    required
-                >
-
-            </div>
-
-        </div>
-
-
-
-        <!-- DATE + TIME -->
-
-        <div class="form-row">
-
-
-            <div class="form-group">
-
-                <label for="date">
-                    DATE
-                </label>
-
-
-                <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    required
-                >
-
-            </div>
-
-
-
-            <div class="form-group">
-
-                <label for="time">
-                    TIME
-                </label>
-
-
-                <input
-                    type="time"
-                    id="time"
-                    name="time"
-                    required
-                >
-
-            </div>
-
-        </div>
-
-
-
-        <!-- NUMBER OF GUESTS -->
-
-        <div class="form-group">
-
-            <label for="guests">
-                NUMBER OF GUESTS
-            </label>
-
-
-            <select
-                id="guests"
-                name="guests"
-                required
-            >
-
-                <option value="">
-                    Select number of guests
-                </option>
-
-                <option value="1">
-                    1 Guest
-                </option>
-
-                <option value="2">
-                    2 Guests
-                </option>
-
-                <option value="3">
-                    3 Guests
-                </option>
-
-                <option value="4">
-                    4 Guests
-                </option>
-
-                <option value="5">
-                    5 Guests
-                </option>
-
-                <option value="6">
-                    6 Guests
-                </option>
-
-                <option value="7">
-                    7 Guests
-                </option>
-
-                <option value="8">
-                    8 Guests
-                </option>
-
-                <option value="9">
-                    9 Guests
-                </option>
-
-                <option value="10">
-                    10 Guests
-                </option>
-
-            </select>
-
-        </div>
-
-
-
-        <!-- SUBMIT -->
-
-        <button
-            type="submit"
-            class="reservation-submit"
-        >
-            RESERVE NOW
-        </button>
-
-    </form>
-
-</section>
-
-
-
-<!-- =========================
-     FOOTER
-========================= -->
-
-<?php include "footer.php"; ?>
+    </section>
 
 </body>
-
 </html>

@@ -4,9 +4,7 @@ session_start();
 require_once "db.php";
 
 
-/* =====================================
-   REVIEW SUBMISSION
-===================================== */
+/* REVIEW SUBMISSION */
 
 $success = "";
 $error = "";
@@ -14,9 +12,7 @@ $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    /* ---------------------------------
-       LOGIN CHECK
-    --------------------------------- */
+    /* LOGIN CHECK */
 
     if (
         !isset($_SESSION["user_logged_in"]) ||
@@ -42,9 +38,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         );
 
 
-        /* ---------------------------------
-           VALIDATE RATING
-        --------------------------------- */
+        /* VALIDATE RATING */
 
         if (
             $rating === false ||
@@ -57,9 +51,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         }
 
-        /* ---------------------------------
-           VALIDATE REVIEW
-        --------------------------------- */
+        /* VALIDATE REVIEW */
 
         elseif ($review_text === "") {
 
@@ -81,9 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         else {
 
-            /* ---------------------------------
-               INSERT REVIEW
-            --------------------------------- */
+            /* INSERT REVIEW */
 
             $stmt = $conn->prepare(
                 "INSERT INTO reviews
@@ -136,9 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 
-/* =====================================
-   GET APPROVED REVIEWS
-===================================== */
+/* GET APPROVED REVIEWS */
 
 $approved_reviews = [];
 

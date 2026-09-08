@@ -5,9 +5,7 @@ require_once "db.php";
 header("Content-Type: application/json; charset=UTF-8");
 
 
-/* =====================================
-   ONLY ALLOW POST REQUESTS
-===================================== */
+/* ONLY ALLOW POST REQUESTS */
 
 if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 
@@ -22,16 +20,12 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 
-/* =====================================
-   GET AND CLEAN EMAIL
-===================================== */
+/* GET AND CLEAN EMAIL */
 
 $email = trim($_POST["email"] ?? "");
 
 
-/* =====================================
-   VALIDATE EMAIL
-===================================== */
+/* VALIDATE EMAIL */
 
 if ($email === "") {
 
@@ -66,9 +60,7 @@ if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 }
 
 
-/* =====================================
-   CHECK IF EMAIL ALREADY EXISTS
-===================================== */
+/* CHECK IF EMAIL ALREADY EXISTS */
 
 $check = $conn->prepare(
     "SELECT subscriber_id
@@ -128,9 +120,7 @@ if ($check->num_rows > 0) {
 $check->close();
 
 
-/* =====================================
-   INSERT EMAIL
-===================================== */
+/* INSERT EMAIL */
 
 $stmt = $conn->prepare(
     "INSERT INTO newsletter_subscribers (email)

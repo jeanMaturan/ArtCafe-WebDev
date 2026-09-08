@@ -1,7 +1,3 @@
-<?php
-session_start();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,13 +8,30 @@ session_start();
     <title>About Us | Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/about.css">
 </head>
 
 <body>
 
     <!-- HEADER -->
-    <?php include "header.php"; ?>
+    <header class="header">
+
+        <div class="logo">
+            <a href="index.php">
+                <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
+            </a>
+        </div>
+
+        <nav class="navbar">
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
+        </nav>
+
+        <a href="login.php" class="reserve-btn">RESERVE A TABLE</a>
+
+    </header>
 
 
     <section class="about-page-hero">
@@ -192,7 +205,93 @@ session_start();
 
 
     <!-- FOOTER -->
-    <?php include "footer.php"; ?>
+    <footer class="footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <img
+                    src="images/logo-white.png"
+                    alt="Maturan's Art Cafe"
+                    class="footer-logo"
+                >
+
+                <p class="footer-tagline">
+                    SIP. CREATE. RELAX.
+                </p>
+
+                <p class="footer-description">
+                    A creative space for coffee lovers,
+                    artists, and everyone in between.
+                </p>
+
+                <div class="social-icons">
+                    <a href="#">F</a>
+                    <a href="#">I</a>
+                    <a href="#">T</a>
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <h3>QUICK LINKS</h3>
+
+                <a href="index.php">Home</a>
+                <a href="about.php">About Us</a>
+                <a href="menu.php">Menu</a>
+                <a href="merch.php">Merch</a>
+
+            </div>
+
+
+            <div class="footer-contact">
+
+                <h3>CONTACT US</h3>
+
+                <p>Dumaguete City</p>
+                <p>Philippines</p>
+                <p>0912 345 6789</p>
+                <p>hello@maturansartcafe.com</p>
+
+            </div>
+
+
+            <div class="footer-subscribe">
+
+                <h3>STAY CONNECTED</h3>
+
+                <p>
+                    Subscribe for updates, events,
+                    and special offers.
+                </p>
+
+                <form class="subscribe-form" action="#" method="POST">
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Your email"
+                        required
+                    >
+
+                    <button type="submit">→</button>
+
+                </form>
+
+                <img
+                    src="images/heart.png"
+                    alt=""
+                    class="heart-small"
+                >
+
+            </div>
+
+        </div>
+
+    </footer>
 
 </body>
 

@@ -1,7 +1,3 @@
-<?php
-session_start();
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,13 +8,30 @@ session_start();
     <title>Events - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/events.css">
 </head>
 
 <body>
 
     <!-- HEADER -->
-    <?php include "header.php"; ?>
+    <header class="header">
+
+        <div class="logo">
+            <img src="images/logo.png" alt="Maturan's Art Cafe">
+        </div>
+
+        <nav class="navbar">
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
+        </nav>
+
+        <a href="login.php" class="reserve-btn">
+            RESERVE A TABLE
+        </a>
+
+    </header>
 
 
     <!-- EVENTS HERO -->
@@ -96,31 +109,24 @@ session_start();
 
                 <div class="event-details">
 
-    <p>
-        📅 December 4, 2027
-    </p>
+                    <p>
+                        📅 December 4, 2027
+                    </p>
 
-    <p>
-        🕔 5:00 PM
-    </p>
+                    <p>
+                        🕔 5:00 PM
+                    </p>
 
-    <p>
-        📍 Maturan's Art Cafe
-    </p>
+                    <p>
+                        📍 Maturan's Art Cafe
+                    </p>
 
-</div>
+                </div>
 
-            <div class="event-action-buttons">
-
-    <a href="artist_registration.php" class="reserve-btn artist-join-btn">
-        JOIN AS AN ARTIST
-    </a>
-
-    <a href="artist_gallery.php" class="reserve-btn artist-gallery-btn">
-         VIEW ARTISTS & ARTWORKS
-    </a>
-
-</div>
+                <a href="index.php#contact"
+                   class="event-page-btn">
+                    JOIN NOW
+                </a>
 
             </div>
 
@@ -187,7 +193,94 @@ session_start();
 
 
     <!-- FOOTER -->
-    <?php include "footer.php"; ?>
+    <footer id="contact" class="footer">
+
+        <div class="footer-content">
+
+            <div class="footer-brand">
+
+                <img src="images/logo.png"
+                     alt="Maturan's Art Cafe"
+                     class="footer-logo">
+
+                <p class="footer-tagline">
+                    Sip. Create. Relax.
+                </p>
+
+                <p class="footer-description">
+                    A cozy art cafe inspiring creativity,
+                    connection, and community.
+                </p>
+
+                <div class="social-icons">
+                    <a href="#">●</a>
+                    <a href="#">◎</a>
+                    <a href="#">✉</a>
+                </div>
+
+            </div>
+
+
+            <div class="footer-links">
+
+                <h3>QUICK LINKS</h3>
+
+                <a href="index.php">Home</a>
+                <a href="about.php">About</a>
+                <a href="menu.php">Menu</a>
+                <a href="events.php">Events</a>
+                <a href="index.php#contact">Contact</a>
+
+            </div>
+
+
+            <div class="footer-contact">
+
+                <h3>CONTACTS</h3>
+
+                <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
+                <p>☎ &nbsp; 0958 586 8934</p>
+                <p>✉ &nbsp; maturansartcafe@gmail.com</p>
+
+            </div>
+
+
+            <div class="footer-subscribe">
+
+                <h3>STAY CONNECTED</h3>
+
+                <p>
+                    Subscribe to get updates on
+                    new events and promos!
+                </p>
+
+                <form class="subscribe-form"
+                      action="check_email.php"
+                      method="POST">
+
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Your email"
+                        required
+                    >
+
+                    <button type="submit">→</button>
+
+                </form>
+
+                <img src="images/whiteheart.png"
+                     alt=""
+                     class="heart-small">
+
+            </div>
+
+        </div>
+
+    </footer>
+
+
+    <script src="JS/script.js"></script>
 
 </body>
 </html>

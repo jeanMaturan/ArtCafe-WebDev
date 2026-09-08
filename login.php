@@ -1,180 +1,27 @@
 <?php
-
 session_start();
-require_once "db.php";
-
-
-/* =====================================
-   CHECK WHY USER IS LOGGING IN
-===================================== */
-
-$from = $_GET["from"] ?? "";
-
-$from_contact = ($from === "contact");
-$from_artist = ($from === "artist");
-$from_review = ($from === "review");
-
-
-/* =====================================
-   IF ALREADY LOGGED IN
-===================================== */
-
-if (
-    isset($_SESSION["user_logged_in"]) &&
-    $_SESSION["user_logged_in"] === true
-) {
-
-    if ($from_contact) {
-
-    header("Location: contact.php");
-
-} elseif ($from_artist) {
-
-    header("Location: artist_registration.php");
-
-} elseif ($from_review) {
-
-    header("Location: reviews.php");
-
-} else {
-
-    header("Location: reservation.php");
-}
-exit();
-}
-
 
 $error = "";
 
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-/* =====================================
-   LOGIN
-===================================== */
+    $email = $_POST["email"];
+    $password = $_POST["password"];
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    if ($email == "user@gmail.com" && $password == "123456") {
 
-    $email = trim($_POST["email"] ?? "");
-    $password = $_POST["password"] ?? "";
+        $_SESSION["user_logged_in"] = true;
+        $_SESSION["user_email"] = $email;
 
-
-    /* =====================================
-       VALIDATE INPUT
-    ===================================== */
-
-    if ($email === "" || $password === "") {
-
-        $error = "Please enter your email and password.";
-
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-
-        $error = "Please enter a valid email address.";
+        header("Location: reserve.php");
+        exit();
 
     } else {
 
+        $error = "Invalid email or password.";
 
-        /* =====================================
-           FIND USER
-        ===================================== */
-
-        $stmt = $conn->prepare(
-            "SELECT user_id, name, email, password
-             FROM users
-             WHERE email = ?
-             LIMIT 1"
-        );
-
-
-        if (!$stmt) {
-
-            $error = "Database error.";
-
-        } else {
-
-            $stmt->bind_param("s", $email);
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-
-
-            /* =====================================
-               CHECK ACCOUNT
-            ===================================== */
-
-            if ($result->num_rows === 1) {
-
-                $user = $result->fetch_assoc();
-
-
-                /* =====================================
-                   VERIFY PASSWORD
-                ===================================== */
-
-                if (
-                    password_verify(
-                        $password,
-                        $user["password"]
-                    )
-                ) {
-
-
-                    /* =====================================
-                       PREVENT SESSION FIXATION
-                    ===================================== */
-
-                    session_regenerate_id(true);
-
-
-                    /* =====================================
-                       CREATE USER SESSION
-                    ===================================== */
-
-                    $_SESSION["user_logged_in"] = true;
-
-                    $_SESSION["user_id"] =
-                        (int)$user["user_id"];
-
-                    $_SESSION["user_name"] =
-                        $user["name"];
-
-                    $_SESSION["user_email"] =
-                        $user["email"];
-
-
-                    /* =====================================
-                       REDIRECT
-                    ===================================== */
-
-                    if ($from_contact) {
-
-                        header("Location: contact.php");
-
-                    } elseif ($from_artist) {
-
-                        header("Location: artist_registration.php");
-
-                    } else {
-
-                        header("Location: reservation.php");
-                    }
-
-                    exit();
-
-                } else {
-
-                    $error = "Invalid email or password.";
-                }
-
-            } else {
-
-                $error = "Invalid email or password.";
-            }
-
-
-            $stmt->close();
-        }
     }
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -183,140 +30,110 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <head>
 
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>Login - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/login.css">
 
 </head>
 
 <body>
 
-<!-- HEADER -->
+    <header class="header">
 
-<?php include "header.php"; ?>
+        <div class="logo">
+            <img src="images/logo.png" alt="Maturan's Art Cafe">
+        </div>
 
+        <nav class="navbar">
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
+        </nav>
 
-<!-- LOGIN -->
-
-<section class="login-page">
-
-    <div class="login-box">
-
-        <p class="login-label">
-    <?php
-    echo $from_contact
-        ? "GET IN TOUCH"
-        : ($from_artist ? "JOIN OUR ARTISTS" : "WELCOME BACK");
-    ?>
-</p>
-
-<h1>
-    LOGIN TO<br>
-    <span>
-        <?php
-        echo $from_contact
-            ? "MESSAGE."
-            : ($from_artist
-                ? "JOIN."
-                : ($from_review
-                    ? "REVIEW."
-                    : "RESERVE."
-                )
-            );
-        ?>
-    </span>
-</h1>
-
-<p class="login-description">
-    <?php
-    echo $from_contact
-        ? "Log in to your account to send a message to Maturan's Art Cafe."
-        : ($from_artist
-            ? "Log in to your account to apply as an artist at Maturan's Art Cafe."
-            : ($from_review
-                ? "Log in to your account to share your experience at Maturan's Art Cafe."
-                : "Log in to your account to reserve a table at Maturan's Art Cafe."
-            )
-        );
-    ?>
-</p>
-
-        <?php if ($error !== ""): ?>
-
-            <div class="login-error">
-                <?php echo htmlspecialchars($error); ?>
-            </div>
-
-        <?php endif; ?>
+    </header>
 
 
-        <form action="login.php<?php echo $from !== "" ? "?from=" . urlencode($from) : ""; ?>" method="POST">
-            <div class="login-group">
+    <section class="login-page">
 
-                <label for="email">
-                    EMAIL
-                </label>
+        <div class="login-box">
 
-                <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    placeholder="Your email"
-                    required
-                >
+            <p class="login-label">
+                WELCOME BACK
+            </p>
 
-            </div>
+            <h1>
+                LOG <span>IN.</span>
+            </h1>
 
-
-            <div class="login-group">
-
-                <label for="password">
-                    PASSWORD
-                </label>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Your password"
-                    required
-                >
-
-            </div>
+            <p class="login-description">
+                Please log in before making a table reservation.
+            </p>
 
 
-            <button
-                type="submit"
-                class="login-button"
-            >
-                LOGIN
-            </button>
+            <?php if ($error != ""): ?>
 
-        </form>
+                <p class="login-error">
+                    <?php echo $error; ?>
+                </p>
 
-
-        <p class="login-note">
-
-            Don't have an account?
-
-            <a href="register.php">
-                CREATE AN ACCOUNT
-            </a>
-
-        </p>
-
-    </div>
-
-</section>
+            <?php endif; ?>
 
 
-<!-- FOOTER -->
+            <form action="login.php" method="POST">
 
-<?php $show_newsletter = true; include "footer.php"; ?>
+                <div class="login-group">
+
+                    <label for="email">
+                        EMAIL
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                    >
+
+                </div>
+
+
+                <div class="login-group">
+
+                    <label for="password">
+                        PASSWORD
+                    </label>
+
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        placeholder="Enter your password"
+                        required
+                    >
+
+                </div>
+
+
+                <button type="submit" class="login-button">
+                    LOG IN
+                </button>
+
+            </form>
+
+
+            <p class="login-note">
+                Don't have an account?
+                <a href="register.php">Create one</a>
+            </p>
+
+        </div>
+
+    </section>
 
 </body>
 </html>

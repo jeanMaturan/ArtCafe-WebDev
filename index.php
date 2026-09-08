@@ -1,9 +1,3 @@
-<?php
-
-session_start();
-
-?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -19,7 +13,24 @@ session_start();
 <body>
 
     <!Headerrrr>
-    <?php include "header.php"; ?>
+    <header class="header">
+
+    <div class="logo">
+        <img src="images/logo.png" alt="Maturan's Art Cafe">
+    </div>
+
+        <nav class="navbar">
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
+        </nav>
+
+    <a href="login.php" class="reserve-btn">
+        RESERVE A TABLE
+    </a>
+    </header>
 
     <section id="hero" class="hero">
 
@@ -39,7 +50,7 @@ session_start();
             where coffee, creativity, and community come together.
         </p>
 
-        <a href="reservation.php" class="hero-btn">
+        <a href="#reservation" class="hero-btn">
             RESERVE A TABLE
         </a>
 
@@ -66,7 +77,7 @@ session_start();
             </p>
         </div>
 
-        <a href="merch.php" class="view-merch">
+        <a href="#" class="view-merch">
             VIEW ALL MERCH ➜
         </a>
 
@@ -101,14 +112,14 @@ session_start();
                  class="bestsellers-brush">
         </div>
 
-        <a href="menu.php" class="view-menu">
+        <a href="#" class="view-menu">
             VIEW FULL MENU ➜
         </a>
 
     </div>
 
 
-<div class="products-container" id="productsContainer">
+    <div class="products-container">
 
     <div class="product-card">
         <img src="images/caramelmacchiato.png" alt="Caramel Macchiato">
@@ -127,19 +138,19 @@ session_start();
     </div>
 
         <div class="product-card">
+        <img src="images/chocolatelatte.png" alt="Chocolate Latte">
+     <div class="product-info">
+         <h3>Chocolate Latte</h3>
+         <p>₱115</p>
+         </div>
+    </div>
+
+    <div class="product-card">
       <img src="images/bluberry.jpeg" alt="Blueberry Cheesecake">
         <div class="product-info">
             <h3>Blueberry Cheesecake</h3>
             <p>₱120</p>
         </div>
-    </div>
-
-
-        <div class="product-card chocolate-card">
-    <img src="images/chocolatelatte.png" alt="Chocolate Latte">
-    <div class="product-info">
-        <h3>Chocolate Latte</h3>
-        <p>₱115</p>
     </div>
 </div>
 
@@ -198,7 +209,7 @@ session_start();
                 ▣ December 4, 2027 • 5:00 PM
             </p>
 
-            <a href="events.php" class="event-btn">
+            <a href="#" class="event-btn">
                 JOIN NOW
             </a>
 
@@ -214,7 +225,7 @@ session_start();
     <div class="special-card">
 
         <div class="special-text">
-            <div class="special-label1">
+            <div class="special-label1"
                 <p class="special-label">OPENING SPECIAL ! ! !</p>
             </div> 
 
@@ -254,7 +265,7 @@ session_start();
             >
         </div>
 
-        <a href="reviews.php" class="view-reviews">
+        <a href="#" class="view-reviews">
             VIEW ALL REVIEWS
             <span>➜</span>
         </a>
@@ -264,328 +275,115 @@ session_start();
 
     <div class="reviews-container">
 
+        <!-- Review 1 -->
+        <div class="review-card">
 
-        <!-- =========================
-             GROUP 1 — REVIEWS 1–3
-        ========================== -->
+            <div class="review-top">
 
-        <div class="review-group">
+                <img
+                    src="images/quote.png"
+                    alt=""
+                    class="quote-icon"
+                >
 
-            <!-- Review 1 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    I love painting here! The staff are
-                    friendly and the food is delicious!
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="Dirpie"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Dirpie</p>
-                        <p class="customer-location">Valencia</p>
-                    </div>
-
+                <div class="stars">
+                    ★★★★★
                 </div>
 
             </div>
 
+            <p class="review-text">
+                I love painting here! The staff are
+                friendly and the food is delicious!
+            </p>
 
-            <!-- Review 2 -->
-            <div class="review-card">
+            <div class="customer">
 
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
+                <img
+                    src="images/derpie.png"
+                    alt="Dirpie"
+                    class="customer-image"
+                >
 
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    It felt like home. I highly
-                    recommend!
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/beam.png"
-                        alt="Beam"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Beam</p>
-                        <p class="customer-location">Dauin</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Review 3 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    Good coffee + cozy space?
-                    Amazing.
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/gordon.png"
-                        alt="Gordon"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Gordon</p>
-                        <p class="customer-location">Tanjay</p>
-                    </div>
-
+                <div>
+                    <p class="customer-name">Dirpie</p>
+                    <p class="customer-location">Valencia</p>
                 </div>
 
             </div>
 
         </div>
 
+        <div class="review-card">
 
-        <!-- =========================
-             GROUP 2 — REVIEWS 4–6
-        ========================== -->
+            <div class="review-top">
 
-        <div class="review-group">
+                <img
+                    src="images/quote.png"
+                    alt=""
+                    class="quote-icon"
+                >
 
-            <!-- Review 4 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    The atmosphere is so cozy and the coffee
-                    tastes amazing!
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/Mia.png"
-                        alt="Mia"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Mia</p>
-                        <p class="customer-location">Dumaguete</p>
-                    </div>
-
+                <div class="stars">
+                    ★★★★★
                 </div>
 
             </div>
 
+            <p class="review-text">
+                It felt like home. I highly
+                recommend!
+            </p>
 
-            <!-- Review 5 -->
-            <div class="review-card">
+            <div class="customer">
 
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
+                <img
+                    src="images/beam.png"
+                    alt="Beam"
+                    class="customer-image"
+                >
 
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    A beautiful place to relax, create,
-                    and enjoy good food.
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/Kyle.png"
-                        alt="Kyle"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Kyle</p>
-                        <p class="customer-location">Bacong</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Review 6 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    Friendly staff, great coffee, and
-                    such a creative environment.
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/Anna.png"
-                        alt="Anna"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Anna</p>
-                        <p class="customer-location">Valencia</p>
-                    </div>
-
+                <div>
+                    <p class="customer-name">Beam</p>
+                    <p class="customer-location">Dauin</p>
                 </div>
 
             </div>
 
         </div>
 
+        <div class="review-card">
 
-        <!-- =========================
-             GROUP 3 — REVIEWS 7–9
-        ========================== -->
+            <div class="review-top">
 
-        <div class="review-group">
+                <img
+                    src="images/quote.png"
+                    alt=""
+                    class="quote-icon"
+                >
 
-            <!-- Review 7 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    One of my favorite places to spend
-                    a quiet afternoon.
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/Lia.png"
-                        alt="Lia"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Lia</p>
-                        <p class="customer-location">Dauin</p>
-                    </div>
-
+                <div class="stars">
+                    ★★★★★
                 </div>
 
             </div>
 
+            <p class="review-text">
+                Good coffee + cozy space?
+                Amazing.
+            </p>
 
-            <!-- Review 8 -->
-            <div class="review-card">
+            <div class="customer">
 
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
+                <img
+                    src="images/gordon.png"
+                    alt="Gordon"
+                    class="customer-image"
+                >
 
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    The perfect combination of art,
-                    coffee, and good vibes.
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/Mark.png"
-                        alt="Mark"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">Mark</p>
-                        <p class="customer-location">Tanjay</p>
-                    </div>
-
+                <div>
+                    <p class="customer-name">Gordon</p>
+                    <p class="customer-location">Tanjay</p>
                 </div>
 
             </div>
@@ -593,9 +391,6 @@ session_start();
         </div>
 
     </div>
-
-
-    <!-- REVIEW DOTS -->
 
     <div class="review-dots">
 
@@ -608,8 +403,87 @@ session_start();
 </section>
 
 <!footer>
-<?php $show_newsletter = true; include "footer.php"; ?>
+<footer id="contact" class="footer">
+
+    <div class="footer-content">
+
+        <div class="footer-brand">
+
+            <img src="images/logo.png"
+                 alt="Maturan's Art Cafe"
+                 class="footer-logo">
+
+            <p class="footer-tagline">
+                Sip. Create. Relax.
+            </p>
+
+            <p class="footer-description">
+                A cozy art cafe inspiring creativity,
+                connection, and community.
+            </p>
+
+            <div class="social-icons">
+                <a href="#">●</a>
+                <a href="#">◎</a>
+                <a href="#">✉</a>
+            </div>
+
+        </div>
+
+        <div class="footer-links">
+
+            <h3>QUICK LINKS</h3>
+
+            <a href="#hero">Home</a>
+            <a href="#about">About</a>
+            <a href="#bestsellers">Menu</a>
+            <a href="#events">Events</a>
+            <a href="#contact">Contact</a>
+
+        </div>
+
+        <div class="footer-contact">
+
+            <h3>CONTACTS</h3>
+
+            <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
+
+            <p>☎ &nbsp; 0958 586 8934</p>
+
+            <p>✉ &nbsp; maturansartcafe@gmail.com</p>
+
+        </div>
+
+        <div class="footer-subscribe">
+
+            <h3>STAY CONNECTED</h3>
+
+            <p>
+                Subscribe to get updates on
+                new events and promos!
+            </p>
+
+            <form class="subscribe-form" action="check_email.php" method="POST">
+                <input 
+                type="email" 
+                 name="email" 
+                 placeholder="Your email"
+                 required
+                >   
+
+                <button type="submit">→</button>
+            </form>
+
+             <img src="images/whiteheart.png" alt="" class="heart-small">
+
+        </div>
+
+    </div>
+
+</footer>
+
+    <script src="JS/script.js"></script>
 
 </body>
 
-</html>
+</html> 

@@ -1,0 +1,19 @@
+﻿# Local environment / IDE
+.vscode/
+.idea/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Local database config (has credentials — use db.example.php as a template instead)
+db.php
+
+# User-uploaded content (created while the site runs, not code you wrote)
+/artwork_images/
+/profile_images/
+
+# Local dev/test scratch files
+test.php
+test_db.php

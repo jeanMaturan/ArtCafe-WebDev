@@ -4,9 +4,7 @@ session_start();
 require_once "db.php";
 
 
-/* =====================================
-   LOGIN CHECK
-===================================== */
+/* LOGIN CHECK */
 
 if (
     !isset($_SESSION["user_logged_in"]) ||
@@ -25,9 +23,7 @@ $success = "";
 $error = "";
 
 
-/* =====================================
-   GET CURRENT PROFILE
-===================================== */
+/* GET CURRENT PROFILE */
 
 $stmt = $conn->prepare(
     "SELECT name, email, profile_picture
@@ -54,9 +50,7 @@ if (!$user) {
 }
 
 
-/* =====================================
-   UPLOAD PROFILE PICTURE
-===================================== */
+/* UPLOAD PROFILE PICTURE */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
