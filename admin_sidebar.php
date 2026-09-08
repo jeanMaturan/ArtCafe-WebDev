@@ -9,7 +9,7 @@
        $admin_active = "artworks";
 
    Valid values: dashboard, artists, artworks,
-   reviews, messages, subscribers.
+   products, events, reviews, messages, subscribers.
 ===================================== */
 
 $admin_active = $admin_active ?? "";
@@ -18,6 +18,8 @@ $admin_nav_items = [
     "dashboard"   => ["href" => "admin_dashboard.php",  "label" => "Dashboard"],
     "artists"     => ["href" => "admin.php",            "label" => "Artists"],
     "artworks"    => ["href" => "admin_artworks.php",   "label" => "Artworks"],
+    "products"    => ["href" => "admin_products.php",   "label" => "Products"],
+    "events"      => ["href" => "admin_events.php",     "label" => "Events"],
     "reviews"     => ["href" => "admin_reviews.php",    "label" => "Reviews"],
     "messages"    => ["href" => "admin_messages.php",   "label" => "Messages"],
     "subscribers" => ["href" => "admin_subscribers.php","label" => "Subscribers"],

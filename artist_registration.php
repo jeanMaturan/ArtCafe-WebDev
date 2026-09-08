@@ -22,6 +22,15 @@ $user_id = (int) $_SESSION["user_id"];
 $success = "";
 $error = "";
 
+if (isset($_SESSION["flash_success"])) {
+    $success = $_SESSION["flash_success"];
+    unset($_SESSION["flash_success"]);
+}
+if (isset($_SESSION["flash_error"])) {
+    $error = $_SESSION["flash_error"];
+    unset($_SESSION["flash_error"]);
+}
+
 
 /* =====================================
    CHECK IF USER IS ALREADY AN APPROVED ARTIST
@@ -331,6 +340,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $check->close();
         }
     }
+
+    if ($success !== "") {
+        $_SESSION["flash_success"] = $success;
+    } elseif ($error !== "") {
+        $_SESSION["flash_error"] = $error;
+    }
+
+    header("Location: artist_registration.php");
+    exit();
 }
 
 ?>

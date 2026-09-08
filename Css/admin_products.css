@@ -1,0 +1,141 @@
+/* =====================================
+   PRODUCT PAGE TITLE ROW
+===================================== */
+
+.product-page-title {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.product-add-button {
+    padding: 11px 16px;
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+
+/* =====================================
+   CATEGORY TABS
+===================================== */
+
+.product-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 22px;
+}
+
+.product-tab {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: 20px;
+    background: var(--white);
+    color: var(--dark-text);
+    text-decoration: none;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 0.8px;
+    box-shadow: 3px 4px 0 rgba(0, 0, 0, 0.04);
+    transition: 0.2s ease;
+}
+
+.product-tab span {
+    background: #f1ebe6;
+    color: #998c85;
+    padding: 2px 7px;
+    border-radius: 10px;
+    font-size: 10px;
+}
+
+.product-tab.active {
+    background: var(--orange);
+    color: var(--white);
+}
+
+.product-tab.active span {
+    background: rgba(255, 255, 255, 0.25);
+    color: var(--white);
+}
+
+.product-tab:hover:not(.active) {
+    background: #f5f0ec;
+}
+
+
+/* =====================================
+   PRODUCT CARD ACTIONS
+===================================== */
+
+.product-edit-link {
+    text-decoration: none;
+    text-align: center;
+}
+
+.product-toggle-button {
+    width: 100%;
+    padding: 10px 14px;
+    border: none;
+    border-radius: 6px;
+    background: #998c85;
+    color: var(--white);
+    font-family: var(--font);
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.product-toggle-button:hover {
+    background: #7c716b;
+}
+
+
+/* =====================================
+   CURRENT IMAGE PREVIEW (EDIT FORMS)
+===================================== */
+
+.product-current-image {
+    display: block;
+    width: 100%;
+    max-height: 220px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 22px;
+}
+
+
+/* =====================================
+   CHECKBOX FORM GROUP
+===================================== */
+
+.admin-checkbox-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: normal;
+    letter-spacing: normal;
+    color: var(--dark-text);
+}
+
+.admin-checkbox-group input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+}
+
+
+@media (max-width: 600px) {
+
+    .product-page-title {
+        flex-direction: column;
+    }
+
+    .product-tabs {
+        flex-wrap: wrap;
+    }
+
+}
