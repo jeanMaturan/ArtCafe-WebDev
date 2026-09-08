@@ -47,6 +47,12 @@ body {
     width: 250px;
 }
 
+.logo a {
+    display: block;
+    outline: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
 .logo img {
     width: 100%;
 }
@@ -652,6 +658,7 @@ body {
 
 .reviews-container {
     display: flex;
+    align-items: flex-start;
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
@@ -929,7 +936,7 @@ body {
     padding: 0 15px;
     border: none;
     outline: none;
-    font-size: 12   px;
+    font-size: 12px;
     color: #3d2115;
 }
 
@@ -1170,6 +1177,10 @@ h6 {
         padding: 45px 40px 60px;
         position: relative;
         z-index: 3;
+        background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.97) 0%,
+            rgba(255, 255, 255, 0.97) 65%,
+            rgba(255, 255, 255, 0) 100%);
     }
 
     .hero-content h1 {
@@ -1210,4 +1221,191 @@ h6 {
         z-index: 2;
     }
 
+}
+
+@media (max-width: 768px) {
+
+    /* Merch */
+    .merch {
+        padding: 25px 15px 30px;
+    }
+
+    .merch-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .merch-header h2 {
+        font-size: 26px;
+    }
+
+    .merch-container {
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .merch-card {
+        width: 100%;
+        aspect-ratio: 16 / 9;
+    }
+
+    /* Bestsellers */
+    .bestsellers {
+        padding: 45px 20px 40px;
+    }
+
+    .bestsellers-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .products-container {
+        width: 100%;
+    }
+
+    .product-card {
+        flex: 0 0 78%;
+    }
+
+    .chocolate-card {
+        margin-left: 0;
+    }
+
+    /* About */
+    .about-container {
+        flex-direction: column;
+        height: auto;
+    }
+
+    .about-image {
+        width: 100%;
+        height: 220px;
+        border-radius: 0 0 35px 35px;
+    }
+
+    .about-content {
+        width: 100%;
+        padding: 25px 25px 30px;
+    }
+
+    .about-content h2 {
+        font-size: 28px;
+    }
+
+    .about-content h2 span {
+        font-size: 24px;
+    }
+
+    .about-content p {
+        max-width: 100%;
+    }
+
+    .second-pattern {
+        display: none;
+    }
+
+    /* Promotions (event card + special card) */
+    .promotions {
+        flex-direction: column;
+        padding: 20px 20px 30px;
+        gap: 20px;
+    }
+
+    .event-card,
+    .special-card {
+        width: 100%;
+        height: auto;
+        min-height: 200px;
+    }
+
+    .special-text {
+        padding: 15px;
+    }
+
+    .special-label1,
+    .special-text .heart-small {
+        margin-left: 10px;
+    }
+
+    .special-text h3 {
+        font-size: 36px;
+    }
+
+    .limited {
+        padding: 9px 22px;
+        font-size: 10px;
+        white-space: nowrap;
+    }
+
+    .limited::before,
+    .limited::after {
+        border-top-width: 21px;
+        border-bottom-width: 6px;
+    }
+
+    .limited::before {
+        left: -6px;
+        border-left-width: 20px;
+    }
+
+    .limited::after {
+        right: -6px;
+        border-right-width: 20px;
+    }
+
+    /* Reviews */
+    .reviews-section {
+        padding: 30px 18px 45px;
+        border-radius: 0 0 20% 20% / 0 0 6% 6%;
+    }
+
+    .reviews-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+        margin-bottom: 25px;
+    }
+
+    .review-group {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .review-card {
+        flex: 0 0 100%;
+        width: 100%;
+        height: auto;
+        min-height: 0;
+        padding: 16px 16px 14px;
+    }
+
+    .review-text {
+        margin: 12px 0 12px;
+    }
+
+    .customer {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+
+    /* Footer */
+    .footer {
+        padding: 45px 6% 25px;
+    }
+
+    .footer-content {
+        grid-template-columns: 1fr;
+        gap: 25px;
+    }
+
+    .subscribe-form {
+        width: 100%;
+    }
+
+    .footer .heart-small {
+        margin-left: 0;
+    }
 }

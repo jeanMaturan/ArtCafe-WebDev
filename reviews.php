@@ -815,7 +815,9 @@ if ($stmt) {
         </div>
 
     </footer>
-    
+
+    <script src="JS/script.js"></script>
+
 </body>
 
 </html>
