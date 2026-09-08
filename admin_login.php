@@ -10,21 +10,39 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST["username"] ?? "");
     $password = $_POST["password"] ?? "";
 
+
+    /* =====================================
+       VALIDATE INPUT
+    ===================================== */
+
     if ($username === "" || $password === "") {
 
         $error = "Please enter your username and password.";
 
+    } elseif (strlen($username) > 100) {
+
+        $error = "Invalid username or password.";
+
     } else {
 
+        /* =====================================
+           FIND ADMIN ACCOUNT
+        ===================================== */
+
         $stmt = $conn->prepare(
-            "SELECT admin_id, username, password
+            "SELECT
+                admin_id,
+                username,
+                password
              FROM admins
-             WHERE username = ?"
+             WHERE username = ?
+             LIMIT 1"
         );
+
 
         if (!$stmt) {
 
-            $error = "Database error: " . $conn->error;
+            $error = "Something went wrong. Please try again.";
 
         } else {
 
@@ -33,15 +51,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $result = $stmt->get_result();
 
+
+            /* =====================================
+               VERIFY ADMIN LOGIN
+            ===================================== */
+
             if ($result->num_rows === 1) {
 
                 $admin = $result->fetch_assoc();
 
-                if (password_verify($password, $admin["password"])) {
+
+                if (
+                    password_verify(
+                        $password,
+                        $admin["password"]
+                    )
+                ) {
+
+                    /* =====================================
+                       PREVENT SESSION FIXATION
+                    ===================================== */
+
+                    session_regenerate_id(true);
+
+
+                    /* =====================================
+                       CREATE ADMIN SESSION
+                    ===================================== */
 
                     $_SESSION["admin_logged_in"] = true;
-                    $_SESSION["admin_id"] = $admin["admin_id"];
-                    $_SESSION["admin_username"] = $admin["username"];
+                    $_SESSION["admin_id"] = (int) $admin["admin_id"];
+                    $_SESSION["admin_username"] =
+                        $admin["username"];
+
+
+                    /* =====================================
+                       REDIRECT TO ADMIN PANEL
+                    ===================================== */
+
+                    $stmt->close();
 
                     header("Location: admin.php");
                     exit();
@@ -57,6 +105,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $error = "Invalid username or password.";
 
             }
+
 
             $stmt->close();
         }

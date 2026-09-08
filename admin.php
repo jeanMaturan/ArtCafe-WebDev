@@ -3,17 +3,24 @@
 session_start();
 require_once "db.php";
 
+
 /* =====================================
    ADMIN LOGIN CHECK
 ===================================== */
 
 if (
     !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true
+    $_SESSION["admin_logged_in"] !== true ||
+    !isset($_SESSION["admin_id"]) ||
+    !is_numeric($_SESSION["admin_id"]) ||
+    !isset($_SESSION["admin_username"]) ||
+    $_SESSION["admin_username"] === ""
 ) {
     header("Location: admin_login.php");
     exit();
 }
+
+$admin_id = (int) $_SESSION["admin_id"];
 
 
 /* =====================================
@@ -45,7 +52,7 @@ if ($event_query && $event_query->num_rows === 1) {
 
     $event = $event_query->fetch_assoc();
 
-    $event_id = $event["event_id"];
+    $event_id = (int) $event["event_id"];
     $event_name = $event["event_name"];
 }
 
@@ -56,146 +63,236 @@ if ($event_query && $event_query->num_rows === 1) {
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $action = $_POST["action"] ?? "";
-    $event_artist_id = (int)($_POST["event_artist_id"] ?? 0);
+    $action = trim($_POST["action"] ?? "");
+    $event_artist_id = filter_input(
+        INPUT_POST,
+        "event_artist_id",
+        FILTER_VALIDATE_INT
+    );
 
 
-    /* ================================
-       APPROVE
-    ================================= */
+    /* =====================================
+       VALIDATE POST DATA
+    ===================================== */
 
-    if ($action === "approve") {
+    if (
+        !in_array(
+            $action,
+            ["approve", "reject"],
+            true
+        )
+    ) {
 
-        /* Count approved artists
-           for the active event */
+        $message = "Invalid action.";
+        $message_type = "error";
 
-        $count_stmt = $conn->prepare(
-            "SELECT COUNT(*) AS approved_count
-             FROM event_artists
-             WHERE event_id = ?
-             AND status = 'Approved'"
-        );
+    } elseif (
+        $event_artist_id === false ||
+        $event_artist_id === null ||
+        $event_artist_id <= 0
+    ) {
 
-        $count_stmt->bind_param(
-            "i",
-            $event_id
-        );
+        $message = "Invalid artist application.";
+        $message_type = "error";
 
-        $count_stmt->execute();
+    } elseif ($event_id === null) {
 
-        $count_result = $count_stmt->get_result();
+        $message = "No active event is currently available.";
+        $message_type = "error";
 
-        $count_data = $count_result->fetch_assoc();
-
-        $approved_count =
-            (int)$count_data["approved_count"];
-
-        $count_stmt->close();
+    } else {
 
 
-        /* Check if already full */
+        /* =====================================
+           APPROVE
+        ===================================== */
 
-        if ($approved_count >= $max_artists) {
+        if ($action === "approve") {
 
-            $message =
-                "The event already has 5 approved artists. You cannot approve another artist.";
 
-            $message_type = "error";
+            /* =====================================
+               COUNT APPROVED ARTISTS
+            ===================================== */
 
-        } else {
-
-            /* Approve artist */
-
-            $approve_stmt = $conn->prepare(
-                "UPDATE event_artists
-                 SET status = 'Approved'
-                 WHERE event_artist_id = ?
-                 AND event_id = ?
-                 AND status = 'Pending'"
+            $count_stmt = $conn->prepare(
+                "SELECT COUNT(*) AS approved_count
+                 FROM event_artists
+                 WHERE event_id = ?
+                 AND status = 'Approved'"
             );
 
-            $approve_stmt->bind_param(
-                "ii",
-                $event_artist_id,
-                $event_id
-            );
 
-            if ($approve_stmt->execute()) {
+            if (!$count_stmt) {
 
-                if ($approve_stmt->affected_rows > 0) {
+                $message =
+                    "Something went wrong. Please try again.";
+
+                $message_type = "error";
+
+            } else {
+
+                $count_stmt->bind_param(
+                    "i",
+                    $event_id
+                );
+
+                $count_stmt->execute();
+
+                $count_result =
+                    $count_stmt->get_result();
+
+                $count_data =
+                    $count_result->fetch_assoc();
+
+                $approved_count =
+                    (int) $count_data["approved_count"];
+
+                $count_stmt->close();
+
+
+                /* =====================================
+                   CHECK EVENT CAPACITY
+                ===================================== */
+
+                if ($approved_count >= $max_artists) {
 
                     $message =
-                        "Artist approved successfully.";
+                        "The event already has 5 approved artists. You cannot approve another artist.";
 
-                    $message_type = "success";
+                    $message_type = "error";
+
+                } else {
+
+
+                    /* =====================================
+                       APPROVE ONLY PENDING APPLICATION
+                       FROM ACTIVE EVENT
+                    ===================================== */
+
+                    $approve_stmt = $conn->prepare(
+                        "UPDATE event_artists
+                         SET status = 'Approved'
+                         WHERE event_artist_id = ?
+                         AND event_id = ?
+                         AND status = 'Pending'"
+                    );
+
+
+                    if (!$approve_stmt) {
+
+                        $message =
+                            "Something went wrong. Please try again.";
+
+                        $message_type = "error";
+
+                    } else {
+
+                        $approve_stmt->bind_param(
+                            "ii",
+                            $event_artist_id,
+                            $event_id
+                        );
+
+
+                        if ($approve_stmt->execute()) {
+
+                            if (
+                                $approve_stmt->affected_rows > 0
+                            ) {
+
+                                $message =
+                                    "Artist approved successfully.";
+
+                                $message_type = "success";
+
+                            } else {
+
+                                $message =
+                                    "The artist could not be approved. The application may no longer be pending.";
+
+                                $message_type = "error";
+                            }
+
+                        } else {
+
+                            $message =
+                                "Something went wrong while approving the artist.";
+
+                            $message_type = "error";
+                        }
+
+                        $approve_stmt->close();
+                    }
+                }
+            }
+        }
+
+
+        /* =====================================
+           REJECT
+        ===================================== */
+
+        elseif ($action === "reject") {
+
+
+            /* =====================================
+               REJECT PENDING OR APPROVED ARTIST
+               ONLY FROM ACTIVE EVENT
+            ===================================== */
+
+            $reject_stmt = $conn->prepare(
+                "UPDATE event_artists
+                 SET status = 'Rejected'
+                 WHERE event_artist_id = ?
+                 AND event_id = ?
+                 AND status IN ('Pending', 'Approved')"
+            );
+
+
+            if (!$reject_stmt) {
+
+                $message =
+                    "Something went wrong. Please try again.";
+
+                $message_type = "error";
+
+            } else {
+
+                $reject_stmt->bind_param(
+                    "ii",
+                    $event_artist_id,
+                    $event_id
+                );
+
+
+                if ($reject_stmt->execute()) {
+
+                    if ($reject_stmt->affected_rows > 0) {
+
+                        $message =
+                            "Artist application rejected.";
+
+                        $message_type = "success";
+
+                    } else {
+
+                        $message =
+                            "The artist could not be rejected. The application may already be rejected.";
+
+                        $message_type = "error";
+                    }
 
                 } else {
 
                     $message =
-                        "The artist could not be approved.";
+                        "Something went wrong while rejecting the artist.";
 
                     $message_type = "error";
                 }
 
-            } else {
-
-                $message =
-                    "Something went wrong while approving the artist.";
-
-                $message_type = "error";
+                $reject_stmt->close();
             }
-
-            $approve_stmt->close();
         }
-    }
-
-
-    /* ================================
-       REJECT
-    ================================= */
-
-    elseif ($action === "reject") {
-
-        $reject_stmt = $conn->prepare(
-            "UPDATE event_artists
-             SET status = 'Rejected'
-             WHERE event_artist_id = ?
-             AND event_id = ?
-             AND status = 'Pending'"
-        );
-
-        $reject_stmt->bind_param(
-            "ii",
-            $event_artist_id,
-            $event_id
-        );
-
-        if ($reject_stmt->execute()) {
-
-            if ($reject_stmt->affected_rows > 0) {
-
-                $message =
-                    "Artist application rejected.";
-
-                $message_type = "success";
-
-            } else {
-
-                $message =
-                    "The artist could not be rejected.";
-
-                $message_type = "error";
-            }
-
-        } else {
-
-            $message =
-                "Something went wrong while rejecting the artist.";
-
-            $message_type = "error";
-        }
-
-        $reject_stmt->close();
     }
 }
 
@@ -215,27 +312,32 @@ if ($event_id !== null) {
          AND status = 'Approved'"
     );
 
-    $approved_stmt->bind_param(
-        "i",
-        $event_id
-    );
 
-    $approved_stmt->execute();
+    if ($approved_stmt) {
 
-    $approved_result =
-        $approved_stmt->get_result();
+        $approved_stmt->bind_param(
+            "i",
+            $event_id
+        );
 
-    $approved_data =
-        $approved_result->fetch_assoc();
+        $approved_stmt->execute();
 
-    $approved_count =
-        (int)$approved_data["approved_count"];
+        $approved_result =
+            $approved_stmt->get_result();
 
-    $approved_stmt->close();
+        $approved_data =
+            $approved_result->fetch_assoc();
+
+        $approved_count =
+            (int) $approved_data["approved_count"];
+
+        $approved_stmt->close();
+    }
 }
 
+
 $remaining_slots =
-    $max_artists - $approved_count;
+    max(0, $max_artists - $approved_count);
 
 
 /* =====================================
@@ -278,22 +380,26 @@ if ($event_id !== null) {
             ea.joined_at ASC"
     );
 
-    $artist_stmt->bind_param(
-        "i",
-        $event_id
-    );
 
-    $artist_stmt->execute();
+    if ($artist_stmt) {
 
-    $artist_result =
-        $artist_stmt->get_result();
+        $artist_stmt->bind_param(
+            "i",
+            $event_id
+        );
 
-    while ($row = $artist_result->fetch_assoc()) {
+        $artist_stmt->execute();
 
-        $artists[] = $row;
+        $artist_result =
+            $artist_stmt->get_result();
+
+        while ($row = $artist_result->fetch_assoc()) {
+
+            $artists[] = $row;
+        }
+
+        $artist_stmt->close();
     }
-
-    $artist_stmt->close();
 }
 
 ?>
@@ -351,47 +457,58 @@ if ($event_id !== null) {
 
     <div class="admin-header-right">
 
-        <a
-            href="admin.php"
-            class="admin-nav-button"
-        >
-            ARTISTS
-        </a>
+    <a
+        href="admin.php"
+        class="admin-nav-button"
+    >
+        ARTISTS
+    </a>
 
-        <a
-            href="admin_artworks.php"
-            class="admin-nav-button"
-        >
-            ARTWORKS
-        </a>
+    <a
+        href="admin_artworks.php"
+        class="admin-nav-button"
+    >
+        ARTWORKS
+    </a>
 
-        <a
-            href="admin_messages.php"
-            class="admin-nav-button"
-        >
-            MESSAGES
-        </a>
+    <!-- REVIEWS -->
+    <a
+        href="admin_reviews.php"
+        class="admin-nav-button"
+    >
+        REVIEWS
+    </a>
 
-        <a href="admin_subscribers.php" class="admin-nav-button">
-             SUBSCRIBERS
-        </a>
+    <a
+        href="admin_messages.php"
+        class="admin-nav-button"
+    >
+        MESSAGES
+    </a>
 
-        <span>
-            Welcome, <?php
-            echo htmlspecialchars(
-                $_SESSION["admin_username"]
-            );
-            ?>
-        </span>
+    <a
+        href="admin_subscribers.php"
+        class="admin-nav-button"
+    >
+        SUBSCRIBERS
+    </a>
 
-        <a
-            href="admin_logout.php"
-            class="admin-logout-button"
-        >
-            LOGOUT
-        </a>
+    <span>
+        Welcome, <?php
+        echo htmlspecialchars(
+            $_SESSION["admin_username"]
+        );
+        ?>
+    </span>
 
-    </div>
+    <a
+        href="admin_logout.php"
+        class="admin-logout-button"
+    >
+        LOGOUT
+    </a>
+
+</div>
 
 </header>
 

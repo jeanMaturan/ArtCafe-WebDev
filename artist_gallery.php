@@ -1,11 +1,12 @@
 <?php
+
 session_start();
 require_once "db.php";
 
 
-// =====================================
-// GET APPROVED ARTISTS AND ARTWORKS
-// =====================================
+/* =====================================
+   GET APPROVED ARTISTS AND ARTWORKS
+===================================== */
 
 $sql = "
     SELECT
@@ -36,7 +37,24 @@ $sql = "
         aw.created_at DESC
 ";
 
+
 $result = $conn->query($sql);
+
+
+/* =====================================
+   DATABASE ERROR HANDLING
+===================================== */
+
+if (!$result) {
+
+    error_log(
+        "Artist gallery query failed: " .
+        $conn->error
+    );
+
+    $result = false;
+}
+
 ?>
 
 <!DOCTYPE html>

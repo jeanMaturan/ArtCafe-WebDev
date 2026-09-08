@@ -1,14 +1,21 @@
 <?php
+
 session_start();
 require_once "db.php";
 
 /* USER MUST BE LOGGED IN */
-if (!isset($_SESSION["user_id"])) {
+if (
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"])
+) {
     header("Location: login.php");
     exit();
 }
 
-$user_id = $_SESSION["user_id"];
+/* CONVERT SESSION USER ID TO INTEGER */
+$user_id = (int) $_SESSION["user_id"];
 
 /* GET ONLY THIS USER'S MESSAGES */
 $stmt = $conn->prepare(
@@ -25,13 +32,20 @@ $stmt = $conn->prepare(
      ORDER BY created_at DESC"
 );
 
+if (!$stmt) {
+    die("Something went wrong. Please try again.");
+}
+
 $stmt->bind_param("i", $user_id);
-$stmt->execute();
+
+if (!$stmt->execute()) {
+    $stmt->close();
+    die("Something went wrong. Please try again.");
+}
 
 $result = $stmt->get_result();
+
 ?>
-
-
 
 <!DOCTYPE html>
 <html lang="en">

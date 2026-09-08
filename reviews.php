@@ -1,6 +1,178 @@
 <?php
+
 session_start();
+require_once "db.php";
+
+
+/* =====================================
+   REVIEW SUBMISSION
+===================================== */
+
+$success = "";
+$error = "";
+
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    /* ---------------------------------
+       LOGIN CHECK
+    --------------------------------- */
+
+    if (
+        !isset($_SESSION["user_logged_in"]) ||
+        $_SESSION["user_logged_in"] !== true ||
+        !isset($_SESSION["user_id"]) ||
+        !is_numeric($_SESSION["user_id"])
+    ) {
+
+        $error = "Please log in before submitting a review.";
+
+    } else {
+
+        $user_id = (int) $_SESSION["user_id"];
+
+        $rating = filter_input(
+            INPUT_POST,
+            "rating",
+            FILTER_VALIDATE_INT
+        );
+
+        $review_text = trim(
+            $_POST["review_text"] ?? ""
+        );
+
+
+        /* ---------------------------------
+           VALIDATE RATING
+        --------------------------------- */
+
+        if (
+            $rating === false ||
+            $rating === null ||
+            $rating < 1 ||
+            $rating > 5
+        ) {
+
+            $error = "Please select a rating from 1 to 5 stars.";
+
+        }
+
+        /* ---------------------------------
+           VALIDATE REVIEW
+        --------------------------------- */
+
+        elseif ($review_text === "") {
+
+            $error = "Please enter your review.";
+
+        }
+
+        elseif (strlen($review_text) < 5) {
+
+            $error = "Your review must be at least 5 characters.";
+
+        }
+
+        elseif (strlen($review_text) > 2000) {
+
+            $error = "Your review must not exceed 2000 characters.";
+
+        }
+
+        else {
+
+            /* ---------------------------------
+               INSERT REVIEW
+            --------------------------------- */
+
+            $stmt = $conn->prepare(
+                "INSERT INTO reviews
+                (user_id, rating, review_text, status)
+                VALUES (?, ?, ?, 'Pending')"
+            );
+
+
+            if (!$stmt) {
+
+                error_log(
+                    "Review prepare failed: " .
+                    $conn->error
+                );
+
+                $error =
+                    "Something went wrong. Please try again.";
+
+            } else {
+
+                $stmt->bind_param(
+                    "iis",
+                    $user_id,
+                    $rating,
+                    $review_text
+                );
+
+
+                if ($stmt->execute()) {
+
+                    $success =
+                        "Thank you! Your review has been submitted and is waiting for approval.";
+
+                } else {
+
+                    error_log(
+                        "Review insert failed: " .
+                        $stmt->error
+                    );
+
+                    $error =
+                        "Something went wrong. Please try again.";
+                }
+
+
+                $stmt->close();
+            }
+        }
+    }
+}
+
+
+/* =====================================
+   GET APPROVED REVIEWS
+===================================== */
+
+$approved_reviews = [];
+
+$stmt = $conn->prepare(
+    "SELECT
+        r.rating,
+        r.review_text,
+        r.created_at,
+        u.name
+     FROM reviews r
+     INNER JOIN users u
+        ON r.user_id = u.user_id
+     WHERE r.status = 'Approved'
+     ORDER BY r.created_at DESC"
+);
+
+
+if ($stmt) {
+
+    if ($stmt->execute()) {
+
+        $result = $stmt->get_result();
+
+        while ($row = $result->fetch_assoc()) {
+
+            $approved_reviews[] = $row;
+        }
+    }
+
+    $stmt->close();
+}
+
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,6 +248,139 @@ session_start();
 
     </section>
 
+    <!-- SUBMIT REVIEW -->
+
+<section class="submit-review-section">
+
+    <div class="submit-review-container">
+
+        <p class="all-reviews-label">
+            SHARE YOUR EXPERIENCE
+        </p>
+
+        <h2>
+            LEAVE A <span>REVIEW.</span>
+        </h2>
+
+        <p>
+            We would love to hear about your experience
+            at Maturan's Art Cafe.
+        </p>
+
+
+        <?php if ($success !== ""): ?>
+
+            <div class="review-success">
+                <?php echo htmlspecialchars($success); ?>
+            </div>
+
+        <?php endif; ?>
+
+
+        <?php if ($error !== ""): ?>
+
+            <div class="review-error">
+                <?php echo htmlspecialchars($error); ?>
+            </div>
+
+        <?php endif; ?>
+
+
+        <?php if (
+            isset($_SESSION["user_logged_in"]) &&
+            $_SESSION["user_logged_in"] === true
+        ): ?>
+
+            <form method="POST" action="reviews.php">
+
+                <div class="review-rating">
+
+                    <label for="rating">
+                        YOUR RATING
+                    </label>
+
+                    <select
+                        name="rating"
+                        id="rating"
+                        required
+                    >
+
+                        <option value="">
+                            Select a rating
+                        </option>
+
+                        <option value="5">
+                            ★★★★★ - Excellent
+                        </option>
+
+                        <option value="4">
+                            ★★★★ - Very Good
+                        </option>
+
+                        <option value="3">
+                            ★★★ - Good
+                        </option>
+
+                        <option value="2">
+                            ★★ - Fair
+                        </option>
+
+                        <option value="1">
+                            ★ - Poor
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="review-message">
+
+                    <label for="review_text">
+                        YOUR REVIEW
+                    </label>
+
+                    <textarea
+                        name="review_text"
+                        id="review_text"
+                        rows="6"
+                        maxlength="2000"
+                        placeholder="Tell us about your experience..."
+                        required
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="submit"
+                    class="submit-review-btn"
+                >
+                    SUBMIT REVIEW
+                </button>
+
+            </form>
+
+
+        <?php else: ?>
+
+            <div class="review-login-message">
+
+                <p>
+                    Please log in to share your experience.
+                </p>
+
+                <a href="login.php?from=review">
+                    LOG IN TO WRITE A REVIEW
+                </a>
+
+            </div>
+
+        <?php endif; ?>
+
+    </div>
+
+</section>
 
     <!-- ALL REVIEWS -->
     <section class="all-reviews-section">
@@ -354,135 +659,74 @@ session_start();
 
             </div>
 
+            <!-- APPROVED USER REVIEWS -->
 
-            <!-- REVIEW 9 -->
-            <div class="all-review-card">
+<?php foreach ($approved_reviews as $review): ?>
 
-                <div class="all-review-top">
-                    <img src="images/quote.png" alt="" class="quote-icon">
+    <div class="all-review-card">
 
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
+        <div class="all-review-top">
 
-                <p class="all-review-text">
-                    Amazing experience every time.
-                    I'll definitely come back!
+            <img
+                src="images/quote.png"
+                alt=""
+                class="quote-icon"
+            >
+
+            <div class="stars">
+                <?php
+                echo str_repeat(
+                    "★",
+                    (int) $review["rating"]
+                );
+                ?>
+            </div>
+
+        </div>
+
+
+        <p class="all-review-text">
+            <?php
+            echo htmlspecialchars(
+                $review["review_text"]
+            );
+            ?>
+        </p>
+
+
+        <div class="all-customer">
+
+            <div class="all-customer-image user-review-avatar">
+                <?php
+                echo strtoupper(
+                    htmlspecialchars(
+                        substr($review["name"], 0, 1)
+                    )
+                );
+                ?>
+            </div>
+
+            <div>
+
+                <p class="all-customer-name">
+                    <?php
+                    echo htmlspecialchars(
+                        $review["name"]
+                    );
+                    ?>
                 </p>
 
-                <div class="all-customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="John"
-                        class="all-customer-image"
-                    >
-
-                    <div>
-                        <p class="all-customer-name">John</p>
-                        <p class="all-customer-location">Dumaguete</p>
-                    </div>
-
-                </div>
+                <p class="all-customer-location">
+                    Customer
+                </p>
 
             </div>
 
-        <!-- REVIEW 10 -->
-            <div class="all-review-card">
+        </div>
 
-                <div class="all-review-top">
-                    <img src="images/quote.png" alt="" class="quote-icon">
+    </div>
 
-                    <div class="stars">
-                        ★★★★
-                    </div>
-                </div>
-
-                <p class="all-review-text">
-                    I love the cozy atmosphere and the art on display. The coffee is great too!
-                </p>
-
-                <div class="all-customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="Klara"
-                        class="all-customer-image"
-                    >
-
-                    <div>
-                        <p class="all-customer-name">Klara</p>
-                        <p class="all-customer-location">Bais</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- REVIEW 9 -->
-            <div class="all-review-card">
-
-                <div class="all-review-top">
-                    <img src="images/quote.png" alt="" class="quote-icon">
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="all-review-text">
-                    It's so very near to my place, and I love the ambiance. The staff are always welcoming and the coffee is top-notch!
-                </p>
-
-                <div class="all-customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="Shimael"
-                        class="all-customer-image"
-                    >
-
-                    <div>
-                        <p class="all-customer-name">Shimael</p>
-                        <p class="all-customer-location">Jawa</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-            <!-- REVIEW 9 -->
-            <div class="all-review-card">
-
-                <div class="all-review-top">
-                    <img src="images/quote.png" alt="" class="quote-icon">
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="all-review-text">
-                    Perfect place to unwind and enjoy a cup of coffee while appreciating art.
-                </p>
-
-                <div class="all-customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="Khell"
-                        class="all-customer-image"
-                    >
-
-                    <div>
-                        <p class="all-customer-name">Khell</p>
-                        <p class="all-customer-location">Liptong</p>
-                    </div>
-
-                </div>
-
-            </div>
+<?php endforeach; ?>
 
         </div>
 

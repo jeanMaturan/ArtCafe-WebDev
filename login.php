@@ -1,24 +1,23 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 session_start();
 require_once "db.php";
 
 
-/* CHECK WHY USER IS LOGGING IN */
+/* =====================================
+   CHECK WHY USER IS LOGGING IN
+===================================== */
 
-$from_contact =
-    isset($_GET["from"]) &&
-    $_GET["from"] === "contact";
+$from = $_GET["from"] ?? "";
 
-$from_artist =
-    isset($_GET["from"]) &&
-    $_GET["from"] === "artist";
+$from_contact = ($from === "contact");
+$from_artist = ($from === "artist");
+$from_review = ($from === "review");
 
 
-/* IF ALREADY LOGGED IN */
+/* =====================================
+   IF ALREADY LOGGED IN
+===================================== */
 
 if (
     isset($_SESSION["user_logged_in"]) &&
@@ -26,42 +25,68 @@ if (
 ) {
 
     if ($from_contact) {
+
     header("Location: contact.php");
+
 } elseif ($from_artist) {
+
     header("Location: artist_registration.php");
+
+} elseif ($from_review) {
+
+    header("Location: reviews.php");
+
 } else {
+
     header("Location: reservation.php");
 }
-
-    exit();
+exit();
 }
 
 
 $error = "";
 
 
-/* LOGIN */
+/* =====================================
+   LOGIN
+===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $email = trim($_POST["email"] ?? "");
     $password = $_POST["password"] ?? "";
 
+
+    /* =====================================
+       VALIDATE INPUT
+    ===================================== */
+
     if ($email === "" || $password === "") {
 
         $error = "Please enter your email and password.";
 
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+        $error = "Please enter a valid email address.";
+
     } else {
+
+
+        /* =====================================
+           FIND USER
+        ===================================== */
 
         $stmt = $conn->prepare(
             "SELECT user_id, name, email, password
              FROM users
-             WHERE email = ?"
+             WHERE email = ?
+             LIMIT 1"
         );
+
 
         if (!$stmt) {
 
-            $error = "Database error: " . $conn->error;
+            $error = "Database error.";
 
         } else {
 
@@ -70,9 +95,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $result = $stmt->get_result();
 
+
+            /* =====================================
+               CHECK ACCOUNT
+            ===================================== */
+
             if ($result->num_rows === 1) {
 
                 $user = $result->fetch_assoc();
+
+
+                /* =====================================
+                   VERIFY PASSWORD
+                ===================================== */
 
                 if (
                     password_verify(
@@ -81,17 +116,41 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     )
                 ) {
 
+
+                    /* =====================================
+                       PREVENT SESSION FIXATION
+                    ===================================== */
+
+                    session_regenerate_id(true);
+
+
+                    /* =====================================
+                       CREATE USER SESSION
+                    ===================================== */
+
                     $_SESSION["user_logged_in"] = true;
-                    $_SESSION["user_id"] = $user["user_id"];
-                    $_SESSION["user_name"] = $user["name"];
-                    $_SESSION["user_email"] = $user["email"];
+
+                    $_SESSION["user_id"] =
+                        (int)$user["user_id"];
+
+                    $_SESSION["user_name"] =
+                        $user["name"];
+
+                    $_SESSION["user_email"] =
+                        $user["email"];
 
 
-                    /* REDIRECT BASED ON WHERE THEY CAME FROM */
+                    /* =====================================
+                       REDIRECT
+                    ===================================== */
 
                     if ($from_contact) {
 
                         header("Location: contact.php");
+
+                    } elseif ($from_artist) {
+
+                        header("Location: artist_registration.php");
 
                     } else {
 
@@ -110,12 +169,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $error = "Invalid email or password.";
             }
 
+
             $stmt->close();
         }
     }
 }
 
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -193,7 +254,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <?php
         echo $from_contact
             ? "MESSAGE."
-            : ($from_artist ? "JOIN." : "RESERVE.");
+            : ($from_artist
+                ? "JOIN."
+                : ($from_review
+                    ? "REVIEW."
+                    : "RESERVE."
+                )
+            );
         ?>
     </span>
 </h1>
@@ -204,7 +271,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ? "Log in to your account to send a message to Maturan's Art Cafe."
         : ($from_artist
             ? "Log in to your account to apply as an artist at Maturan's Art Cafe."
-            : "Log in to your account to reserve a table at Maturan's Art Cafe.");
+            : ($from_review
+                ? "Log in to your account to share your experience at Maturan's Art Cafe."
+                : "Log in to your account to reserve a table at Maturan's Art Cafe."
+            )
+        );
     ?>
 </p>
 
@@ -217,8 +288,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <?php endif; ?>
 
 
-        <form action="login.php" method="POST">
-
+        <form action="login.php<?php echo $from !== "" ? "?from=" . urlencode($from) : ""; ?>" method="POST">
             <div class="login-group">
 
                 <label for="email">

@@ -5,70 +5,216 @@ require_once "db.php";
 $error = "";
 $success = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $name = trim($_POST["name"]);
-    $email = trim($_POST["email"]);
-    $password = $_POST["password"];
-    $confirm_password = $_POST["confirm_password"];
+    $name = trim($_POST["name"] ?? "");
+    $email = trim($_POST["email"] ?? "");
+    $password = $_POST["password"] ?? "";
+    $confirm_password = $_POST["confirm_password"] ?? "";
 
-    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
+
+    // =====================================
+    // CHECK EMPTY FIELDS
+    // =====================================
+
+    if (
+        $name === "" ||
+        $email === "" ||
+        $password === "" ||
+        $confirm_password === ""
+    ) {
 
         $error = "Please fill in all fields.";
 
-    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    }
+
+
+    // =====================================
+    // VALIDATE FULL NAME
+    // =====================================
+
+    elseif (!preg_match("/[A-Za-z]/", $name)) {
+
+        $error = "Full name must contain letters.";
+
+    }
+
+    elseif (preg_match("/^[0-9]+$/", $name)) {
+
+        $error = "Full name cannot contain numbers only.";
+
+    }
+
+    elseif (strlen($name) < 2) {
+
+        $error = "Please enter a valid full name.";
+
+    }
+
+
+    // =====================================
+    // VALIDATE EMAIL
+    // =====================================
+
+    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
         $error = "Please enter a valid email address.";
 
-    } elseif ($password !== $confirm_password) {
+    }
+
+    elseif (!preg_match("/[A-Za-z]/", explode("@", $email)[0])) {
+
+        $error = "Email address cannot use numbers only before @.";
+
+    }
+
+
+    // =====================================
+    // VALIDATE PASSWORD LENGTH
+    // =====================================
+
+    elseif (strlen($password) < 8) {
+
+        $error = "Password must be at least 8 characters.";
+
+    }
+
+
+    // =====================================
+    // PASSWORD MUST CONTAIN UPPERCASE
+    // =====================================
+
+    elseif (!preg_match("/[A-Z]/", $password)) {
+
+        $error = "Password must contain at least one uppercase letter.";
+
+    }
+
+
+    // =====================================
+    // PASSWORD MUST CONTAIN LOWERCASE
+    // =====================================
+
+    elseif (!preg_match("/[a-z]/", $password)) {
+
+        $error = "Password must contain at least one lowercase letter.";
+
+    }
+
+
+    // =====================================
+    // PASSWORD MUST CONTAIN NUMBER
+    // =====================================
+
+    elseif (!preg_match("/[0-9]/", $password)) {
+
+        $error = "Password must contain at least one number.";
+
+    }
+
+
+    // =====================================
+    // PASSWORD MUST CONTAIN SPECIAL CHARACTER
+    // =====================================
+
+    elseif (!preg_match("/[^A-Za-z0-9]/", $password)) {
+
+        $error = "Password must contain at least one special character.";
+
+    }
+
+
+    // =====================================
+    // CONFIRM PASSWORD
+    // =====================================
+
+    elseif ($password !== $confirm_password) {
 
         $error = "Passwords do not match.";
 
-    } elseif (strlen($password) < 6) {
+    }
 
-        $error = "Password must be at least 6 characters.";
 
-    } else {
+    // =====================================
+    // CHECK DUPLICATE EMAIL
+    // =====================================
 
-        // Check if email already exists
-        $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
-        $check->bind_param("s", $email);
-        $check->execute();
-        $result = $check->get_result();
+    else {
 
-        if ($result->num_rows > 0) {
+        $check = $conn->prepare(
+            "SELECT user_id
+             FROM users
+             WHERE email = ?
+             LIMIT 1"
+        );
 
-            $error = "An account with that email already exists.";
+        if (!$check) {
+
+            $error = "Database error.";
 
         } else {
 
-            // Securely hash the password
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
+            $check->bind_param("s", $email);
+            $check->execute();
 
-            $stmt = $conn->prepare(
-                "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
-            );
+            $result = $check->get_result();
 
-            $stmt->bind_param(
-                "sss",
-                $name,
-                $email,
-                $hashed_password
-            );
+            if ($result->num_rows > 0) {
 
-            if ($stmt->execute()) {
-
-                $success = "Account created successfully! You can now log in.";
+                $error = "An account with that email already exists.";
 
             } else {
 
-                $error = "Something went wrong. Please try again.";
+                // =====================================
+                // HASH PASSWORD
+                // =====================================
+
+                $hashed_password = password_hash(
+                    $password,
+                    PASSWORD_DEFAULT
+                );
+
+
+                // =====================================
+                // CREATE ACCOUNT
+                // =====================================
+
+                $stmt = $conn->prepare(
+                    "INSERT INTO users
+                    (name, email, password)
+                    VALUES (?, ?, ?)"
+                );
+
+                if (!$stmt) {
+
+                    $error = "Database error.";
+
+                } else {
+
+                    $stmt->bind_param(
+                        "sss",
+                        $name,
+                        $email,
+                        $hashed_password
+                    );
+
+                    if ($stmt->execute()) {
+
+                        $success =
+                            "Account created successfully! You can now log in.";
+
+                    } else {
+
+                        $error =
+                            "Something went wrong. Please try again.";
+                    }
+
+                    $stmt->close();
+                }
             }
 
-            $stmt->close();
+            $check->close();
         }
-
-        $check->close();
     }
 }
 

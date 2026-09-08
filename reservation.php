@@ -1,9 +1,8 @@
 <?php
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
 
 session_start();
 require_once "db.php";
+
 
 /* =========================
    CHECK IF USER IS LOGGED IN
@@ -11,11 +10,17 @@ require_once "db.php";
 
 if (
     !isset($_SESSION["user_logged_in"]) ||
-    $_SESSION["user_logged_in"] !== true
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"])
 ) {
     header("Location: login.php");
     exit();
 }
+
+
+/* Make sure the session ID is an integer */
+$user_id = (int) $_SESSION["user_id"];
 
 
 $message = "";
@@ -28,31 +33,112 @@ $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $user_id = $_SESSION["user_id"];
+    $name = trim($_POST["reservation_name"] ?? "");
+    $phone = trim($_POST["reservation_phone"] ?? "");
+    $date = trim($_POST["date"] ?? "");
+    $time = trim($_POST["time"] ?? "");
+    $guests = filter_input(
+        INPUT_POST,
+        "guests",
+        FILTER_VALIDATE_INT
+    );
 
-    $name = trim($_POST["reservation_name"]);
-    $phone = trim($_POST["reservation_phone"]);
-    $date = $_POST["date"];
-    $time = $_POST["time"];
-    $guests = (int) $_POST["guests"];
 
-
-    /* CHECK REQUIRED FIELDS */
+    /* =========================
+       CHECK REQUIRED FIELDS
+    ========================= */
 
     if (
-        empty($name) ||
-        empty($phone) ||
-        empty($date) ||
-        empty($time) ||
-        $guests < 1
+        $name === "" ||
+        $phone === "" ||
+        $date === "" ||
+        $time === "" ||
+        $guests === false ||
+        $guests === null
     ) {
 
         $error = "Please complete all required fields.";
 
-    } else {
+    }
 
 
-        /* INSERT RESERVATION */
+    /* =========================
+       VALIDATE NAME
+    ========================= */
+
+    elseif (!preg_match("/[A-Za-z]/", $name)) {
+
+        $error = "Please enter a valid name.";
+
+    }
+
+
+    /* =========================
+       VALIDATE PHILIPPINE PHONE
+    ========================= */
+
+    elseif (!preg_match("/^(09\d{9}|\+639\d{9})$/", $phone)) {
+
+        $error = "Please enter a valid Philippine mobile number.";
+
+    }
+
+
+    /* =========================
+       VALIDATE NUMBER OF GUESTS
+    ========================= */
+
+    elseif ($guests < 1 || $guests > 10) {
+
+        $error = "Number of guests must be between 1 and 10.";
+
+    }
+
+
+    /* =========================
+       VALIDATE DATE
+    ========================= */
+
+    elseif (
+        !DateTime::createFromFormat("Y-m-d", $date) ||
+        DateTime::createFromFormat("Y-m-d", $date)->format("Y-m-d") !== $date
+    ) {
+
+        $error = "Please enter a valid reservation date.";
+
+    }
+
+
+    /* =========================
+       PREVENT PAST DATES
+    ========================= */
+
+    elseif ($date < date("Y-m-d")) {
+
+        $error = "You cannot reserve a table for a past date.";
+
+    }
+
+
+    /* =========================
+       VALIDATE TIME
+    ========================= */
+
+    elseif (
+        !DateTime::createFromFormat("H:i", $time) &&
+        !DateTime::createFromFormat("H:i:s", $time)
+    ) {
+
+        $error = "Please enter a valid reservation time.";
+
+    }
+
+
+    /* =========================
+       INSERT RESERVATION
+    ========================= */
+
+    else {
 
         $stmt = $conn->prepare(
             "INSERT INTO reservations
@@ -70,7 +156,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if (!$stmt) {
 
-            $error = "Database error: " . $conn->error;
+            $error = "Unable to process your reservation.";
 
         } else {
 
@@ -87,25 +173,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if ($stmt->execute()) {
 
-                $message = "Your table has been reserved successfully!";
+                $message =
+                    "Your table has been reserved successfully!";
 
             } else {
 
-                $error = "Unable to save your reservation: " . $stmt->error;
-
+                $error =
+                    "Unable to save your reservation. Please try again.";
             }
 
 
             $stmt->close();
-
         }
-
     }
-
 }
 
 ?>
-
 
 <!DOCTYPE html>
 <html lang="en">

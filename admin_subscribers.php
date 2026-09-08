@@ -3,86 +3,161 @@
 session_start();
 require_once "db.php";
 
-/* ADMIN MUST BE LOGGED IN */
+
+/* =====================================
+   ADMIN LOGIN CHECK
+===================================== */
+
 if (
     !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true
+    $_SESSION["admin_logged_in"] !== true ||
+    !isset($_SESSION["admin_id"]) ||
+    !is_numeric($_SESSION["admin_id"]) ||
+    !isset($_SESSION["admin_username"]) ||
+    $_SESSION["admin_username"] === ""
 ) {
     header("Location: admin_login.php");
     exit();
 }
 
-/* ================================
+$admin_id = (int) $_SESSION["admin_id"];
+
+$success = "";
+$error = "";
+
+
+/* =====================================
    DELETE SELECTED SUBSCRIBERS
-================================ */
+===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $subscriber_ids = $_POST["subscriber_ids"] ?? [];
 
-    if (!empty($subscriber_ids)) {
+    /* ================================
+       VALIDATE SUBSCRIBER IDS
+    ================================= */
 
-        $subscriber_ids = array_map("intval", $subscriber_ids);
+    if (!is_array($subscriber_ids)) {
 
-        $subscriber_ids = array_filter(
-            $subscriber_ids,
-            function ($id) {
-                return $id > 0;
+        $error = "Invalid subscriber selection.";
+
+    } else {
+
+        $clean_ids = [];
+
+        foreach ($subscriber_ids as $id) {
+
+            $validated_id = filter_var(
+                $id,
+                FILTER_VALIDATE_INT
+            );
+
+            if (
+                $validated_id !== false &&
+                $validated_id > 0
+            ) {
+                $clean_ids[] = $validated_id;
             }
+        }
+
+        /* Remove duplicate IDs */
+
+        $clean_ids = array_values(
+            array_unique($clean_ids)
         );
 
-        if (!empty($subscriber_ids)) {
+
+        if (empty($clean_ids)) {
+
+            $error = "Please select at least one subscriber.";
+
+        } else {
+
+            /* ================================
+               PREPARED DELETE
+            ================================= */
 
             $placeholders = implode(
                 ",",
-                array_fill(0, count($subscriber_ids), "?")
+                array_fill(
+                    0,
+                    count($clean_ids),
+                    "?"
+                )
             );
 
-            $types = str_repeat("i", count($subscriber_ids));
+            $types = str_repeat(
+                "i",
+                count($clean_ids)
+            );
+
 
             $stmt = $conn->prepare(
                 "DELETE FROM newsletter_subscribers
                  WHERE subscriber_id IN ($placeholders)"
             );
 
-            $stmt->bind_param(
-                $types,
-                ...$subscriber_ids
-            );
 
-            $stmt->execute();
-            $stmt->close();
-        }
+            if (!$stmt) {
+
+                $error =
+                    "Something went wrong. Please try again.";
+
+            } else {
+
+                $stmt->bind_param(
+                    $types,
+                    ...$clean_ids
+                );
 
 
-        /* CHECK IF TABLE IS EMPTY */
+                if ($stmt->execute()) {
 
-        $check = $conn->query(
-            "SELECT COUNT(*) AS total
-             FROM newsletter_subscribers"
-        );
+                    if ($stmt->affected_rows > 0) {
 
-        $row = $check->fetch_assoc();
+                        $success =
+                            $stmt->affected_rows .
+                            " subscriber(s) deleted successfully.";
 
-        if ((int)$row["total"] === 0) {
+                    } else {
 
-            $conn->query(
-                "TRUNCATE TABLE newsletter_subscribers"
-            );
+                        $error =
+                            "No matching subscribers were found.";
+                    }
+
+                } else {
+
+                    $error =
+                        "Something went wrong. Please try again.";
+                }
+
+
+                $stmt->close();
+            }
         }
     }
 }
 
 
-/* ================================
+/* =====================================
    GET ALL SUBSCRIBERS
-================================ */
+===================================== */
 
 $result = $conn->query(
-    "SELECT subscriber_id, email, subscribed_at
+    "SELECT
+        subscriber_id,
+        email,
+        subscribed_at
      FROM newsletter_subscribers
      ORDER BY subscribed_at DESC"
 );
+
+
+if (!$result) {
+
+    $error = "Unable to load subscribers.";
+}
 
 ?>
 
