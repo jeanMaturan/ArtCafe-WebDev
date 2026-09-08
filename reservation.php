@@ -537,52 +537,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         </div>
 
-
-
-        <!-- SUBSCRIBE -->
-
-        <div class="footer-subscribe">
-
-            <h3>
-                STAY CONNECTED
-            </h3>
-
-
-            <p>
-                Subscribe to get updates on
-                new events and promos!
-            </p>
-
-
-            <form
-                class="subscribe-form"
-                action="#"
-                method="POST"
-            >
-
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Your email"
-                    required
-                >
-
-
-                <button type="submit">
-                    →
-                </button>
-
-            </form>
-
-
-            <img
-                src="images/whiteheart.png"
-                alt=""
-                class="heart-small"
-            >
-
-        </div>
-
     </div>
 
 </footer>

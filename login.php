@@ -6,15 +6,35 @@ ini_set('display_errors', 1);
 session_start();
 require_once "db.php";
 
+
+/* CHECK WHY USER IS LOGGING IN */
+
+$from_contact =
+    isset($_GET["from"]) &&
+    $_GET["from"] === "contact";
+
+
+/* IF ALREADY LOGGED IN */
+
 if (
     isset($_SESSION["user_logged_in"]) &&
     $_SESSION["user_logged_in"] === true
 ) {
-    header("Location: reservation.php");
+
+    if ($from_contact) {
+        header("Location: contact.php");
+    } else {
+        header("Location: reservation.php");
+    }
+
     exit();
 }
 
+
 $error = "";
+
+
+/* LOGIN */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -48,26 +68,40 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 $user = $result->fetch_assoc();
 
-                if (password_verify($password, $user["password"])) {
+                if (
+                    password_verify(
+                        $password,
+                        $user["password"]
+                    )
+                ) {
 
                     $_SESSION["user_logged_in"] = true;
                     $_SESSION["user_id"] = $user["user_id"];
                     $_SESSION["user_name"] = $user["name"];
                     $_SESSION["user_email"] = $user["email"];
 
-                    header("Location: reservation.php");
+
+                    /* REDIRECT BASED ON WHERE THEY CAME FROM */
+
+                    if ($from_contact) {
+
+                        header("Location: contact.php");
+
+                    } else {
+
+                        header("Location: reservation.php");
+                    }
+
                     exit();
 
                 } else {
 
                     $error = "Invalid email or password.";
-
                 }
 
             } else {
 
                 $error = "Invalid email or password.";
-
             }
 
             $stmt->close();
@@ -76,7 +110,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 }
 
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -141,19 +174,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="login-box">
 
         <p class="login-label">
-            WELCOME BACK
-        </p>
+    <?php echo $from_contact ? "GET IN TOUCH" : "WELCOME BACK"; ?>
+</p>
 
-        <h1>
-            LOGIN TO<br>
-            <span>RESERVE.</span>
-        </h1>
+<h1>
+    LOGIN TO<br>
+    <span>
+        <?php echo $from_contact ? "MESSAGE." : "RESERVE."; ?>
+    </span>
+</h1>
 
-        <p class="login-description">
-            Log in to your account to reserve
-            a table at Maturan's Art Cafe.
-        </p>
+<p class="login-description">
 
+    <?php
+
+    echo $from_contact
+        ? "Log in to your account to send a message to Maturan's Art Cafe."
+        : "Log in to your account to reserve a table at Maturan's Art Cafe.";
+
+    ?>
+
+</p>
 
         <?php if ($error !== ""): ?>
 

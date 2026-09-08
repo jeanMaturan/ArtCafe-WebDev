@@ -331,12 +331,9 @@ if ($event_id !== null) {
 
     <div class="admin-header-left">
 
-        <img
-            src="images/logo.png"
-            alt="Maturan's Art Cafe Logo"
-            class="admin-header-logo"
-        >
-
+        <div class="admin-logo-wrapper">
+    <img src="images/logo.png" alt="Maturan's Art Cafe Logo" class="admin-header-logo">
+</div>
         <div>
 
             <h1>

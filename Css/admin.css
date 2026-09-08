@@ -35,41 +35,42 @@
 
 .admin-header-left {
     display: flex;
-
     align-items: center;
-
     gap: 15px;
 }
 
-.admin-header-logo {
-    width: 55px;
+.admin-logo-wrapper {
+    width: 170px;
+    height: 60px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
-    height: auto;
+.admin-header-logo {
+    width: 160px !important;
+    height: auto !important;
+    max-width: none !important;
+    flex-shrink: 0;
 }
 
 .admin-header-left h1 {
     font-size: 18px;
-
     letter-spacing: 2px;
-
     margin-bottom: 3px;
 }
 
 .admin-header-left p {
     font-size: 10px;
-
     opacity: 0.8;
-
     letter-spacing: 1px;
 }
 
 .admin-header-right {
     display: flex;
-
     align-items: center;
-
     gap: 20px;
-
     font-size: 11px;
 }
 
