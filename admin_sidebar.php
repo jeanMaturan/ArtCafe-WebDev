@@ -30,7 +30,7 @@ $admin_nav_items = [
 
     <div class="dash-brand">
         <img src="images/logo.png" alt="Maturan's Art Cafe">
-        <span>Maturan's<br>Art Cafe</span>
+        <span>Maturan's Art Cafe</span>
     </div>
 
     <nav class="dash-nav">

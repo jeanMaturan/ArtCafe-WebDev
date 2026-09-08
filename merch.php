@@ -1,5 +1,29 @@
 <?php
+
 session_start();
+require_once "db.php";
+require_once "image_helper.php";
+
+
+/* =====================================
+   GET MERCH PRODUCTS
+===================================== */
+
+$merch_products = [];
+
+$result = $conn->query(
+    "SELECT name, description, price, image
+     FROM products
+     WHERE category = 'Merch' AND status = 'Active'
+     ORDER BY created_at ASC"
+);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $merch_products[] = $row;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -43,124 +67,50 @@ session_start();
     <!-- MERCH COLLECTION -->
     <section class="merch-section">
 
-        <div class="merch-grid">
+        <?php if (count($merch_products) === 0): ?>
 
-            <!-- TOTE BAG -->
-            <div class="merch-card">
+            <p class="merch-empty-message">No merch items available right now. Check back soon!</p>
 
-                <div class="merch-image">
-                    <img
-                        src="images/tote.png"
-                        alt="Maturan's Art Cafe Tote Bag"
-                    >
-                </div>
+        <?php else: ?>
 
-                <div class="merch-info">
-                    <h2>TOTE BAG</h2>
+            <div class="merch-grid">
 
-                    <p>
-                        Carry your everyday essentials with
-                        our Maturan's Art Cafe tote bag.
-                    </p>
+                <?php foreach ($merch_products as $product):
+                    $image_path = resolve_catalog_image($product["image"], "product_images/");
+                ?>
 
-                    <span class="merch-price">
-                        ₱350
-                    </span>
-                </div>
+                    <div class="merch-card">
 
-            </div>
+                        <div class="merch-image">
 
+                            <?php if ($image_path !== null): ?>
+                                <img src="<?php echo htmlspecialchars($image_path); ?>"
+                                     alt="<?php echo htmlspecialchars($product["name"]); ?>">
+                            <?php else: ?>
+                                <div class="merch-no-image">NO IMAGE</div>
+                            <?php endif; ?>
 
-            <!-- COFFEE CUP -->
-            <div class="merch-card">
+                        </div>
 
-                <div class="merch-image">
+                        <div class="merch-info">
+                            <h2><?php echo htmlspecialchars(strtoupper($product["name"])); ?></h2>
 
-                    <img
-                        src="images/coffeecup.png"
-                        alt="Maturan's Art Cafe Coffee Cup"
-                    >
+                            <?php if (!empty($product["description"])): ?>
+                                <p><?php echo htmlspecialchars($product["description"]); ?></p>
+                            <?php endif; ?>
 
-                </div>
+                            <span class="merch-price">
+                                ₱<?php echo number_format((float) $product["price"], 0); ?>
+                            </span>
+                        </div>
 
-                <div class="merch-info">
+                    </div>
 
-                    <h2>COFFEE CUP</h2>
-
-                    <p>
-                        Enjoy your favorite coffee in our
-                        signature Maturan's Art Cafe cup.
-                    </p>
-
-                    <span class="merch-price">
-                        ₱280
-                    </span>
-
-                </div>
+                <?php endforeach; ?>
 
             </div>
 
-
-            <!-- APRON -->
-            <div class="merch-card">
-
-                <div class="merch-image">
-
-                    <img
-                        src="images/apron.png"
-                        alt="Maturan's Art Cafe Apron"
-                    >
-
-                </div>
-
-                <div class="merch-info">
-
-                    <h2>CAFE APRON</h2>
-
-                    <p>
-                        A simple and stylish apron inspired by
-                        the creative atmosphere of our cafe.
-                    </p>
-
-                    <span class="merch-price">
-                        ₱450
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <!-- STICKERS -->
-            <div class="merch-card">
-
-                <div class="merch-image">
-
-                    <img
-                        src="images/stickers.jpg"
-                        alt="Maturan's Art Cafe Stickers"
-                    >
-
-                </div>
-
-                <div class="merch-info">
-
-                    <h2>CAFE STICKERS</h2>
-
-                    <p>
-                        Adorn your belongings with our exclusive
-                        Maturan's Art Cafe stickers.
-                    </p>
-
-                    <span class="merch-price">
-                        ₱100
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
+        <?php endif; ?>
 
     </section>
 

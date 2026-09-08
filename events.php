@@ -1,5 +1,32 @@
 <?php
+
 session_start();
+require_once "db.php";
+require_once "image_helper.php";
+
+
+/* =====================================
+   GET ACTIVE EVENT
+===================================== */
+
+$active_event = null;
+
+$result = $conn->query(
+    "SELECT event_name, description, event_date, event_time, location, image
+     FROM events
+     WHERE status = 'Active'
+     ORDER BY event_id ASC
+     LIMIT 1"
+);
+
+if ($result && $result->num_rows === 1) {
+    $active_event = $result->fetch_assoc();
+}
+
+$event_image_path = $active_event
+    ? resolve_catalog_image($active_event["image"], "event_images/")
+    : null;
+
 ?>
 
 <!DOCTYPE html>
@@ -62,69 +89,88 @@ session_start();
                 UPCOMING <span>EVENTS</span>
             </h2>
 
-            <img src="images/line.png"
-                 alt=""
-                 class="events-line">
+            <img src="images/line.png" alt="" class="events-line">
 
         </div>
 
 
-        <!-- EVENT 1 -->
-        <div class="event-page-card">
+        <?php if ($active_event === null): ?>
 
-            <div class="event-page-image">
-                <img src="images/eventpic.png"
-                     alt="Paint and Sip Night">
+            <p class="events-empty-message">
+                No upcoming events right now. Check back soon!
+            </p>
+
+        <?php else: ?>
+
+            <!-- ACTIVE EVENT -->
+            <div class="event-page-card">
+
+                <div class="event-page-image">
+
+                    <?php if ($event_image_path !== null): ?>
+                        <img src="<?php echo htmlspecialchars($event_image_path); ?>"
+                             alt="<?php echo htmlspecialchars($active_event["event_name"]); ?>">
+                    <?php else: ?>
+                        <img src="images/eventpic.png" alt="Maturan's Art Cafe Event">
+                    <?php endif; ?>
+
+                </div>
+
+                <div class="event-page-info">
+
+                    <p class="event-page-label">
+                        UPCOMING EVENT
+                    </p>
+
+                    <h3>
+                        <?php echo htmlspecialchars($active_event["event_name"]); ?>
+                    </h3>
+
+                    <?php if (!empty($active_event["description"])): ?>
+                        <p class="event-page-description">
+                            <?php echo nl2br(htmlspecialchars($active_event["description"])); ?>
+                        </p>
+                    <?php endif; ?>
+
+                    <div class="event-details">
+
+                        <?php if (!empty($active_event["event_date"])): ?>
+                            <p>
+                                📅 <?php echo htmlspecialchars(date("F j, Y", strtotime($active_event["event_date"]))); ?>
+                            </p>
+                        <?php endif; ?>
+
+                        <?php if (!empty($active_event["event_time"])): ?>
+                            <p>
+                                🕔 <?php echo htmlspecialchars(date("g:i A", strtotime($active_event["event_time"]))); ?>
+                            </p>
+                        <?php endif; ?>
+
+                        <?php if (!empty($active_event["location"])): ?>
+                            <p>
+                                📍 <?php echo htmlspecialchars($active_event["location"]); ?>
+                            </p>
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="event-action-buttons">
+
+                        <a href="artist_registration.php" class="reserve-btn artist-join-btn">
+                            JOIN AS AN ARTIST
+                        </a>
+
+                        <a href="artist_gallery.php" class="reserve-btn artist-gallery-btn">
+                             VIEW ARTISTS & ARTWORKS
+                        </a>
+
+                    </div>
+
+                </div>
+
             </div>
 
-            <div class="event-page-info">
-
-                <p class="event-page-label">
-                    UPCOMING EVENT
-                </p>
-
-                <h3>
-                    Paint & Sip<br>
-                    <span>Night</span>
-                </h3>
-
-                <p class="event-page-description">
-                    Paint, sip, unwind, and let your creativity
-                    flow. Bring your friends and enjoy a relaxing
-                    night of art, coffee, and good company.
-                </p>
-
-                <div class="event-details">
-
-    <p>
-        📅 December 4, 2027
-    </p>
-
-    <p>
-        🕔 5:00 PM
-    </p>
-
-    <p>
-        📍 Maturan's Art Cafe
-    </p>
-
-</div>
-
-            <div class="event-action-buttons">
-
-    <a href="artist_registration.php" class="reserve-btn artist-join-btn">
-        JOIN AS AN ARTIST
-    </a>
-
-    <a href="artist_gallery.php" class="reserve-btn artist-gallery-btn">
-         VIEW ARTISTS & ARTWORKS
-    </a>
-
-</div>
-
-            </div>
-
-        </div>
+        <?php endif; ?>
 
     </section>
 
@@ -159,8 +205,7 @@ session_start();
         </div>
 
         <div class="special-page-image">
-            <img src="images/coffee.png"
-                 alt="Coffee">
+            <img src="images/coffee.png" alt="Coffee">
         </div>
 
     </section>
@@ -178,8 +223,7 @@ session_start();
             experiences, great coffee, and good company.
         </p>
 
-        <a href="index.php#contact"
-           class="hero-btn">
+        <a href="index.php#contact" class="hero-btn">
             VISIT US
         </a>
 

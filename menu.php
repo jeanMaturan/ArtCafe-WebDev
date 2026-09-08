@@ -1,5 +1,49 @@
 <?php
+
 session_start();
+require_once "db.php";
+require_once "image_helper.php";
+
+
+/* =====================================
+   GET COFFEE PRODUCTS
+===================================== */
+
+$coffee_products = [];
+
+$result = $conn->query(
+    "SELECT name, description, price, image
+     FROM products
+     WHERE category = 'Coffee' AND status = 'Active'
+     ORDER BY created_at ASC"
+);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $coffee_products[] = $row;
+    }
+}
+
+
+/* =====================================
+   GET PASTRY PRODUCTS
+===================================== */
+
+$pastry_products = [];
+
+$result = $conn->query(
+    "SELECT name, description, price, image
+     FROM products
+     WHERE category = 'Pastries' AND status = 'Active'
+     ORDER BY created_at ASC"
+);
+
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
+        $pastry_products[] = $row;
+    }
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -48,204 +92,59 @@ session_start();
     </section>
 
 
-    <!COFFEE MENU>
+    <!-- COFFEE MENU -->
     <section class="menu-section">
 
         <div class="menu-section-header">
-    <h2>
-        COFFEE
-        <img src="images/orangeheart.png" alt="" class="heart-icon">
-    </h2>
+            <h2>
+                COFFEE
+                <img src="images/orangeheart.png" alt="" class="heart-icon">
+            </h2>
 
-    <img
-        src="images/line.png"
-        alt=""
-        class="menu-line"
-    >
-
-</div>
+            <img src="images/line.png" alt="" class="menu-line">
+        </div>
 
 
         <div class="menu-products">
 
-            <!-- PRODUCT 1 -->
-            <div class="menu-product-card">
+            <?php if (count($coffee_products) === 0): ?>
 
-                <div class="menu-product-image">
-                    <img src="images/caramelmacchiato.png"
-                         alt="Caramel Macchiato">
-                </div>
+                <p class="menu-empty-message">No coffee items available right now. Check back soon!</p>
 
-                <div class="menu-product-info">
-                    <h3>Caramel Macchiato</h3>
-                    <p>
-                        Rich espresso with creamy milk
-                        and sweet caramel.
-                    </p>
-                    <strong>₱140</strong>
-                </div>
+            <?php else: ?>
 
-            </div>
+                <?php foreach ($coffee_products as $product):
+                    $image_path = resolve_catalog_image($product["image"], "product_images/");
+                ?>
 
+                    <div class="menu-product-card">
 
-            <!-- PRODUCT 2 -->
-            <div class="menu-product-card">
+                        <div class="menu-product-image">
 
-                <div class="menu-product-image">
-                    <img src="images/icedspanishlatte.png"
-                         alt="Iced Spanish Latte">
-                </div>
+                            <?php if ($image_path !== null): ?>
+                                <img src="<?php echo htmlspecialchars($image_path); ?>"
+                                     alt="<?php echo htmlspecialchars($product["name"]); ?>">
+                            <?php else: ?>
+                                <div class="menu-no-image">NO IMAGE</div>
+                            <?php endif; ?>
 
-                <div class="menu-product-info">
-                    <h3>Iced Spanish Latte</h3>
-                    <p>
-                        Smooth espresso blended with
-                        creamy sweet milk over ice.
-                    </p>
-                    <strong>₱150</strong>
-                </div>
+                        </div>
 
-            </div>
+                        <div class="menu-product-info">
+                            <h3><?php echo htmlspecialchars($product["name"]); ?></h3>
 
+                            <?php if (!empty($product["description"])): ?>
+                                <p><?php echo htmlspecialchars($product["description"]); ?></p>
+                            <?php endif; ?>
 
-            <!-- PRODUCT 3 -->
-            <div class="menu-product-card">
+                            <strong>₱<?php echo number_format((float) $product["price"], 0); ?></strong>
+                        </div>
 
-                <div class="menu-product-image">
-                    <img src="images/chocolatelatte.png"
-                         alt="Chocolate Latte">
-                </div>
+                    </div>
 
-                <div class="menu-product-info">
-                    <h3>Chocolate Latte</h3>
-                    <p>
-                        Smooth coffee combined with
-                        rich and creamy chocolate.
-                    </p>
-                    <strong>₱115</strong>
-                </div>
+                <?php endforeach; ?>
 
-            </div>
-
-
-            <!-- PRODUCT 5 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/mochadream.jpg"
-                         alt="Mocha Dream">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Mocha Dream</h3>
-                    <p>
-                        Rich espresso blended with
-                        chocolate and creamy milk.
-                    </p>
-                    <strong>₱150</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 6 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/icedmatchalatte.jpg"
-                         alt="Iced Matcha Latte">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Iced Matcha Latte</h3>
-                    <p>
-                        Earthy matcha combined with
-                        creamy milk for a refreshing drink.
-                    </p>
-                    <strong>₱160</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 7 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/strawberryCreamfrappe.jpg"
-                         alt="Strawberry Cream Frappe">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Strawberry Cream Frappe</h3>
-                    <p>
-                        Sweet strawberry blended with ice
-                        and creamy milk, topped with whipped cream.
-                    </p>
-                    <strong>₱165</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 8 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/capuccino.jpg"
-                         alt="Cappuccino">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Cappuccino</h3>
-                    <p>
-                        Rich espresso topped with steamed
-                        milk and a thick layer of creamy foam.
-                    </p>
-                    <strong>₱140</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 9 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/coffee.png"
-                         alt="Americano">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Americano</h3>
-                    <p>
-                        Smooth and bold espresso balanced
-                        with hot water for a clean coffee flavor.
-                    </p>
-                    <strong>₱120</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 10 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/ubelatte.jpg"
-                         alt="Ube Latte">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Ube Latte</h3>
-                    <p>
-                        Creamy espresso blended with sweet
-                        ube for a smooth Filipino-inspired latte.
-                    </p>
-                    <strong>₱155</strong>
-                </div>
-
-            </div>
+            <?php endif; ?>
 
         </div>
 
@@ -256,180 +155,55 @@ session_start();
     <section class="menu-section menu-pastries">
 
         <div class="menu-section-header">
-    <h2>
-        PASTRIES
-        <img src="images/orangeheart.png" alt="" class="heart-icon">
-    </h2>
+            <h2>
+                PASTRIES
+                <img src="images/orangeheart.png" alt="" class="heart-icon">
+            </h2>
 
-    <img
-        src="images/line.png"
-        alt=""
-        class="menu-line"
-    >
-
-</div>
+            <img src="images/line.png" alt="" class="menu-line">
+        </div>
 
 
         <div class="menu-products">
 
-            <!-- PRODUCT 4 -->
-            <div class="menu-product-card">
+            <?php if (count($pastry_products) === 0): ?>
 
-                <div class="menu-product-image">
-                    <img src="images/bluberry.jpeg"
-                         alt="Blueberry Cheesecake">
-                </div>
+                <p class="menu-empty-message">No pastries available right now. Check back soon!</p>
 
-                <div class="menu-product-info">
-                    <h3>Blueberry Cheesecake</h3>
-                    <p>
-                        Creamy cheesecake topped with
-                        sweet blueberry goodness.
-                    </p>
-                    <strong>₱120</strong>
-                </div>
+            <?php else: ?>
 
-            </div>
+                <?php foreach ($pastry_products as $product):
+                    $image_path = resolve_catalog_image($product["image"], "product_images/");
+                ?>
 
+                    <div class="menu-product-card">
 
-            <!-- PRODUCT 11 -->
-            <div class="menu-product-card">
+                        <div class="menu-product-image">
 
-                <div class="menu-product-image">
-                    <img src="images/butterCroissant.jpg"
-                         alt="Butter Croissant">
-                </div>
+                            <?php if ($image_path !== null): ?>
+                                <img src="<?php echo htmlspecialchars($image_path); ?>"
+                                     alt="<?php echo htmlspecialchars($product["name"]); ?>">
+                            <?php else: ?>
+                                <div class="menu-no-image">NO IMAGE</div>
+                            <?php endif; ?>
 
-                <div class="menu-product-info">
-                    <h3>Butter Croissant</h3>
-                    <p>
-                        Flaky, golden pastry with a
-                        rich buttery flavor.
-                    </p>
-                    <strong>₱95</strong>
-                </div>
+                        </div>
 
-            </div>
+                        <div class="menu-product-info">
+                            <h3><?php echo htmlspecialchars($product["name"]); ?></h3>
 
+                            <?php if (!empty($product["description"])): ?>
+                                <p><?php echo htmlspecialchars($product["description"]); ?></p>
+                            <?php endif; ?>
 
-            <!-- PRODUCT 12 -->
-            <div class="menu-product-card">
+                            <strong>₱<?php echo number_format((float) $product["price"], 0); ?></strong>
+                        </div>
 
-                <div class="menu-product-image">
-                    <img src="images/chocCroissant.jpg"
-                         alt="Chocolate Croissant">
-                </div>
+                    </div>
 
-                <div class="menu-product-info">
-                    <h3>Chocolate Croissant</h3>
-                    <p>
-                        Buttery, flaky pastry filled
-                        with smooth chocolate.
-                    </p>
-                    <strong>₱110</strong>
-                </div>
+                <?php endforeach; ?>
 
-            </div>
-
-
-            <!-- PRODUCT 13 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/cinnamonroll.jpg"
-                         alt="Cinnamon Roll">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Cinnamon Roll</h3>
-                    <p>
-                        Soft, sweet pastry filled with
-                        cinnamon and topped with creamy glaze.
-                    </p>
-                    <strong>₱105</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 14 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/bananacake.jpg"
-                         alt="Banana Cake">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Banana Cake</h3>
-                    <p>
-                        Soft, moist banana loaf with
-                        a comforting homemade taste.
-                    </p>
-                    <strong>₱95</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 15 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/cheeseDanish.jpg"
-                         alt="Cheese Danish">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Cheese Danish</h3>
-                    <p>
-                        Flaky Danish pastry filled with
-                        sweet and creamy cheese.
-                    </p>
-                    <strong>₱110</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 16 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/chocCookies.jpg"
-                         alt="Chocolate Chip Cookie">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Chocolate Chip Cookie</h3>
-                    <p>
-                        Soft-baked cookie loaded with
-                        rich chocolate chips.
-                    </p>
-                    <strong>₱75</strong>
-                </div>
-
-            </div>
-
-
-            <!-- PRODUCT 17 -->
-            <div class="menu-product-card">
-
-                <div class="menu-product-image">
-                    <img src="images/coconutMuffs.jpg"
-                         alt="Coconut Muffin">
-                </div>
-
-                <div class="menu-product-info">
-                    <h3>Coconut Muffin</h3>
-                    <p>
-                        Soft and moist muffin with a lightly
-                        sweet coconut flavor and toasted coconut.
-                    </p>
-                    <strong>₱100</strong>
-                </div>
-
-            </div>
+            <?php endif; ?>
 
 
             <!-- EXTRA MENU CARD -->

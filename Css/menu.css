@@ -369,3 +369,28 @@
         max-width: 100%;
     }
 }
+
+/* =====================================
+   DYNAMIC MENU ADDITIONS
+===================================== */
+
+.menu-no-image {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f1ebe6;
+    color: #998c85;
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.menu-empty-message {
+    width: 100%;
+    text-align: center;
+    color: #998c85;
+    font-size: 13px;
+    padding: 20px 0;
+}

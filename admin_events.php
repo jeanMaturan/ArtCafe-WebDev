@@ -141,6 +141,7 @@ if ($result) {
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/admin.css">
     <link rel="stylesheet" href="Css/admin_dashboard.css">
+    <link rel="stylesheet" href="Css/admin_artworks.css">
     <link rel="stylesheet" href="Css/admin_subscribers.css">
     <link rel="stylesheet" href="Css/admin_events.css">
 

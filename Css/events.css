@@ -433,3 +433,15 @@
         max-width: 100%;
     }
 }
+
+/* =====================================
+   DYNAMIC EVENTS ADDITIONS
+===================================== */
+
+.events-empty-message {
+    width: 100%;
+    text-align: center;
+    color: #998c85;
+    font-size: 14px;
+    padding: 40px 0;
+}
