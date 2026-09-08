@@ -209,7 +209,7 @@
                 ▣ December 4, 2027 • 5:00 PM
             </p>
 
-            <a href="#" class="event-btn">
+            <a href="events.php" class="event-btn">
                 JOIN NOW
             </a>
 

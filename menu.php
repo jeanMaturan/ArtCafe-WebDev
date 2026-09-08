@@ -225,7 +225,7 @@
             something delicious while you create.
         </p>
 
-        <a href="index.php#contact" class="hero-btn">
+        <a href="contact.php" class="hero-btn">
             VISIT US
         </a>
 
