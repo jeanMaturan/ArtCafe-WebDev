@@ -213,7 +213,7 @@
             <div class="footer-brand">
 
                 <img
-                    src="images/logo-white.png"
+                    src="images/logo.png"
                     alt="Maturan's Art Cafe"
                     class="footer-logo"
                 >

@@ -6,8 +6,8 @@
     --orange: #ed542c;
     --orange-dark: #c9401d;
     --cream: #fff9df;
-    --beige: #ead8c4;
-    --pink: #fff5ef;
+    --beige: #f5e2cd;
+    --pink: #FFD4BF;
     --footer: #ad8068;
     --shadow: 5px 6px 0 rgba(0, 0, 0, 0.08);
     --font: Arial, sans-serif;
@@ -654,9 +654,9 @@ body {
 
 .review-card {
     position: relative;
-    width: 31%;
-    height: 125px;
-    padding: 12px 14px;
+    width: 30%;
+    height: 180px;
+    padding: 20px 14px;
     background: #eadfda;
     border-radius: 8px;
     box-shadow: 9px 8px 0 #f1eeee;
@@ -682,9 +682,9 @@ body {
 }
 
 .review-text {
-    margin: 12px 8px 8px;
+    margin: 18px 25px 15px;
     color: #33231d;
-    font-size: 11px;
+    font-size: 14px;
     line-height: 1.4;
     letter-spacing: 0.4px;
 }
@@ -694,7 +694,7 @@ body {
     align-items: center;
     gap: 9px;
     margin-left: 8px;
-    margin-top: 5px;
+    margin-top: 30px;
 }
 
 .customer-image {
@@ -774,7 +774,7 @@ body {
 }
 
 .footer-logo {
-    width: 170px;
+    width: 200px;
     height: auto;
     display: block;
     opacity: 0.95;
@@ -782,27 +782,29 @@ body {
 
 .footer-tagline {
     margin-top: 8px;
-    font-size: 11px;
+    font-size: 12px;
     letter-spacing: 0.8px;
 }
 
 .footer-description {
     max-width: 180px;
     margin-top: 7px;
-    font-size: 9px;
+    font-size: 11px;
     line-height: 1.5;
     opacity: 0.9;
+
+    color:var(--pink);
 }
 
 .social-icons {
     display: flex;
     gap: 8px;
-    margin-top: 13px;
+    margin-top: 8px;
 }
 
 .social-icons a {
-    width: 18px;
-    height: 18px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -827,15 +829,15 @@ body {
 
 .footer h3 {
     margin-bottom: 12px;
-    font-size: 10px;
+    font-size: 14px;
     letter-spacing: 1px;
 }
 
 .footer-links a,
 .footer-contact p {
     display: block;
-    color: var(--white);
-    font-size: 8px;
+    color: var(--pink);
+    font-size: 14px;
     line-height: 1.8;
     opacity: 0.9;
     text-decoration: none;
@@ -851,14 +853,15 @@ body {
 
 .footer-subscribe p {
     max-width: 180px;
-    font-size: 8px;
+    font-size: 14px;
     line-height: 1.5;
     opacity: 0.9;
+    color: var(--pink);
 }
 
 .subscribe-form {
-    width: 190px;
-    height: 25px;
+    width: 260px;
+    height: 40px;
     display: flex;
     margin-top: 12px;
     overflow: hidden;
@@ -867,12 +870,11 @@ body {
 }
 
 .subscribe-form input {
-    min-width: 0;
     flex: 1;
-    padding: 0 10px;
+    padding: 0 15px;
     border: none;
     outline: none;
-    font-size: 7px;
+    font-size: 12   px;
     color: #3d2115;
 }
 

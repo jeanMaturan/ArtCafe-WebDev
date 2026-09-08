@@ -78,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>Admin Login | Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/admin_login.css">
 
 </head>
 

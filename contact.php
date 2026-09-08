@@ -16,9 +16,7 @@
 <body>
 
 
-    <!-- =========================
-         HEADER
-    ========================== -->
+    <!HEADER>
 
     <header class="header">
 
@@ -58,9 +56,7 @@
 
 
 
-    <!-- =========================
-         CONTACT HERO
-    ========================== -->
+    <!HERO>
 
     <section class="contact-page-hero">
 
