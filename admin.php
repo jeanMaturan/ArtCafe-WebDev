@@ -422,6 +422,7 @@ if ($event_id !== null) {
 
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/admin.css">
+    <link rel="stylesheet" href="Css/admin_dashboard.css">
 
 </head>
 
@@ -429,97 +430,14 @@ if ($event_id !== null) {
 <body class="admin-dashboard-page">
 
 
-    <!-- =====================================
-         ADMIN HEADER
-    ====================================== -->
+    <div class="dash-layout">
 
-    <header class="admin-header">
+    <?php
+    $admin_active = "artists";
+    include "admin_sidebar.php";
+    ?>
 
-    <div class="admin-header-left">
-
-        <div class="admin-logo-wrapper">
-    <img src="images/logo.png" alt="Maturan's Art Cafe Logo" class="admin-header-logo">
-</div>
-        <div>
-
-            <h1>
-                ADMIN PANEL
-            </h1>
-
-            <p>
-                Maturan's Art Cafe
-            </p>
-
-        </div>
-
-    </div>
-
-
-    <div class="admin-header-right">
-
-    <a
-        href="admin_dashboard.php"
-        class="admin-nav-button"
-    >
-        DASHBOARD
-    </a>
-
-    <a
-        href="admin.php"
-        class="admin-nav-button"
-    >
-        ARTISTS
-    </a>
-
-    <a
-        href="admin_artworks.php"
-        class="admin-nav-button"
-    >
-        ARTWORKS
-    </a>
-
-    <!-- REVIEWS -->
-    <a
-        href="admin_reviews.php"
-        class="admin-nav-button"
-    >
-        REVIEWS
-    </a>
-
-    <a
-        href="admin_messages.php"
-        class="admin-nav-button"
-    >
-        MESSAGES
-    </a>
-
-    <a
-        href="admin_subscribers.php"
-        class="admin-nav-button"
-    >
-        SUBSCRIBERS
-    </a>
-
-    <span>
-        Welcome, <?php
-        echo htmlspecialchars(
-            $_SESSION["admin_username"]
-        );
-        ?>
-    </span>
-
-    <a
-        href="admin_logout.php"
-        class="admin-logout-button"
-    >
-        LOGOUT
-    </a>
-
-</div>
-
-</header>
-
-
+    <div class="dash-main">
 
     <!-- =====================================
          ADMIN CONTENT
@@ -901,6 +819,10 @@ if ($event_id !== null) {
 
 
     </main>
+
+    </div>
+
+    </div>
 
 
 </body>
