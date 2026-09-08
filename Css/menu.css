@@ -79,13 +79,6 @@
     margin-bottom: 40px;
 }
 
-.menu-section-header h2 {
-    color: var(--brown);
-    font-size: 35px;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-}
-
 .menu-section-header h2 span {
     color: var(--orange);
 }
@@ -205,12 +198,6 @@
     line-height: 1.6;
 }
 
-.menu-heart {
-    color: var(--orange);
-    font-size: 40px;
-    margin-top: 20px;
-}
-
 
 /* DARK CARD */
 
@@ -258,4 +245,41 @@
     color: var(--dark-text);
     font-size: 14px;
     line-height: 1.6;
+}
+
+
+.menu-section-header {
+    margin-bottom: 40px;
+}
+
+.menu-line {
+    width: 80px;
+    height: auto;
+    display: block;
+    margin-top: 10px;
+}
+
+.menu-section-header h2 {
+    color: var(--brown);
+    font-size: 35px;
+    letter-spacing: 2px;
+    margin: 0 0 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    white-space: nowrap;
+}
+
+.menu-section-header .heart-icon {
+    width: 30px;
+    height: auto;
+    display: inline-block;
+    flex-shrink: 0;
+    margin: 0;
+}
+
+.menu-section-header .menu-line {
+    width: 80px;
+    height: auto;
+    display: block;
 }

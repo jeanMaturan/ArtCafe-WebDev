@@ -13,6 +13,10 @@ $from_contact =
     isset($_GET["from"]) &&
     $_GET["from"] === "contact";
 
+$from_artist =
+    isset($_GET["from"]) &&
+    $_GET["from"] === "artist";
+
 
 /* IF ALREADY LOGGED IN */
 
@@ -22,10 +26,12 @@ if (
 ) {
 
     if ($from_contact) {
-        header("Location: contact.php");
-    } else {
-        header("Location: reservation.php");
-    }
+    header("Location: contact.php");
+} elseif ($from_artist) {
+    header("Location: artist_registration.php");
+} else {
+    header("Location: reservation.php");
+}
 
     exit();
 }
@@ -174,26 +180,32 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <div class="login-box">
 
         <p class="login-label">
-    <?php echo $from_contact ? "GET IN TOUCH" : "WELCOME BACK"; ?>
+    <?php
+    echo $from_contact
+        ? "GET IN TOUCH"
+        : ($from_artist ? "JOIN OUR ARTISTS" : "WELCOME BACK");
+    ?>
 </p>
 
 <h1>
     LOGIN TO<br>
     <span>
-        <?php echo $from_contact ? "MESSAGE." : "RESERVE."; ?>
+        <?php
+        echo $from_contact
+            ? "MESSAGE."
+            : ($from_artist ? "JOIN." : "RESERVE.");
+        ?>
     </span>
 </h1>
 
 <p class="login-description">
-
     <?php
-
     echo $from_contact
         ? "Log in to your account to send a message to Maturan's Art Cafe."
-        : "Log in to your account to reserve a table at Maturan's Art Cafe.";
-
+        : ($from_artist
+            ? "Log in to your account to apply as an artist at Maturan's Art Cafe."
+            : "Log in to your account to reserve a table at Maturan's Art Cafe.");
     ?>
-
 </p>
 
         <?php if ($error !== ""): ?>

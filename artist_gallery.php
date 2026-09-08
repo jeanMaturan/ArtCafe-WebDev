@@ -1,12 +1,11 @@
 <?php
-
 session_start();
 require_once "db.php";
 
 
-/* =====================================
-   GET APPROVED ARTISTS AND ARTWORKS
-===================================== */
+// =====================================
+// GET APPROVED ARTISTS AND ARTWORKS
+// =====================================
 
 $sql = "
     SELECT
@@ -37,24 +36,7 @@ $sql = "
         aw.created_at DESC
 ";
 
-
 $result = $conn->query($sql);
-
-
-/* =====================================
-   DATABASE ERROR HANDLING
-===================================== */
-
-if (!$result) {
-
-    error_log(
-        "Artist gallery query failed: " .
-        $conn->error
-    );
-
-    $result = false;
-}
-
 ?>
 
 <!DOCTYPE html>
@@ -78,7 +60,55 @@ if (!$result) {
 
 <!-- HEADER -->
 
-<?php include "header.php"; ?>
+<header class="header">
+
+    <div class="logo">
+        <img src="images/logo.png" alt="Maturan's Art Cafe">
+    </div>
+
+
+    <nav class="navbar">
+
+        <a href="index.php">HOME</a>
+
+        <a href="about.php">ABOUT</a>
+
+        <a href="menu.php">MENU</a>
+
+        <a href="events.php">EVENTS</a>
+
+        <a href="contact.php">CONTACT</a>
+
+        <?php if (isset($_SESSION["user_id"])): ?>
+
+            <a href="my_messages.php">
+                MY MESSAGES
+            </a>
+
+        <?php endif; ?>
+
+    </nav>
+
+
+    <?php if (
+        isset($_SESSION["user_logged_in"]) &&
+        $_SESSION["user_logged_in"] === true
+    ): ?>
+
+        <a href="reservation.php" class="reserve-btn">
+            RESERVE A TABLE
+        </a>
+
+    <?php else: ?>
+
+        <a href="login.php" class="reserve-btn">
+            RESERVE A TABLE
+        </a>
+
+    <?php endif; ?>
+
+
+</header>
 
 
 
@@ -310,7 +340,14 @@ if (!$result) {
 
 <!-- FOOTER -->
 
-<?php include "footer.php"; ?>
+<footer id="contact" class="footer">
+
+    <!-- Keep your existing footer here -->
+
+</footer>
+
+
+<script src="JS/script.js"></script>
 
 </body>
 

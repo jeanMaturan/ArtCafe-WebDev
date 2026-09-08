@@ -4,9 +4,40 @@ session_start();
 require_once "db.php";
 
 if (!isset($_SESSION["user_logged_in"]) || $_SESSION["user_logged_in"] !== true) {
-    header("Location: login.php");
+    header("Location: login.php?from=artist");
     exit();
+
 }
+
+// =====================================
+// CHECK IF USER IS ALREADY AN APPROVED ARTIST
+// =====================================
+
+$user_id = $_SESSION["user_id"];
+
+$artist_check = $conn->prepare(
+    "SELECT a.artist_id
+     FROM artists a
+     INNER JOIN event_artists ea
+        ON a.artist_id = ea.artist_id
+     WHERE a.user_id = ?
+       AND ea.status = 'Approved'
+     LIMIT 1"
+);
+
+$artist_check->bind_param("i", $user_id);
+$artist_check->execute();
+
+$artist_result = $artist_check->get_result();
+
+if ($artist_result->num_rows === 1) {
+
+    header("Location: artist_artworks.php");
+    exit();
+
+}
+
+$artist_check->close();
 
 $success = "";
 $error = "";
@@ -16,10 +47,8 @@ $error = "";
 // CHECK ARTIST CAPACITY
 // =====================================
 
-// Maximum number of approved artists
 $max_artists = 5;
 
-// Count approved artists for the active event
 $approved_count = 0;
 
 $capacity_query = $conn->query(
@@ -48,19 +77,28 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     // =====================================
-    // CHECK IF EVENT IS ALREADY FULL
+    // CHECK ARTIST CAPACITY
     // =====================================
 
     if ($approved_count >= $max_artists) {
 
         $error = "Artist registration is currently full. The maximum of 5 approved artists has been reached.";
 
-    } elseif ($artist_name === "" || $contact === "") {
+    }
+
+
+    // =====================================
+    // CHECK REQUIRED FIELDS
+    // =====================================
+
+    elseif ($artist_name === "" || $contact === "") {
 
         $error = "Please fill in all required fields.";
 
-    } else {
+    }
 
+
+    else {
 
         // =====================================
         // CHECK IF USER IS ALREADY AN ARTIST
@@ -82,8 +120,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $error = "You are already registered as an artist.";
 
-        } else {
+        }
 
+        else {
 
             // =====================================
             // INSERT ARTIST
@@ -110,7 +149,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
                 // =====================================
-                // GET THE ACTIVE EVENT
+                // GET ACTIVE EVENT
                 // =====================================
 
                 $event_query = $conn->query(
@@ -122,9 +161,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 );
 
 
-                if ($event_query && $event_query->num_rows === 1) {
+                if (
+                    $event_query &&
+                    $event_query->num_rows === 1
+                ) {
 
                     $event = $event_query->fetch_assoc();
+
                     $event_id = $event["event_id"];
 
 
@@ -150,35 +193,46 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                         $success =
                             "Artist registration submitted successfully! Your application is now pending approval.";
 
-                    } else {
+                    }
+
+                    else {
 
                         $error =
                             "Artist was registered, but the event application could not be submitted.";
+
                     }
 
 
                     $event_stmt->close();
 
-                } else {
+                }
+
+                else {
 
                     $error =
                         "No active event is currently available.";
+
                 }
 
+            }
 
-            } else {
+            else {
 
                 $error =
                     "Something went wrong. Please try again.";
+
             }
 
 
             $stmt->close();
+
         }
 
 
         $check->close();
+
     }
+
 }
 
 ?>
@@ -195,8 +249,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <title>Join as an Artist | Maturan's Art Cafe</title>
 
-    <link rel="stylesheet"
-          href="Css/style.css">
+    <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/artist_registration.css">
 
 </head>
 
@@ -385,16 +439,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     <div class="login-group">
 
                         <label class="login-label">
-                            ABOUT YOUR ART
+                            ABOUT YOU AS AN ARTIST
                         </label>
 
                         <textarea
                             name="bio"
-                            placeholder="Tell us about yourself and your artwork..."
+                            placeholder="Tell us about yourself..."
                             rows="5"
                         ></textarea>
 
                     </div>
+
+                    <div class="login-group">
+
+</div>
 
 
 

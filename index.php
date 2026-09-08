@@ -89,7 +89,7 @@
             </p>
         </div>
 
-        <a href="#" class="view-merch">
+        <a href="merch.php" class="view-merch">
             VIEW ALL MERCH ➜
         </a>
 
@@ -124,7 +124,7 @@
                  class="bestsellers-brush">
         </div>
 
-        <a href="#" class="view-menu">
+        <a href="menu.php" class="view-menu">
             VIEW FULL MENU ➜
         </a>
 
@@ -277,7 +277,7 @@
             >
         </div>
 
-        <a href="#" class="view-reviews">
+        <a href="reviews.php" class="view-reviews">
             VIEW ALL REVIEWS
             <span>➜</span>
         </a>
