@@ -258,3 +258,13 @@
     font-size: 14px;
     box-sizing: border-box;
 }
+
+/* FIX NAVBAR PROFILE LINK */
+.header .navbar a {
+    color: #24150f !important;
+    text-decoration: none !important;
+}
+
+.header .navbar a:hover {
+    color: var(--orange) !important;
+}

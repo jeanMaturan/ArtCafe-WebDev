@@ -77,6 +77,16 @@ $result = $stmt->get_result();
             <a href="events.php">EVENTS</a>
             <a href="contact.php">CONTACT</a>
             <a href="my_messages.php" class="active" style="color: #ed542c !important;">MY MESSAGES</a>
+
+             <?php if (
+        isset($_SESSION["user_logged_in"]) &&
+        $_SESSION["user_logged_in"] === true
+    ): ?>
+
+        <a href="profile.php">MY PROFILE</a>
+
+    <?php endif; ?>
+
         </nav>
 
         <a href="reservation.php" class="reserve-btn">

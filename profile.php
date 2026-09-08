@@ -4,7 +4,9 @@ session_start();
 require_once "db.php";
 
 
-/* LOGIN CHECK */
+/* =====================================
+   LOGIN CHECK
+===================================== */
 
 if (
     !isset($_SESSION["user_logged_in"]) ||
@@ -23,7 +25,9 @@ $success = "";
 $error = "";
 
 
-/* GET CURRENT PROFILE */
+/* =====================================
+   GET CURRENT PROFILE
+===================================== */
 
 $stmt = $conn->prepare(
     "SELECT name, email, profile_picture
@@ -50,7 +54,9 @@ if (!$user) {
 }
 
 
-/* UPLOAD PROFILE PICTURE */
+/* =====================================
+   UPLOAD PROFILE PICTURE
+===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
@@ -232,7 +238,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
     <!-- HEADER -->
-    <?php include "header.php"; ?>
+    <header class="header">
+
+        <div class="logo">
+            <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
+        </div>
+
+        <nav class="navbar">
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
+            <a href="my_messages.php" class="active">MY MESSAGES</a>
+
+            <?php if (
+        isset($_SESSION["user_logged_in"]) &&
+        $_SESSION["user_logged_in"] === true
+    ): ?>
+
+        <a href="profile.php" class="active" style="color: #ed542c !important;">MY PROFILE</a>
+
+    <?php endif; ?>
+        </nav>
+
+</header>
 
 <section class="profile-page">
 
@@ -319,8 +349,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </div>
 
 </section>
-
-    <script src="JS/script.js"></script>
 
 </body>
 

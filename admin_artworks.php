@@ -321,12 +321,6 @@ if ($stmt) {
                 ARTIST APPLICATIONS
             </a>
 
-            <a
-                href="admin_artworks.php"
-                class="admin-nav-button"
-            >
-                ARTWORKS
-            </a>
 
             <span>
                 Welcome,

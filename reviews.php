@@ -147,7 +147,8 @@ $stmt = $conn->prepare(
         r.rating,
         r.review_text,
         r.created_at,
-        u.name
+        u.name,
+        u.profile_picture
      FROM reviews r
      INNER JOIN users u
         ON r.user_id = u.user_id
@@ -697,14 +698,27 @@ if ($stmt) {
         <div class="all-customer">
 
             <div class="all-customer-image user-review-avatar">
-                <?php
-                echo strtoupper(
-                    htmlspecialchars(
-                        substr($review["name"], 0, 1)
-                    )
-                );
-                ?>
-            </div>
+
+    <?php if (!empty($review["profile_picture"])): ?>
+
+        <img
+            src="<?php echo htmlspecialchars($review["profile_picture"]); ?>"
+            alt="Profile Picture"
+        >
+
+    <?php else: ?>
+
+        <?php
+        echo strtoupper(
+            htmlspecialchars(
+                substr($review["name"], 0, 1)
+            )
+        );
+        ?>
+
+    <?php endif; ?>
+
+</div>
 
             <div>
 

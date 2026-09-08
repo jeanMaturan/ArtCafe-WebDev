@@ -324,6 +324,19 @@
     background: var(--orange-dark);
 }
 
+.user-review-avatar {
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.user-review-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+}
+
 /* =========================
    MOBILE
    ========================= */
