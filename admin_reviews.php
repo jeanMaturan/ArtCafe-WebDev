@@ -59,9 +59,63 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
        VALIDATE ACTION
     --------------------------------- */
 
-    elseif (!in_array($action, ["approve", "reject"], true)) {
+    elseif (!in_array($action, ["approve", "reject", "delete"], true)) {
 
         $error = "Invalid action.";
+
+    }
+
+    elseif ($action === "delete") {
+
+        /* ---------------------------------
+           DELETE REVIEW
+        --------------------------------- */
+
+        $stmt = $conn->prepare(
+            "DELETE FROM reviews
+             WHERE review_id = ?"
+        );
+
+        if (!$stmt) {
+
+            error_log(
+                "Review delete prepare failed: " .
+                $conn->error
+            );
+
+            $error =
+                "Something went wrong. Please try again.";
+
+        } else {
+
+            $stmt->bind_param("i", $review_id);
+
+            if ($stmt->execute()) {
+
+                if ($stmt->affected_rows === 1) {
+
+                    $success =
+                        "Review deleted successfully.";
+
+                } else {
+
+                    $error =
+                        "The review could not be deleted. It may have already been removed.";
+                }
+
+            } else {
+
+                error_log(
+                    "Review delete failed: " .
+                    $stmt->error
+                );
+
+                $error =
+                    "Something went wrong. Please try again.";
+            }
+
+            $stmt->close();
+        }
 
     }
 
@@ -581,6 +635,42 @@ if (!$result) {
 
 
                     <?php endif; ?>
+
+
+                    <!-- DELETE (always available) -->
+
+                    <div class="admin-review-actions">
+
+                        <form
+                            method="POST"
+                            action="admin_reviews.php"
+                            onsubmit="return confirm('Are you sure you want to permanently delete this review?');"
+                        >
+
+                            <input
+                                type="hidden"
+                                name="review_id"
+                                value="<?php
+                                    echo (int) $row["review_id"];
+                                ?>"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="action"
+                                value="delete"
+                            >
+
+                            <button
+                                type="submit"
+                                class="reject-review-btn"
+                            >
+                                DELETE
+                            </button>
+
+                        </form>
+
+                    </div>
 
 
                 </div>
