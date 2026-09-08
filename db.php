@@ -5,7 +5,12 @@ $username = "root";
 $password = "";
 $database = "maturans_art_cafe";
 
-$conn = new mysqli($host, $username, $password, $database);
+$conn = new mysqli(
+    $host,
+    $username,
+    $password,
+    $database
+);
 
 if ($conn->connect_error) {
     die("Database connection failed: " . $conn->connect_error);

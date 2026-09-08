@@ -1,222 +1,74 @@
 <?php
 
-session_start();
-
 require_once "db.php";
 
 $error = "";
 $success = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-    $name = trim($_POST["name"] ?? "");
-    $email = trim($_POST["email"] ?? "");
-    $password = $_POST["password"] ?? "";
-    $confirm_password = $_POST["confirm_password"] ?? "";
+    $name = trim($_POST["name"]);
+    $email = trim($_POST["email"]);
+    $password = $_POST["password"];
+    $confirm_password = $_POST["confirm_password"];
 
-
-    // =====================================
-    // CHECK EMPTY FIELDS
-    // =====================================
-
-    if (
-        $name === "" ||
-        $email === "" ||
-        $password === "" ||
-        $confirm_password === ""
-    ) {
+    if (empty($name) || empty($email) || empty($password) || empty($confirm_password)) {
 
         $error = "Please fill in all fields.";
 
-    }
-
-
-    // =====================================
-    // VALIDATE FULL NAME
-    // =====================================
-
-    elseif (!preg_match("/[A-Za-z]/", $name)) {
-
-        $error = "Full name must contain letters.";
-
-    }
-
-    elseif (preg_match("/^[0-9]+$/", $name)) {
-
-        $error = "Full name cannot contain numbers only.";
-
-    }
-
-    elseif (strlen($name) < 2) {
-
-        $error = "Please enter a valid full name.";
-
-    }
-
-
-    // =====================================
-    // VALIDATE EMAIL
-    // =====================================
-
-    elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
 
         $error = "Please enter a valid email address.";
 
-    }
-
-    elseif (!preg_match("/[A-Za-z]/", explode("@", $email)[0])) {
-
-        $error = "Email address cannot use numbers only before @.";
-
-    }
-
-
-    // =====================================
-    // VALIDATE PASSWORD LENGTH
-    // =====================================
-
-    elseif (strlen($password) < 8) {
-
-        $error = "Password must be at least 8 characters.";
-
-    }
-
-
-    // =====================================
-    // PASSWORD MUST CONTAIN UPPERCASE
-    // =====================================
-
-    elseif (!preg_match("/[A-Z]/", $password)) {
-
-        $error = "Password must contain at least one uppercase letter.";
-
-    }
-
-
-    // =====================================
-    // PASSWORD MUST CONTAIN LOWERCASE
-    // =====================================
-
-    elseif (!preg_match("/[a-z]/", $password)) {
-
-        $error = "Password must contain at least one lowercase letter.";
-
-    }
-
-
-    // =====================================
-    // PASSWORD MUST CONTAIN NUMBER
-    // =====================================
-
-    elseif (!preg_match("/[0-9]/", $password)) {
-
-        $error = "Password must contain at least one number.";
-
-    }
-
-
-    // =====================================
-    // PASSWORD MUST CONTAIN SPECIAL CHARACTER
-    // =====================================
-
-    elseif (!preg_match("/[^A-Za-z0-9]/", $password)) {
-
-        $error = "Password must contain at least one special character.";
-
-    }
-
-
-    // =====================================
-    // CONFIRM PASSWORD
-    // =====================================
-
-    elseif ($password !== $confirm_password) {
+    } elseif ($password !== $confirm_password) {
 
         $error = "Passwords do not match.";
 
-    }
+    } elseif (strlen($password) < 6) {
 
+        $error = "Password must be at least 6 characters.";
 
-    // =====================================
-    // CHECK DUPLICATE EMAIL
-    // =====================================
+    } else {
 
-    else {
+        // Check if email already exists
+        $check = $conn->prepare("SELECT user_id FROM users WHERE email = ?");
+        $check->bind_param("s", $email);
+        $check->execute();
+        $result = $check->get_result();
 
-        $check = $conn->prepare(
-            "SELECT user_id
-             FROM users
-             WHERE email = ?
-             LIMIT 1"
-        );
+        if ($result->num_rows > 0) {
 
-        if (!$check) {
-
-            $error = "Database error.";
+            $error = "An account with that email already exists.";
 
         } else {
 
-            $check->bind_param("s", $email);
-            $check->execute();
+            // Securely hash the password
+            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-            $result = $check->get_result();
+            $stmt = $conn->prepare(
+                "INSERT INTO users (name, email, password) VALUES (?, ?, ?)"
+            );
 
-            if ($result->num_rows > 0) {
+            $stmt->bind_param(
+                "sss",
+                $name,
+                $email,
+                $hashed_password
+            );
 
-                $error = "An account with that email already exists.";
+            if ($stmt->execute()) {
+
+                $success = "Account created successfully! You can now log in.";
 
             } else {
 
-                // =====================================
-                // HASH PASSWORD
-                // =====================================
-
-                $hashed_password = password_hash(
-                    $password,
-                    PASSWORD_DEFAULT
-                );
-
-
-                // =====================================
-                // CREATE ACCOUNT
-                // =====================================
-
-                $stmt = $conn->prepare(
-                    "INSERT INTO users
-                    (name, email, password)
-                    VALUES (?, ?, ?)"
-                );
-
-                if (!$stmt) {
-
-                    $error = "Database error.";
-
-                } else {
-
-                    $stmt->bind_param(
-                        "sss",
-                        $name,
-                        $email,
-                        $hashed_password
-                    );
-
-                    if ($stmt->execute()) {
-
-                        $success =
-                            "Account created successfully! You can now log in.";
-
-                    } else {
-
-                        $error =
-                            "Something went wrong. Please try again.";
-                    }
-
-                    $stmt->close();
-                }
+                $error = "Something went wrong. Please try again.";
             }
 
-            $check->close();
+            $stmt->close();
         }
+
+        $check->close();
     }
 }
 
@@ -233,13 +85,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <title>Create Account - Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/login.css">
 
 </head>
 
 <body>
 
-<?php include "header.php"; ?>
+<header class="header">
+
+    <div class="logo">
+        <img src="images/logo.png" alt="Maturan's Art Cafe">
+    </div>
+
+    <nav class="navbar">
+        <a href="index.php">HOME</a>
+        <a href="about.php">ABOUT</a>
+        <a href="menu.php">MENU</a>
+        <a href="events.php">EVENTS</a>
+        <a href="contact.php">CONTACT</a>
+    </nav>
+
+    <a href="login.php" class="reserve-btn">
+        RESERVE A TABLE
+    </a>
+
+</header>
 
 
 <section class="login-page">
@@ -352,8 +221,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 </section>
 
-
-    <script src="JS/script.js"></script>
 
 </body>
 </html>
