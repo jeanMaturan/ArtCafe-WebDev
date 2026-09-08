@@ -1,5 +1,7 @@
 <?php
 
+session_start();
+
 require_once "db.php";
 
 $error = "";
@@ -237,29 +239,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 <body>
 
-<header class="header">
-
-    <div class="logo">
-        <img src="images/logo.png" alt="Maturan's Art Cafe">
-    </div>
-
-    <button class="menu-toggle" id="menuToggle">
-            ☰
-        </button>
-
-    <nav class="navbar">
-        <a href="index.php">HOME</a>
-        <a href="about.php">ABOUT</a>
-        <a href="menu.php">MENU</a>
-        <a href="events.php">EVENTS</a>
-        <a href="contact.php">CONTACT</a>
-    </nav>
-
-    <a href="login.php" class="reserve-btn">
-        RESERVE A TABLE
-    </a>
-
-</header>
+<?php include "header.php"; ?>
 
 
 <section class="login-page">

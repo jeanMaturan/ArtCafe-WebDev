@@ -238,35 +238,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <body>
 
     <!-- HEADER -->
-    <header class="header">
-
-        <div class="logo">
-            <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
-        </div>
-
-        <button class="menu-toggle" id="menuToggle">
-            ☰
-        </button>
-
-        <nav class="navbar">
-            <a href="index.php">HOME</a>
-            <a href="about.php">ABOUT</a>
-            <a href="menu.php">MENU</a>
-            <a href="events.php">EVENTS</a>
-            <a href="contact.php">CONTACT</a>
-            <a href="my_messages.php" class="active">MY MESSAGES</a>
-
-            <?php if (
-        isset($_SESSION["user_logged_in"]) &&
-        $_SESSION["user_logged_in"] === true
-    ): ?>
-
-        <a href="profile.php" class="active" style="color: #ed542c !important;">MY PROFILE</a>
-
-    <?php endif; ?>
-        </nav>
-
-</header>
+    <?php include "header.php"; ?>
 
 <section class="profile-page">
 

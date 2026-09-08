@@ -19,39 +19,7 @@ session_start();
 <body>
 
     <!Headerrrr>
-    <header class="header">
-
-    <div class="logo">
-        <img src="images/logo.png" alt="Maturan's Art Cafe">
-    </div>
-
-        <button class="menu-toggle" id="menuToggle">
-            ☰
-        </button>
-
-        <nav class="navbar">
-            <a href="index.php">HOME</a>
-            <a href="about.php">ABOUT</a>
-            <a href="menu.php">MENU</a>
-            <a href="events.php">EVENTS</a>
-            <a href="contact.php">CONTACT</a>
-        </nav>
-
-    <?php if (isset($_SESSION["user_logged_in"]) && $_SESSION["user_logged_in"] === true): ?>
-
-    <a href="reservation.php" class="reserve-btn">
-        RESERVE A TABLE
-    </a>
-
-<?php else: ?>
-
-    <a href="login.php" class="reserve-btn">
-        RESERVE A TABLE
-    </a>
-
-<?php endif; ?>
-
-    </header>
+    <?php include "header.php"; ?>
 
     <section id="hero" class="hero">
 
@@ -246,7 +214,7 @@ session_start();
     <div class="special-card">
 
         <div class="special-text">
-            <div class="special-label1"
+            <div class="special-label1">
                 <p class="special-label">OPENING SPECIAL ! ! !</p>
             </div> 
 
@@ -448,7 +416,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/beam.png"
+                        src="images/Mia.png"
                         alt="Mia"
                         class="customer-image"
                     >
@@ -486,7 +454,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/gordon.png"
+                        src="images/Kyle.png"
                         alt="Kyle"
                         class="customer-image"
                     >
@@ -524,7 +492,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/derpie.png"
+                        src="images/Anna.png"
                         alt="Anna"
                         class="customer-image"
                     >
@@ -570,7 +538,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/beam.png"
+                        src="images/Lia.png"
                         alt="Lia"
                         class="customer-image"
                     >
@@ -608,7 +576,7 @@ session_start();
                 <div class="customer">
 
                     <img
-                        src="images/gordon.png"
+                        src="images/Mark.png"
                         alt="Mark"
                         class="customer-image"
                     >
@@ -616,44 +584,6 @@ session_start();
                     <div>
                         <p class="customer-name">Mark</p>
                         <p class="customer-location">Tanjay</p>
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <!-- Review 9 -->
-            <div class="review-card">
-
-                <div class="review-top">
-                    <img
-                        src="images/quote.png"
-                        alt=""
-                        class="quote-icon"
-                    >
-
-                    <div class="stars">
-                        ★★★★★
-                    </div>
-                </div>
-
-                <p class="review-text">
-                    Amazing experience every time.
-                    I'll definitely come back!
-                </p>
-
-                <div class="customer">
-
-                    <img
-                        src="images/derpie.png"
-                        alt="John"
-                        class="customer-image"
-                    >
-
-                    <div>
-                        <p class="customer-name">John</p>
-                        <p class="customer-location">Dumaguete</p>
                     </div>
 
                 </div>
@@ -678,104 +608,8 @@ session_start();
 </section>
 
 <!footer>
-<footer id="contact" class="footer">
-
-    <div class="footer-content">
-
-        <div class="footer-brand">
-
-            <img src="images/logo.png"
-                 alt="Maturan's Art Cafe"
-                 class="footer-logo">
-
-            <p class="footer-tagline">
-                Sip. Create. Relax.
-            </p>
-
-            <p class="footer-description">
-                A cozy art cafe inspiring creativity,
-                connection, and community.
-            </p>
-
-            <div class="social-icons">
-                <a href="#">●</a>
-                <a href="#">◎</a>
-                <a href="#">✉</a>
-            </div>
-
-        </div>
-
-        <div class="footer-links">
-
-            <h3>QUICK LINKS</h3>
-
-            <a href="index.php">Home</a>
-            <a href="about.php">About</a>
-            <a href="menu.php">Menu</a>
-            <a href="events.php">Events</a>
-            <a href="contact.php">Contact</a>
-
-        </div>
-
-        <div class="footer-contact">
-
-            <h3>CONTACTS</h3>
-
-            <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
-
-            <p>☎ &nbsp; 0958 586 8934</p>
-
-            <p>✉ &nbsp; maturansartcafe@gmail.com</p>
-
-        </div>
-
-       <div class="footer-subscribe">
-
-    <h3>STAY CONNECTED</h3>
-
-    <p>
-        Subscribe to get updates on
-        new events and promos!
-    </p>
-
-
-    <form class="subscribe-form" id="subscribeForm">
-
-    <input
-        type="email"
-        name="email"
-        id="subscribeEmail"
-        placeholder="Your email"
-        required
-    >
-
-    <button type="submit">→</button>
-
-</form>
-
-<p
-    class="subscribe-message"
-    id="subscribeMessage"
-    style="display: none;"
-></p>
-
-
-    <img
-        src="images/whiteheart.png"
-        alt=""
-        class="heart-small">
-
-</div>
-
-</form>
-        </div>
-
-    </div>
-
-</footer>
-
-    <script src="JS/script.js"></script>
+<?php $show_newsletter = true; include "footer.php"; ?>
 
 </body>
 
-</html> 
+</html>

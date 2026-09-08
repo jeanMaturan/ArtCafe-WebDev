@@ -18,43 +18,7 @@ session_start();
 <body>
 
     <!HEADER>
-    <header class="header">
-
-        <div class="logo">
-            <a href="index.php">
-                <img src="images/logo.png" alt="Maturan's Art Cafe">
-            </a>
-        </div>
-
-        <button class="menu-toggle" id="menuToggle">
-            ☰
-        </button>
-
-        <nav class="navbar">
-            <a href="index.php">HOME</a>
-            <a href="about.php">ABOUT</a>
-            <a href="menu.php" class="active" style="color: #ed542c !important;">MENU</a>
-            <a href="events.php">EVENTS</a>
-            <a href="contact.php">CONTACT</a>
-
-            <?php if (isset($_SESSION["user_id"])): ?>
-             <a href="my_messages.php">MY MESSAGES</a>
-            <?php endif; ?>
-
-            <?php if (
-                isset($_SESSION["user_logged_in"]) &&
-                $_SESSION["user_logged_in"] === true
-                ): ?>
-
-                <a href="profile.php">MY PROFILE</a>
-            <?php endif; ?>
-        </nav>
-
-        <a href="login.php" class="reserve-btn">
-            RESERVE A TABLE
-        </a>
-
-    </header>
+    <?php include "header.php"; ?>
 
 
     <!-- MENU HERO -->
@@ -163,6 +127,126 @@ session_start();
 
             </div>
 
+
+            <!-- PRODUCT 5 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/mochadream.jpg"
+                         alt="Mocha Dream">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Mocha Dream</h3>
+                    <p>
+                        Rich espresso blended with
+                        chocolate and creamy milk.
+                    </p>
+                    <strong>₱150</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 6 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/icedmatchalatte.jpg"
+                         alt="Iced Matcha Latte">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Iced Matcha Latte</h3>
+                    <p>
+                        Earthy matcha combined with
+                        creamy milk for a refreshing drink.
+                    </p>
+                    <strong>₱160</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 7 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/strawberryCreamfrappe.jpg"
+                         alt="Strawberry Cream Frappe">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Strawberry Cream Frappe</h3>
+                    <p>
+                        Sweet strawberry blended with ice
+                        and creamy milk, topped with whipped cream.
+                    </p>
+                    <strong>₱165</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 8 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/cappucino.jpg"
+                         alt="Cappuccino">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Cappuccino</h3>
+                    <p>
+                        Rich espresso topped with steamed
+                        milk and a thick layer of creamy foam.
+                    </p>
+                    <strong>₱140</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 9 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/coffee.png"
+                         alt="Americano">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Americano</h3>
+                    <p>
+                        Smooth and bold espresso balanced
+                        with hot water for a clean coffee flavor.
+                    </p>
+                    <strong>₱120</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 10 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/ubelatte.jpg"
+                         alt="Ube Latte">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Ube Latte</h3>
+                    <p>
+                        Creamy espresso blended with sweet
+                        ube for a smooth Filipino-inspired latte.
+                    </p>
+                    <strong>₱155</strong>
+                </div>
+
+            </div>
+
         </div>
 
     </section>
@@ -203,6 +287,146 @@ session_start();
                         sweet blueberry goodness.
                     </p>
                     <strong>₱120</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 11 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/butterCroissant.jpg"
+                         alt="Butter Croissant">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Butter Croissant</h3>
+                    <p>
+                        Flaky, golden pastry with a
+                        rich buttery flavor.
+                    </p>
+                    <strong>₱95</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 12 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/chocCroissant.jpg"
+                         alt="Chocolate Croissant">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Chocolate Croissant</h3>
+                    <p>
+                        Buttery, flaky pastry filled
+                        with smooth chocolate.
+                    </p>
+                    <strong>₱110</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 13 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/cinnamonroll.jpg"
+                         alt="Cinnamon Roll">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Cinnamon Roll</h3>
+                    <p>
+                        Soft, sweet pastry filled with
+                        cinnamon and topped with creamy glaze.
+                    </p>
+                    <strong>₱105</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 14 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/bananacake.jpg"
+                         alt="Banana Cake">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Banana Cake</h3>
+                    <p>
+                        Soft, moist banana loaf with
+                        a comforting homemade taste.
+                    </p>
+                    <strong>₱95</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 15 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/cheeseDanish.jpg"
+                         alt="Cheese Danish">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Cheese Danish</h3>
+                    <p>
+                        Flaky Danish pastry filled with
+                        sweet and creamy cheese.
+                    </p>
+                    <strong>₱110</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 16 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/chocCookies.jpg"
+                         alt="Chocolate Chip Cookie">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Chocolate Chip Cookie</h3>
+                    <p>
+                        Soft-baked cookie loaded with
+                        rich chocolate chips.
+                    </p>
+                    <strong>₱75</strong>
+                </div>
+
+            </div>
+
+
+            <!-- PRODUCT 17 -->
+            <div class="menu-product-card">
+
+                <div class="menu-product-image">
+                    <img src="images/coconutMuffs.jpg"
+                         alt="Coconut Muffin">
+                </div>
+
+                <div class="menu-product-info">
+                    <h3>Coconut Muffin</h3>
+                    <p>
+                        Soft and moist muffin with a lightly
+                        sweet coconut flavor and toasted coconut.
+                    </p>
+                    <strong>₱100</strong>
                 </div>
 
             </div>
@@ -272,63 +496,7 @@ session_start();
 
 
     <!-- FOOTER -->
-    <footer id="contact" class="footer">
-
-        <div class="footer-content">
-
-            <div class="footer-brand">
-
-                <img src="images/logo.png"
-                     alt="Maturan's Art Cafe"
-                     class="footer-logo">
-
-                <p class="footer-tagline">
-                    Sip. Create. Relax.
-                </p>
-
-                <p class="footer-description">
-                    A cozy art cafe inspiring creativity,
-                    connection, and community.
-                </p>
-
-                <div class="social-icons">
-                    <a href="#">●</a>
-                    <a href="#">◎</a>
-                    <a href="#">✉</a>
-                </div>
-
-            </div>
-
-
-            <div class="footer-links">
-
-                <h3>QUICK LINKS</h3>
-
-                <a href="index.php">Home</a>
-                <a href="about.php">About</a>
-                <a href="menu.php">Menu</a>
-                <a href="events.php">Events</a>
-                <a href="contact.php">Contact</a>
-
-            </div>
-
-
-            <div class="footer-contact">
-
-                <h3>CONTACTS</h3>
-
-                <p>◈ &nbsp; Jawa, Valencia Negros Oriental</p>
-                <p>☎ &nbsp; 0958 586 8934</p>
-                <p>✉ &nbsp; maturansartcafe@gmail.com</p>
-
-            </div>
-
-        </div>
-
-    </footer>
-
-
-    <script src="JS/script.js"></script>
+    <?php include "footer.php"; ?>
 
 </body>
 </html>
