@@ -192,7 +192,7 @@ session_start();
             <div class="menu-product-card">
 
                 <div class="menu-product-image">
-                    <img src="images/cappucino.jpg"
+                    <img src="images/capuccino.jpg"
                          alt="Cappuccino">
                 </div>
 

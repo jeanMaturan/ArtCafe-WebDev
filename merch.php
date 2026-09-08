@@ -131,29 +131,29 @@ session_start();
             </div>
 
 
-            <!-- SHIRT -->
+            <!-- STICKERS -->
             <div class="merch-card">
 
                 <div class="merch-image">
 
                     <img
-                        src="images/shirt.png"
-                        alt="Maturan's Art Cafe Shirt"
+                        src="images/stickers.jpg"
+                        alt="Maturan's Art Cafe Stickers"
                     >
 
                 </div>
 
                 <div class="merch-info">
 
-                    <h2>CAFE SHIRT</h2>
+                    <h2>CAFE STICKERS</h2>
 
                     <p>
-                        Wear the Maturan's Art Cafe spirit
-                        wherever you go.
+                        Adorn your belongings with our exclusive
+                        Maturan's Art Cafe stickers.
                     </p>
 
                     <span class="merch-price">
-                        ₱550
+                        ₱100
                     </span>
 
                 </div>
