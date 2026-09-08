@@ -3,132 +3,52 @@
 session_start();
 require_once "db.php";
 
-
 /* =====================================
    ADMIN LOGIN CHECK
 ===================================== */
 
 if (
     !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true ||
-    !isset($_SESSION["admin_id"]) ||
-    !is_numeric($_SESSION["admin_id"]) ||
-    !isset($_SESSION["admin_username"]) ||
-    $_SESSION["admin_username"] === ""
+    $_SESSION["admin_logged_in"] !== true
 ) {
     header("Location: admin_login.php");
     exit();
 }
 
-$admin_id = (int) $_SESSION["admin_id"];
-
-$success = "";
-$error = "";
-
 
 /* =====================================
-   APPROVE / REJECT ARTWORK
+   GET APPROVED ARTISTS
 ===================================== */
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
+$artists = [];
 
-    $artwork_id = filter_input(
-        INPUT_POST,
-        "artwork_id",
-        FILTER_VALIDATE_INT
-    );
+$stmt = $conn->prepare(
+    "SELECT
+        a.artist_id,
+        a.artist_name
+     FROM artists a
+     INNER JOIN event_artists ea
+        ON a.artist_id = ea.artist_id
+     WHERE ea.status = 'Approved'
+     ORDER BY a.artist_name ASC"
+);
 
-    $action = trim($_POST["action"] ?? "");
+$stmt->execute();
 
+$result = $stmt->get_result();
 
-    /* =====================================
-       VALIDATE ARTWORK ID
-    ===================================== */
-
-    if ($artwork_id === false || $artwork_id === null || $artwork_id <= 0) {
-
-        $error = "Invalid artwork.";
-
-    } elseif (!in_array($action, ["approve", "reject"], true)) {
-
-        $error = "Invalid action.";
-
-    } else {
-
-        /* =====================================
-           DETERMINE NEW STATUS
-        ===================================== */
-
-        $new_status = ($action === "approve")
-            ? "Available"
-            : "Rejected";
-
-
-        /* =====================================
-           UPDATE ONLY ARTWORKS BELONGING TO
-           APPROVED ARTISTS AND CURRENTLY PENDING
-        ===================================== */
-
-        $stmt = $conn->prepare(
-            "UPDATE artworks aw
-             INNER JOIN artists a
-                ON aw.artist_id = a.artist_id
-             INNER JOIN event_artists ea
-                ON a.artist_id = ea.artist_id
-             SET aw.status = ?
-             WHERE aw.artwork_id = ?
-               AND aw.status = 'Pending'
-               AND ea.status = 'Approved'"
-        );
-
-        if (!$stmt) {
-
-            $error = "Something went wrong. Please try again.";
-
-        } else {
-
-            $stmt->bind_param(
-                "si",
-                $new_status,
-                $artwork_id
-            );
-
-            if ($stmt->execute()) {
-
-                if ($stmt->affected_rows === 1) {
-
-                    if ($action === "approve") {
-
-                        $success = "Artwork approved successfully.";
-
-                    } else {
-
-                        $success = "Artwork rejected.";
-                    }
-
-                } else {
-
-                    $error =
-                        "The artwork could not be updated. " .
-                        "It may have already been reviewed or is no longer associated with an approved artist.";
-                }
-
-            } else {
-
-                $error = "Something went wrong. Please try again.";
-            }
-
-            $stmt->close();
-        }
-    }
+while ($row = $result->fetch_assoc()) {
+    $artists[] = $row;
 }
 
+$stmt->close();
+
 
 /* =====================================
-   GET PENDING ARTWORKS
+   GET EXISTING ARTWORKS
 ===================================== */
 
-$pending_artworks = [];
+$artworks = [];
 
 $stmt = $conn->prepare(
     "SELECT
@@ -138,122 +58,25 @@ $stmt = $conn->prepare(
         aw.price,
         aw.image,
         aw.status,
-        aw.created_at,
         a.artist_name
      FROM artworks aw
      INNER JOIN artists a
         ON aw.artist_id = a.artist_id
-     WHERE aw.status = 'Pending'
-       AND EXISTS (
-           SELECT 1
-           FROM event_artists ea
-           WHERE ea.artist_id = a.artist_id
-             AND ea.status = 'Approved'
-       )
+     INNER JOIN event_artists ea
+        ON a.artist_id = ea.artist_id
+     WHERE ea.status = 'Approved'
      ORDER BY aw.created_at DESC"
 );
 
-if ($stmt) {
+$stmt->execute();
 
-    if ($stmt->execute()) {
+$result = $stmt->get_result();
 
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $pending_artworks[] = $row;
-        }
-    }
-
-    $stmt->close();
+while ($row = $result->fetch_assoc()) {
+    $artworks[] = $row;
 }
 
-
-/* =====================================
-   GET APPROVED ARTWORKS
-===================================== */
-
-$approved_artworks = [];
-
-$stmt = $conn->prepare(
-    "SELECT
-        aw.artwork_id,
-        aw.title,
-        aw.description,
-        aw.price,
-        aw.image,
-        aw.status,
-        aw.created_at,
-        a.artist_name
-     FROM artworks aw
-     INNER JOIN artists a
-        ON aw.artist_id = a.artist_id
-     WHERE aw.status = 'Available'
-       AND EXISTS (
-           SELECT 1
-           FROM event_artists ea
-           WHERE ea.artist_id = a.artist_id
-             AND ea.status = 'Approved'
-       )
-     ORDER BY aw.created_at DESC"
-);
-
-if ($stmt) {
-
-    if ($stmt->execute()) {
-
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $approved_artworks[] = $row;
-        }
-    }
-
-    $stmt->close();
-}
-
-
-/* =====================================
-   GET REJECTED ARTWORKS
-===================================== */
-
-$rejected_artworks = [];
-
-$stmt = $conn->prepare(
-    "SELECT
-        aw.artwork_id,
-        aw.title,
-        aw.description,
-        aw.price,
-        aw.image,
-        aw.status,
-        aw.created_at,
-        a.artist_name
-     FROM artworks aw
-     INNER JOIN artists a
-        ON aw.artist_id = a.artist_id
-     WHERE aw.status = 'Rejected'
-       AND EXISTS (
-           SELECT 1
-           FROM event_artists ea
-           WHERE ea.artist_id = a.artist_id
-             AND ea.status = 'Approved'
-       )
-     ORDER BY aw.created_at DESC"
-);
-
-if ($stmt) {
-
-    if ($stmt->execute()) {
-
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()) {
-            $rejected_artworks[] = $row;
-        }
-    }
-
-    $stmt->close();
-}
+$stmt->close();
 
 ?>
 
@@ -273,9 +96,14 @@ if ($stmt) {
         Artwork Management | Maturan's Art Cafe
     </title>
 
-    <link rel="stylesheet" href="Css/style.css">
-    <link rel="stylesheet" href="Css/admin.css">
-    <link rel="stylesheet" href="Css/admin_artworks.css">
+    <link
+        rel="stylesheet"
+        href="Css/style.css"
+    >
+    <link
+        rel="stylesheet"
+        href="Css/admin_artworks.css"
+    >
 
 </head>
 
@@ -284,7 +112,7 @@ if ($stmt) {
 
 
     <!-- =====================================
-         ADMIN HEADER
+         HEADER
     ====================================== -->
 
     <header class="admin-header">
@@ -299,13 +127,9 @@ if ($stmt) {
 
             <div>
 
-                <h1>
-                    ADMIN PANEL
-                </h1>
+                <h1>ADMIN PANEL</h1>
 
-                <p>
-                    Maturan's Art Cafe
-                </p>
+                <p>Maturan's Art Cafe</p>
 
             </div>
 
@@ -320,16 +144,6 @@ if ($stmt) {
             >
                 ARTIST APPLICATIONS
             </a>
-
-
-            <span>
-                Welcome,
-                <?php
-                echo htmlspecialchars(
-                    $_SESSION["admin_username"]
-                );
-                ?>
-            </span>
 
             <a
                 href="admin_logout.php"
@@ -353,13 +167,10 @@ if ($stmt) {
 
         <div class="admin-page-title">
 
-            <h2>
-                ARTWORK MANAGEMENT
-            </h2>
+            <h2>ARTWORK MANAGEMENT</h2>
 
             <p>
-                Review and manage artwork submissions
-                from approved artists.
+                Manage artworks for approved artists.
             </p>
 
         </div>
@@ -367,66 +178,28 @@ if ($stmt) {
 
 
         <!-- =====================================
-             SUCCESS / ERROR MESSAGE
-        ====================================== -->
-
-        <?php if ($success !== ""): ?>
-
-            <div class="admin-message success">
-
-                <?php
-                echo htmlspecialchars($success);
-                ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <?php if ($error !== ""): ?>
-
-            <div class="admin-message error">
-
-                <?php
-                echo htmlspecialchars($error);
-                ?>
-
-            </div>
-
-        <?php endif; ?>
-
-
-
-        <!-- =====================================
-             PENDING ARTWORKS
+             APPROVED ARTISTS
         ====================================== -->
 
         <section class="clean-admin-section">
 
-
             <div class="clean-section-heading">
 
-                <h3>
-                    PENDING ARTWORKS
-                </h3>
+                <h3>APPROVED ARTISTS</h3>
 
                 <span>
-                    <?php
-                    echo count($pending_artworks);
-                    ?>
-                    pending
+                    <?php echo count($artists); ?> artists
                 </span>
 
             </div>
 
 
-            <?php if (count($pending_artworks) === 0): ?>
+            <?php if (count($artists) === 0): ?>
 
                 <div class="clean-empty">
 
                     <p>
-                        No artwork submissions are waiting
-                        for approval.
+                        No approved artists yet.
                     </p>
 
                 </div>
@@ -434,234 +207,82 @@ if ($stmt) {
             <?php else: ?>
 
 
-                <div class="clean-artwork-grid">
+                <div class="approved-artist-list">
 
+                    <?php foreach ($artists as $artist): ?>
 
-                    <?php foreach ($pending_artworks as $artwork): ?>
+                        <div class="approved-artist-row">
 
-                        <div class="clean-artwork-card pending-artwork-card">
+                            <div class="approved-artist-name">
 
-
-                            <!-- ARTWORK IMAGE -->
-
-                            <?php if (
-                                !empty($artwork["image"]) &&
-                                file_exists(
-                                    "artwork_images/" .
-                                    $artwork["image"]
-                                )
-                            ): ?>
-
-                                <img
-                                    src="artwork_images/<?php
-                                    echo htmlspecialchars(
-                                        $artwork["image"]
-                                    );
-                                    ?>"
-                                    alt="<?php
-                                    echo htmlspecialchars(
-                                        $artwork["title"]
-                                    );
-                                    ?>"
-                                    class="clean-artwork-image"
-                                >
-
-                            <?php else: ?>
-
-                                <div class="clean-no-image">
-                                    NO IMAGE
-                                </div>
-
-                            <?php endif; ?>
-
-
-
-                            <!-- ARTWORK INFORMATION -->
-
-                            <div class="clean-artwork-info">
-
-
-                                <span class="clean-artist-name">
-
+                                <span class="artist-circle">
                                     <?php
-                                    echo htmlspecialchars(
-                                        $artwork["artist_name"]
+                                    echo strtoupper(
+                                        substr(
+                                            $artist["artist_name"],
+                                            0,
+                                            1
+                                        )
                                     );
                                     ?>
-
                                 </span>
 
-
-                                <h4>
-
+                                <strong>
                                     <?php
                                     echo htmlspecialchars(
-                                        $artwork["title"]
+                                        $artist["artist_name"]
                                     );
                                     ?>
-
-                                </h4>
-
-
-                                <?php if (
-                                    !empty(
-                                        $artwork["description"]
-                                    )
-                                ): ?>
-
-                                    <p class="artwork-description">
-
-                                        <?php
-                                        echo nl2br(
-                                            htmlspecialchars(
-                                                $artwork["description"]
-                                            )
-                                        );
-                                        ?>
-
-                                    </p>
-
-                                <?php endif; ?>
-
-
-
-                                <div class="clean-artwork-bottom">
-
-                                    <strong>
-                                        ₱<?php
-                                        echo number_format(
-                                            (float)$artwork["price"],
-                                            2
-                                        );
-                                        ?>
-                                    </strong>
-
-                                    <span class="artwork-status pending-status">
-                                        PENDING
-                                    </span>
-
-                                </div>
-
-
-
-                                <!-- ACTION BUTTONS -->
-
-                                <div class="artwork-admin-actions">
-
-
-                                    <!-- APPROVE -->
-
-                                    <form
-                                        method="POST"
-                                        onsubmit="return confirm('Approve this artwork?');"
-                                    >
-
-                                        <input
-                                            type="hidden"
-                                            name="artwork_id"
-                                            value="<?php
-                                            echo $artwork["artwork_id"];
-                                            ?>"
-                                        >
-
-                                        <input
-                                            type="hidden"
-                                            name="action"
-                                            value="approve"
-                                        >
-
-                                        <button
-                                            type="submit"
-                                            class="artwork-approve-button"
-                                        >
-                                            APPROVE
-                                        </button>
-
-                                    </form>
-
-
-
-                                    <!-- REJECT -->
-
-                                    <form
-                                        method="POST"
-                                        onsubmit="return confirm('Reject this artwork?');"
-                                    >
-
-                                        <input
-                                            type="hidden"
-                                            name="artwork_id"
-                                            value="<?php
-                                            echo $artwork["artwork_id"];
-                                            ?>"
-                                        >
-
-                                        <input
-                                            type="hidden"
-                                            name="action"
-                                            value="reject"
-                                        >
-
-                                        <button
-                                            type="submit"
-                                            class="artwork-reject-button"
-                                        >
-                                            REJECT
-                                        </button>
-
-                                    </form>
-
-
-                                </div>
-
+                                </strong>
 
                             </div>
 
 
+                            <a
+                                href="admin_add_artwork.php?artist_id=<?php
+                                echo $artist["artist_id"];
+                                ?>"
+                                class="add-artwork-button"
+                            >
+                                + ADD ARTWORK
+                            </a>
+
                         </div>
 
                     <?php endforeach; ?>
-
 
                 </div>
 
 
             <?php endif; ?>
 
-
         </section>
 
 
 
         <!-- =====================================
-             APPROVED ARTWORKS
+             ARTWORKS
         ====================================== -->
 
         <section class="clean-admin-section artwork-section">
 
-
             <div class="clean-section-heading">
 
-                <h3>
-                    APPROVED ARTWORKS
-                </h3>
+                <h3>ARTWORKS</h3>
 
                 <span>
-                    <?php
-                    echo count($approved_artworks);
-                    ?>
-                    artworks
+                    <?php echo count($artworks); ?> artworks
                 </span>
 
             </div>
 
 
-            <?php if (count($approved_artworks) === 0): ?>
+            <?php if (count($artworks) === 0): ?>
 
                 <div class="clean-empty">
 
                     <p>
-                        No approved artworks yet.
+                        No artworks have been added yet.
                     </p>
 
                 </div>
@@ -672,7 +293,7 @@ if ($stmt) {
                 <div class="clean-artwork-grid">
 
 
-                    <?php foreach ($approved_artworks as $artwork): ?>
+                    <?php foreach ($artworks as $artwork): ?>
 
                         <div class="clean-artwork-card">
 
@@ -710,7 +331,6 @@ if ($stmt) {
 
                             <div class="clean-artwork-info">
 
-
                                 <span class="clean-artist-name">
 
                                     <?php
@@ -733,44 +353,26 @@ if ($stmt) {
                                 </h4>
 
 
-                                <?php if (
-                                    !empty(
-                                        $artwork["description"]
-                                    )
-                                ): ?>
-
-                                    <p class="artwork-description">
-
-                                        <?php
-                                        echo nl2br(
-                                            htmlspecialchars(
-                                                $artwork["description"]
-                                            )
-                                        );
-                                        ?>
-
-                                    </p>
-
-                                <?php endif; ?>
-
-
                                 <div class="clean-artwork-bottom">
 
                                     <strong>
                                         ₱<?php
                                         echo number_format(
-                                            (float)$artwork["price"],
+                                            $artwork["price"],
                                             2
                                         );
                                         ?>
                                     </strong>
 
-                                    <span class="artwork-status approved-status">
-                                        APPROVED
+                                    <span class="artwork-status">
+                                        <?php
+                                        echo htmlspecialchars(
+                                            $artwork["status"]
+                                        );
+                                        ?>
                                     </span>
 
                                 </div>
-
 
                             </div>
 
@@ -784,164 +386,6 @@ if ($stmt) {
 
 
             <?php endif; ?>
-
-
-        </section>
-
-
-
-        <!-- =====================================
-             REJECTED ARTWORKS
-        ====================================== -->
-
-        <section class="clean-admin-section artwork-section">
-
-
-            <div class="clean-section-heading">
-
-                <h3>
-                    REJECTED ARTWORKS
-                </h3>
-
-                <span>
-                    <?php
-                    echo count($rejected_artworks);
-                    ?>
-                    rejected
-                </span>
-
-            </div>
-
-
-            <?php if (count($rejected_artworks) === 0): ?>
-
-                <div class="clean-empty">
-
-                    <p>
-                        No rejected artworks.
-                    </p>
-
-                </div>
-
-            <?php else: ?>
-
-
-                <div class="clean-artwork-grid">
-
-
-                    <?php foreach ($rejected_artworks as $artwork): ?>
-
-                        <div class="clean-artwork-card">
-
-
-                            <?php if (
-                                !empty($artwork["image"]) &&
-                                file_exists(
-                                    "artwork_images/" .
-                                    $artwork["image"]
-                                )
-                            ): ?>
-
-                                <img
-                                    src="artwork_images/<?php
-                                    echo htmlspecialchars(
-                                        $artwork["image"]
-                                    );
-                                    ?>"
-                                    alt="<?php
-                                    echo htmlspecialchars(
-                                        $artwork["title"]
-                                    );
-                                    ?>"
-                                    class="clean-artwork-image"
-                                >
-
-                            <?php else: ?>
-
-                                <div class="clean-no-image">
-                                    NO IMAGE
-                                </div>
-
-                            <?php endif; ?>
-
-
-                            <div class="clean-artwork-info">
-
-
-                                <span class="clean-artist-name">
-
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $artwork["artist_name"]
-                                    );
-                                    ?>
-
-                                </span>
-
-
-                                <h4>
-
-                                    <?php
-                                    echo htmlspecialchars(
-                                        $artwork["title"]
-                                    );
-                                    ?>
-
-                                </h4>
-
-
-                                <?php if (
-                                    !empty(
-                                        $artwork["description"]
-                                    )
-                                ): ?>
-
-                                    <p class="artwork-description">
-
-                                        <?php
-                                        echo nl2br(
-                                            htmlspecialchars(
-                                                $artwork["description"]
-                                            )
-                                        );
-                                        ?>
-
-                                    </p>
-
-                                <?php endif; ?>
-
-
-                                <div class="clean-artwork-bottom">
-
-                                    <strong>
-                                        ₱<?php
-                                        echo number_format(
-                                            (float)$artwork["price"],
-                                            2
-                                        );
-                                        ?>
-                                    </strong>
-
-                                    <span class="artwork-status rejected-status">
-                                        REJECTED
-                                    </span>
-
-                                </div>
-
-
-                            </div>
-
-
-                        </div>
-
-                    <?php endforeach; ?>
-
-
-                </div>
-
-
-            <?php endif; ?>
-
 
         </section>
 
