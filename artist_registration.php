@@ -358,44 +358,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <!-- HEADER -->
 
-    <header class="header">
-
-        <div class="logo">
-
-            <img
-                src="images/logo.png"
-                alt="Maturan's Art Cafe Logo"
-            >
-
-        </div>
-
-        <button class="menu-toggle" id="menuToggle">
-            ☰
-        </button>
-
-        <nav class="navbar">
-
-            <a href="index.php">HOME</a>
-
-            <a href="about.php">ABOUT</a>
-
-            <a href="menu.php">MENU</a>
-
-            <a href="events.php">EVENTS</a>
-
-            <a href="contact.php">CONTACT</a>
-
-        </nav>
-
-
-        <a
-            href="login.php"
-            class="reserve-btn"
-        >
-            RESERVE A TABLE
-        </a>
-
-    </header>
+    <?php include "header.php"; ?>
 
 
 
@@ -579,16 +542,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     <!-- FOOTER -->
 
-    <footer class="footer">
-
-        <p>
-            © 2027 Maturan's Art Cafe.
-            All Rights Reserved.
-        </p>
-
-    </footer>
-
-    <script src="JS/script.js"></script>
+    <?php include "footer.php"; ?>
 
 </body>
 

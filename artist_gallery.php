@@ -78,58 +78,7 @@ if (!$result) {
 
 <!-- HEADER -->
 
-<header class="header">
-
-    <div class="logo">
-        <img src="images/logo.png" alt="Maturan's Art Cafe">
-    </div>
-
-    <button class="menu-toggle" id="menuToggle">
-            ☰
-        </button>
-
-    <nav class="navbar">
-
-        <a href="index.php">HOME</a>
-
-        <a href="about.php">ABOUT</a>
-
-        <a href="menu.php">MENU</a>
-
-        <a href="events.php">EVENTS</a>
-
-        <a href="contact.php">CONTACT</a>
-
-        <?php if (isset($_SESSION["user_id"])): ?>
-
-            <a href="my_messages.php">
-                MY MESSAGES
-            </a>
-
-        <?php endif; ?>
-
-    </nav>
-
-
-    <?php if (
-        isset($_SESSION["user_logged_in"]) &&
-        $_SESSION["user_logged_in"] === true
-    ): ?>
-
-        <a href="reservation.php" class="reserve-btn">
-            RESERVE A TABLE
-        </a>
-
-    <?php else: ?>
-
-        <a href="login.php" class="reserve-btn">
-            RESERVE A TABLE
-        </a>
-
-    <?php endif; ?>
-
-
-</header>
+<?php include "header.php"; ?>
 
 
 
@@ -361,14 +310,7 @@ if (!$result) {
 
 <!-- FOOTER -->
 
-<footer id="contact" class="footer">
-
-    <!-- Keep your existing footer here -->
-
-</footer>
-
-
-<script src="JS/script.js"></script>
+<?php include "footer.php"; ?>
 
 </body>
 
