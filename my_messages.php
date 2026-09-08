@@ -1,21 +1,14 @@
 <?php
-
 session_start();
 require_once "db.php";
 
 /* USER MUST BE LOGGED IN */
-if (
-    !isset($_SESSION["user_logged_in"]) ||
-    $_SESSION["user_logged_in"] !== true ||
-    !isset($_SESSION["user_id"]) ||
-    !is_numeric($_SESSION["user_id"])
-) {
+if (!isset($_SESSION["user_id"])) {
     header("Location: login.php");
     exit();
 }
 
-/* CONVERT SESSION USER ID TO INTEGER */
-$user_id = (int) $_SESSION["user_id"];
+$user_id = $_SESSION["user_id"];
 
 /* GET ONLY THIS USER'S MESSAGES */
 $stmt = $conn->prepare(
@@ -32,19 +25,10 @@ $stmt = $conn->prepare(
      ORDER BY created_at DESC"
 );
 
-if (!$stmt) {
-    die("Something went wrong. Please try again.");
-}
-
 $stmt->bind_param("i", $user_id);
-
-if (!$stmt->execute()) {
-    $stmt->close();
-    die("Something went wrong. Please try again.");
-}
+$stmt->execute();
 
 $result = $stmt->get_result();
-
 ?>
 
 <!DOCTYPE html>
@@ -58,13 +42,34 @@ $result = $stmt->get_result();
 
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/my_messages.css">
+    <link rel="stylesheet" href="Css/admin.css">
+    <link rel="stylesheet" href="Css/admin_messages.css">
 
 </head>
 
 <body>
 
     <!-- HEADER -->
-    <?php include "header.php"; ?>
+    <header class="header">
+
+        <div class="logo">
+            <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
+        </div>
+
+        <nav class="navbar">
+            <a href="index.php">HOME</a>
+            <a href="about.php">ABOUT</a>
+            <a href="menu.php">MENU</a>
+            <a href="events.php">EVENTS</a>
+            <a href="contact.php">CONTACT</a>
+            <a href="my_messages.php">MY MESSAGES</a>
+        </nav>
+
+        <a href="reservation.php" class="reserve-btn">
+            RESERVE A TABLE
+        </a>
+
+    </header>
 
 
     <!-- MY MESSAGES -->
@@ -145,7 +150,24 @@ $result = $stmt->get_result();
     </main>
 
 
-    <?php include "footer.php"; ?>
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-content">
+
+            <div class="footer-logo">
+                <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
+            </div>
+
+            <div class="footer-links">
+                <a href="index.php">HOME</a>
+                <a href="about.php">ABOUT</a>
+                <a href="menu.php">MENU</a>
+                <a href="events.php">EVENTS</a>
+                <a href="contact.php">CONTACT</a>
+            </div>
+
+        </div>
+    </footer>
 
 </body>
 </html>

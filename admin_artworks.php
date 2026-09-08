@@ -96,14 +96,9 @@ $stmt->close();
         Artwork Management | Maturan's Art Cafe
     </title>
 
-    <link
-        rel="stylesheet"
-        href="Css/style.css"
-    >
-    <link
-        rel="stylesheet"
-        href="Css/admin_artworks.css"
-    >
+    <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/admin.css">
+    <link rel="stylesheet" href="Css/admin_artworks.css">
 
 </head>
 

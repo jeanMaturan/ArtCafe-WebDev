@@ -6,6 +6,14 @@ ini_set('display_errors', 1);
 session_start();
 require_once "db.php";
 
+if (
+    isset($_SESSION["user_logged_in"]) &&
+    $_SESSION["user_logged_in"] === true
+) {
+    header("Location: reservation.php");
+    exit();
+}
+
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -109,9 +117,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     </nav>
 
-    <a href="login.php" class="reserve-btn">
-        RESERVE A TABLE
-    </a>
+    <?php if (isset($_SESSION["user_logged_in"]) && $_SESSION["user_logged_in"] === true): ?>
+
+         <a href="reservation.php" class="reserve-btn">
+                RESERVE A TABLE
+         </a>
+
+    <?php else: ?>
+
+         <a href="login.php" class="reserve-btn">
+             RESERVE A TABLE
+         </a>
+
+    <?php endif; ?>
 
 </header>
 

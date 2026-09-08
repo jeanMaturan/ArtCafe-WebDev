@@ -1,3 +1,7 @@
+<?php
+session_start();
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -26,6 +30,10 @@
             <a href="menu.php">MENU</a>
             <a href="events.php">EVENTS</a>
             <a href="contact.php">CONTACT</a>
+
+            <?php if (isset($_SESSION["user_id"])): ?>
+             <a href="my_messages.php">MY MESSAGES</a>
+            <?php endif; ?>
         </nav>
 
         <a href="login.php" class="reserve-btn">

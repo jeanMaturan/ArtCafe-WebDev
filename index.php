@@ -1,3 +1,8 @@
+<?php
+session_start();
+?>
+
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -27,9 +32,20 @@
             <a href="contact.php">CONTACT</a>
         </nav>
 
+    <?php if (isset($_SESSION["user_logged_in"]) && $_SESSION["user_logged_in"] === true): ?>
+
+    <a href="reservation.php" class="reserve-btn">
+        RESERVE A TABLE
+    </a>
+
+<?php else: ?>
+
     <a href="login.php" class="reserve-btn">
         RESERVE A TABLE
     </a>
+
+<?php endif; ?>
+
     </header>
 
     <section id="hero" class="hero">
@@ -434,11 +450,11 @@
 
             <h3>QUICK LINKS</h3>
 
-            <a href="#hero">Home</a>
-            <a href="#about">About</a>
-            <a href="#bestsellers">Menu</a>
-            <a href="#events">Events</a>
-            <a href="#contact">Contact</a>
+            <a href="index.php">Home</a>
+            <a href="about.php">About</a>
+            <a href="menu.php">Menu</a>
+            <a href="events.php">Events</a>
+            <a href="contact.php">Contact</a>
 
         </div>
 

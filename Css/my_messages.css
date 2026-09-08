@@ -103,8 +103,6 @@
             box-shadow: var(--shadow);
         }
 
-        
-
         @media (max-width: 768px) {
 
             .my-messages-page {

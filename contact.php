@@ -1,14 +1,14 @@
 <?php
 
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
+session_start();
 require_once "db.php";
 
 $success = "";
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $user_id = $_SESSION["user_id"];
 
     $name = trim($_POST["name"] ?? "");
     $email = trim($_POST["email"] ?? "");
@@ -32,8 +32,14 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         $stmt = $conn->prepare(
             "INSERT INTO contact_messages
-            (name, email, subject, message)
-            VALUES (?, ?, ?, ?)"
+            (
+                user_id,
+                name,
+                email,
+                subject,
+                message
+            )
+            VALUES (?, ?, ?, ?, ?)"
         );
 
         if (!$stmt) {
@@ -43,7 +49,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } else {
 
             $stmt->bind_param(
-                "ssss",
+                "issss",
+                $user_id,
                 $name,
                 $email,
                 $subject,
@@ -52,12 +59,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if ($stmt->execute()) {
 
-                $success = "Your message has been sent successfully!";
+                $success =
+                    "Your message has been sent successfully!";
 
             } else {
 
-                $error = "Something went wrong. Please try again.";
-
+                $error =
+                    "Something went wrong. Please try again.";
             }
 
             $stmt->close();
@@ -100,17 +108,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
         <nav class="navbar">
-
             <a href="index.php">HOME</a>
-
             <a href="about.php">ABOUT</a>
-
             <a href="menu.php">MENU</a>
-
             <a href="events.php">EVENTS</a>
-
             <a href="contact.php">CONTACT</a>
 
+            <?php if (isset($_SESSION["user_id"])): ?>
+             <a href="my_messages.php">MY MESSAGES</a>
+            <?php endif; ?>
         </nav>
 
 
@@ -472,33 +478,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 </h3>
 
 
-                <a href="index.php">
-                    Home
-                </a>
-
-
-                <a href="about.php">
-                    About
-                </a>
-
-
-                <a href="menu.php">
-                    Menu
-                </a>
-
-
-                <a href="events.php">
-                    Events
-                </a>
-
-
-                <a href="contact.php">
-                    Contact
-                </a>
+                <a href="index.php">Home</a>
+                <a href="about.php">About</a>
+                <a href="menu.php">Menu</a>
+                <a href="events.php">Events</a>
+                <a href="contact.php">Contact</a>
 
             </div>
-
-
 
             <!-- FOOTER CONTACT -->
 
