@@ -1,3 +1,72 @@
+<?php
+
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+require_once "db.php";
+
+$success = "";
+$error = "";
+
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+
+    $name = trim($_POST["name"] ?? "");
+    $email = trim($_POST["email"] ?? "");
+    $subject = trim($_POST["subject"] ?? "");
+    $message = trim($_POST["message"] ?? "");
+
+    if (
+        $name === "" ||
+        $email === "" ||
+        $subject === "" ||
+        $message === ""
+    ) {
+
+        $error = "Please complete all fields.";
+
+    } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+
+        $error = "Please enter a valid email address.";
+
+    } else {
+
+        $stmt = $conn->prepare(
+            "INSERT INTO contact_messages
+            (name, email, subject, message)
+            VALUES (?, ?, ?, ?)"
+        );
+
+        if (!$stmt) {
+
+            $error = "Database error: " . $conn->error;
+
+        } else {
+
+            $stmt->bind_param(
+                "ssss",
+                $name,
+                $email,
+                $subject,
+                $message
+            );
+
+            if ($stmt->execute()) {
+
+                $success = "Your message has been sent successfully!";
+
+            } else {
+
+                $error = "Something went wrong. Please try again.";
+
+            }
+
+            $stmt->close();
+        }
+    }
+}
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 
