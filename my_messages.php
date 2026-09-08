@@ -70,6 +70,10 @@ $result = $stmt->get_result();
             <img src="images/logo.png" alt="Maturan's Art Cafe Logo">
         </div>
 
+        <button class="menu-toggle" id="menuToggle">
+            ☰
+        </button>
+
         <nav class="navbar">
             <a href="index.php">HOME</a>
             <a href="about.php">ABOUT</a>

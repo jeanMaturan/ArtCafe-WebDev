@@ -219,3 +219,12 @@ if (subscribeForm) {
     });
 
 }
+
+const menuToggle = document.getElementById("menuToggle");
+const navbar = document.querySelector(".navbar");
+
+if (menuToggle && navbar) {
+    menuToggle.addEventListener("click", function () {
+        navbar.classList.toggle("show");
+    });
+}
