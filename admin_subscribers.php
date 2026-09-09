@@ -173,63 +173,26 @@ if (!$result) {
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/admin.css">
     <link rel="stylesheet" href="Css/admin_subscribers.css">
+    <link rel="stylesheet" href="Css/admin_dashboard.css">
 </head>
 
 <body>
 
-<header class="admin-header">
+    <div class="dash-layout">
 
-    <div class="admin-header-left">
+        <?php $active_page = "subscribers"; include "admin_sidebar.php"; ?>
 
-        <img
-            src="images/logo.png"
-            alt="Maturan's Art Cafe Logo"
-            class="admin-header-logo"
-        >
+        <main class="dash-main">
 
-        <div>
-            <h1>ADMIN PANEL</h1>
-            <p>Maturan's Art Cafe</p>
-        </div>
-
-    </div>
-
-    <div class="admin-header-right">
-
-        <a href="admin_dashboard.php" class="admin-nav-button">
-            DASHBOARD
-        </a>
-
-        <a href="admin.php" class="admin-nav-button">
-            ARTISTS
-        </a>
-
-        <a href="admin_artworks.php" class="admin-nav-button">
-            ARTWORKS
-        </a>
-
-        <a href="admin_reviews.php" class="admin-nav-button">REVIEWS</a>
-
-        <a href="admin_messages.php" class="admin-nav-button">
-            MESSAGES
-        </a>
-
-        <a href="admin_subscribers.php" class="admin-nav-button">
-            SUBSCRIBERS
-        </a>
-
-        <span>
-            Welcome,
-            <?php echo htmlspecialchars($_SESSION["user_name"]); ?>
-        </span>
-
-        <a href="admin_logout.php" class="admin-logout-button">
-            LOGOUT
-        </a>
-
-    </div>
-
-</header>
+            <header class="dash-topbar">
+                <div class="dash-admin-chip">
+                    <?php
+                        echo htmlspecialchars(
+                            $_SESSION["user_name"]
+                        );
+                    ?>
+                </div>
+            </header>
 
 
 <main class="admin-page">
@@ -312,6 +275,11 @@ if (!$result) {
     
 
 </main>
+
+        </main>
+
+    </div>
+
 <script>
 
 const selectAll = document.getElementById("selectAll");

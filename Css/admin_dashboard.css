@@ -143,6 +143,7 @@ body {
     border-radius: 20px;
     font-size: 13px;
     color: var(--dash-text-dim);
+    margin-left: auto;
 }
 
 

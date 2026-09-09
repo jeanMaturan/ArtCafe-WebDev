@@ -32,6 +32,12 @@ $max_artists = 5;
 $message = "";
 $message_type = "";
 
+if (isset($_SESSION["admin_flash_message"])) {
+    $message = $_SESSION["admin_flash_message"];
+    $message_type = $_SESSION["admin_flash_message_type"] ?? "";
+    unset($_SESSION["admin_flash_message"], $_SESSION["admin_flash_message_type"]);
+}
+
 
 /* =====================================
    GET ACTIVE EVENT
@@ -294,6 +300,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         }
     }
+
+    $_SESSION["admin_flash_message"] = $message;
+    $_SESSION["admin_flash_message_type"] = $message_type;
+    header("Location: admin.php");
+    exit();
 }
 
 
