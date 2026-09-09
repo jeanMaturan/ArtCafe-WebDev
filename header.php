@@ -19,6 +19,7 @@
 
         <?php if (isset($_SESSION["user_id"])): ?>
             <a href="my_messages.php">MY MESSAGES</a>
+            <a href="profile.php">PROFILE</a>
         <?php endif; ?>
     </nav>
 

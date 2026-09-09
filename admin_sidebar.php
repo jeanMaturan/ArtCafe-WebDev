@@ -1,51 +1,17 @@
-<?php
-
-/* =====================================
-   SHARED ADMIN SIDEBAR
-
-   Set $admin_active before including this
-   file to highlight the current page, e.g.:
-
-       $admin_active = "artworks";
-
-   Valid values: dashboard, artists, artworks,
-   products, events, reviews, messages, subscribers.
-===================================== */
-
-$admin_active = $admin_active ?? "";
-
-$admin_nav_items = [
-    "dashboard"   => ["href" => "admin_dashboard.php",  "label" => "Dashboard"],
-    "artists"     => ["href" => "admin.php",            "label" => "Artists"],
-    "artworks"    => ["href" => "admin_artworks.php",   "label" => "Artworks"],
-    "products"    => ["href" => "admin_products.php",   "label" => "Products"],
-    "events"      => ["href" => "admin_events.php",     "label" => "Events"],
-    "reviews"     => ["href" => "admin_reviews.php",    "label" => "Reviews"],
-    "messages"    => ["href" => "admin_messages.php",   "label" => "Messages"],
-    "subscribers" => ["href" => "admin_subscribers.php","label" => "Subscribers"],
-];
-
-?>
 <aside class="dash-sidebar">
 
     <div class="dash-brand">
         <img src="images/logo.png" alt="Maturan's Art Cafe">
-        <span>Maturan's Art Cafe</span>
+        <span>Maturan's<br>Art Cafe</span>
     </div>
 
     <nav class="dash-nav">
-
-        <?php foreach ($admin_nav_items as $key => $item): ?>
-
-            <a
-                href="<?php echo htmlspecialchars($item["href"]); ?>"
-                class="dash-nav-link<?php echo $admin_active === $key ? " active" : ""; ?>"
-            >
-                <?php echo htmlspecialchars($item["label"]); ?>
-            </a>
-
-        <?php endforeach; ?>
-
+        <a href="admin_dashboard.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'dashboard' ? ' active' : ''; ?>">Dashboard</a>
+        <a href="admin.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'artists' ? ' active' : ''; ?>">Artists</a>
+        <a href="admin_artworks.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'artworks' ? ' active' : ''; ?>">Artworks</a>
+        <a href="admin_reviews.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'reviews' ? ' active' : ''; ?>">Reviews</a>
+        <a href="admin_messages.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'messages' ? ' active' : ''; ?>">Messages</a>
+        <a href="admin_subscribers.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'subscribers' ? ' active' : ''; ?>">Subscribers</a>
     </nav>
 
     <div class="dash-sidebar-footer">

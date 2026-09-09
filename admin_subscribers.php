@@ -9,18 +9,18 @@ require_once "db.php";
 ===================================== */
 
 if (
-    !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true ||
-    !isset($_SESSION["admin_id"]) ||
-    !is_numeric($_SESSION["admin_id"]) ||
-    !isset($_SESSION["admin_username"]) ||
-    $_SESSION["admin_username"] === ""
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"]) ||
+    !isset($_SESSION["role"]) ||
+    $_SESSION["role"] !== "admin"
 ) {
-    header("Location: admin_login.php");
+    header("Location: login.php");
     exit();
 }
 
-$admin_id = (int) $_SESSION["admin_id"];
+$admin_id = (int) $_SESSION["user_id"];
 
 $success = "";
 $error = "";
@@ -173,19 +173,64 @@ if (!$result) {
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/admin.css">
     <link rel="stylesheet" href="Css/admin_subscribers.css">
-    <link rel="stylesheet" href="Css/admin_dashboard.css">
 </head>
 
 <body>
 
-<div class="dash-layout">
+<header class="admin-header">
 
-<?php
-$admin_active = "subscribers";
-include "admin_sidebar.php";
-?>
+    <div class="admin-header-left">
 
-<div class="dash-main">
+        <img
+            src="images/logo.png"
+            alt="Maturan's Art Cafe Logo"
+            class="admin-header-logo"
+        >
+
+        <div>
+            <h1>ADMIN PANEL</h1>
+            <p>Maturan's Art Cafe</p>
+        </div>
+
+    </div>
+
+    <div class="admin-header-right">
+
+        <a href="admin_dashboard.php" class="admin-nav-button">
+            DASHBOARD
+        </a>
+
+        <a href="admin.php" class="admin-nav-button">
+            ARTISTS
+        </a>
+
+        <a href="admin_artworks.php" class="admin-nav-button">
+            ARTWORKS
+        </a>
+
+        <a href="admin_reviews.php" class="admin-nav-button">REVIEWS</a>
+
+        <a href="admin_messages.php" class="admin-nav-button">
+            MESSAGES
+        </a>
+
+        <a href="admin_subscribers.php" class="admin-nav-button">
+            SUBSCRIBERS
+        </a>
+
+        <span>
+            Welcome,
+            <?php echo htmlspecialchars($_SESSION["user_name"]); ?>
+        </span>
+
+        <a href="admin_logout.php" class="admin-logout-button">
+            LOGOUT
+        </a>
+
+    </div>
+
+</header>
+
 
 <main class="admin-page">
 
@@ -267,11 +312,6 @@ include "admin_sidebar.php";
     
 
 </main>
-
-</div>
-
-</div>
-
 <script>
 
 const selectAll = document.getElementById("selectAll");

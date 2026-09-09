@@ -9,18 +9,18 @@ require_once "db.php";
 ===================================== */
 
 if (
-    !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true ||
-    !isset($_SESSION["admin_id"]) ||
-    !is_numeric($_SESSION["admin_id"]) ||
-    !isset($_SESSION["admin_username"]) ||
-    $_SESSION["admin_username"] === ""
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"]) ||
+    !isset($_SESSION["role"]) ||
+    $_SESSION["role"] !== "admin"
 ) {
-    header("Location: admin_login.php");
+    header("Location: login.php");
     exit();
 }
 
-$admin_id = (int) $_SESSION["admin_id"];
+$admin_id = (int) $_SESSION["user_id"];
 
 
 /* =====================================
@@ -337,12 +337,21 @@ if (!$result) {
 
     <div class="dash-layout">
 
-    <?php
-    $admin_active = "messages";
-    include "admin_sidebar.php";
-    ?>
+        <?php $active_page = "messages"; include "admin_sidebar.php"; ?>
 
-    <div class="dash-main">
+        <main class="dash-main">
+
+            <header class="dash-topbar">
+                <div class="dash-admin-chip">
+                    <?php
+                        echo htmlspecialchars(
+                            $_SESSION["user_name"]
+                        );
+                    ?>
+                </div>
+            </header>
+
+
 
     <!-- =====================================
          CUSTOMER MESSAGES
@@ -663,10 +672,6 @@ if (!$result) {
 
 
     </main>
-
-    </div>
-
-    </div>
 
 
     <script src="JS/script.js"></script>

@@ -77,7 +77,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         ===================================== */
 
         $stmt = $conn->prepare(
-            "SELECT user_id, name, email, password
+            "SELECT user_id, name, email, password, role
              FROM users
              WHERE email = ?
              LIMIT 1"
@@ -139,10 +139,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $_SESSION["user_email"] =
                         $user["email"];
 
+                    $_SESSION["role"] =
+                        $user["role"];
+
 
                     /* =====================================
                        REDIRECT
                     ===================================== */
+
+                    if ($user["role"] === "admin") {
+
+                        header("Location: admin_dashboard.php");
+                        exit();
+
+                    }
 
                     if ($from_contact) {
 

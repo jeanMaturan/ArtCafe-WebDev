@@ -41,7 +41,7 @@ session_destroy();
    RETURN TO ADMIN LOGIN
 ===================================== */
 
-header("Location: admin_login.php");
+header("Location: login.php");
 exit();
 
 ?>

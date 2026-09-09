@@ -9,14 +9,14 @@ require_once "db.php";
 ===================================== */
 
 if (
-    !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true ||
-    !isset($_SESSION["admin_id"]) ||
-    !is_numeric($_SESSION["admin_id"]) ||
-    !isset($_SESSION["admin_username"]) ||
-    $_SESSION["admin_username"] === ""
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"]) ||
+    !isset($_SESSION["role"]) ||
+    $_SESSION["role"] !== "admin"
 ) {
-    header("Location: admin_login.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -162,31 +162,7 @@ if ($res) {
 
     <div class="dash-layout">
 
-        <!-- SIDEBAR -->
-        <aside class="dash-sidebar">
-
-            <div class="dash-brand">
-                <img src="images/logo.png" alt="Maturan's Art Cafe">
-                <span>Maturan's<br>Art Cafe</span>
-            </div>
-
-            <nav class="dash-nav">
-                <a href="admin_dashboard.php" class="dash-nav-link active">Dashboard</a>
-                <a href="admin.php" class="dash-nav-link">Artists</a>
-                <a href="admin_artworks.php" class="dash-nav-link">Artworks</a>
-                <a href="admin_products.php" class="dash-nav-link">Products</a>
-                <a href="admin_events.php" class="dash-nav-link">Events</a>
-                <a href="admin_reviews.php" class="dash-nav-link">Reviews</a>
-                <a href="admin_messages.php" class="dash-nav-link">Messages</a>
-                <a href="admin_subscribers.php" class="dash-nav-link">Subscribers</a>
-            </nav>
-
-            <div class="dash-sidebar-footer">
-                <a href="index.php">View Site</a>
-                <a href="admin_logout.php">Logout</a>
-            </div>
-
-        </aside>
+        <?php $active_page = "dashboard"; include "admin_sidebar.php"; ?>
 
 
         <!-- MAIN -->
@@ -197,7 +173,7 @@ if ($res) {
                 <div class="dash-admin-chip">
                     <?php
                         echo htmlspecialchars(
-                            $_SESSION["admin_username"]
+                            $_SESSION["user_name"]
                         );
                     ?>
                 </div>

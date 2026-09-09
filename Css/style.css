@@ -88,6 +88,22 @@ body {
     font-weight: bold;
 }
 
+.logout-btn {
+    display: inline-block;
+    text-decoration: none;
+    background: var(--orange);
+    color: var(--white) !important;
+    padding: 8px 16px;
+    border-radius: 7px;
+    white-space: nowrap;
+    font-size: 13px;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    background: var(--orange-dark);
+}
+
 .hero {
     position: relative;
     min-height: 600px;
