@@ -9,6 +9,8 @@
         <a href="admin_dashboard.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'dashboard' ? ' active' : ''; ?>">Dashboard</a>
         <a href="admin.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'artists' ? ' active' : ''; ?>">Artists</a>
         <a href="admin_artworks.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'artworks' ? ' active' : ''; ?>">Artworks</a>
+        <a href="admin_products.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'products' ? ' active' : ''; ?>">Products</a>
+        <a href="admin_events.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'events' ? ' active' : ''; ?>">Events</a>
         <a href="admin_reviews.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'reviews' ? ' active' : ''; ?>">Reviews</a>
         <a href="admin_messages.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'messages' ? ' active' : ''; ?>">Messages</a>
         <a href="admin_subscribers.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'subscribers' ? ' active' : ''; ?>">Subscribers</a>

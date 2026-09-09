@@ -9,10 +9,14 @@ require_once "db.php";
 ===================================== */
 
 if (
-    !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"]) ||
+    !isset($_SESSION["role"]) ||
+    $_SESSION["role"] !== "admin"
 ) {
-    header("Location: admin_login.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -152,7 +156,7 @@ if ($result) {
 <div class="dash-layout">
 
     <?php
-    $admin_active = "events";
+    $active_page = "events";
     include "admin_sidebar.php";
     ?>
 

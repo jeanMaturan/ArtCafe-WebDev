@@ -9,14 +9,14 @@ require_once "db.php";
 ===================================== */
 
 if (
-    !isset($_SESSION["admin_logged_in"]) ||
-    $_SESSION["admin_logged_in"] !== true ||
-    !isset($_SESSION["admin_id"]) ||
-    !is_numeric($_SESSION["admin_id"]) ||
-    !isset($_SESSION["admin_username"]) ||
-    $_SESSION["admin_username"] === ""
+    !isset($_SESSION["user_logged_in"]) ||
+    $_SESSION["user_logged_in"] !== true ||
+    !isset($_SESSION["user_id"]) ||
+    !is_numeric($_SESSION["user_id"]) ||
+    !isset($_SESSION["role"]) ||
+    $_SESSION["role"] !== "admin"
 ) {
-    header("Location: admin_login.php");
+    header("Location: login.php");
     exit();
 }
 
@@ -190,7 +190,7 @@ if ($count_result) {
 <div class="dash-layout">
 
     <?php
-    $admin_active = "products";
+    $active_page = "products";
     include "admin_sidebar.php";
     ?>
 
