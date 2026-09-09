@@ -28,9 +28,19 @@
         $_SESSION["user_logged_in"] === true
     ): ?>
 
-        <a href="reservation.php" class="reserve-btn">
-            RESERVE A TABLE
-        </a>
+        <?php if (basename($_SERVER["PHP_SELF"]) === "profile.php"): ?>
+
+            <a href="logout.php" class="logout-btn">
+                LOGOUT
+            </a>
+
+        <?php else: ?>
+
+            <a href="reservation.php" class="reserve-btn">
+                RESERVE A TABLE
+            </a>
+
+        <?php endif; ?>
 
     <?php else: ?>
 
