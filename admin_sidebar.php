@@ -7,6 +7,7 @@
 
     <nav class="dash-nav">
         <a href="admin_dashboard.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'dashboard' ? ' active' : ''; ?>">Dashboard</a>
+        <a href="admin_reservations.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'reservations' ? ' active' : ''; ?>">Reservations</a>
         <a href="admin.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'artists' ? ' active' : ''; ?>">Artists</a>
         <a href="admin_artworks.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'artworks' ? ' active' : ''; ?>">Artworks</a>
         <a href="admin_products.php" class="dash-nav-link<?php echo ($active_page ?? '') === 'products' ? ' active' : ''; ?>">Products</a>
