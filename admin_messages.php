@@ -24,7 +24,7 @@ $admin_id = (int) $_SESSION["user_id"];
 
 
 /* =====================================
-   SEND ADMIN REPLY / UPDATE STATUS
+   HANDLE POST ACTIONS
 ===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -55,7 +55,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
 
-    if (!in_array($action, ["reply", "read", "replied"], true)) {
+    if (!in_array($action, ["reply", "read"], true)) {
 
         $_SESSION["admin_message_error"] = "Invalid action.";
 
@@ -65,79 +65,88 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     /* =====================================
-       SEND REPLY
+       SEND REPLY (ADDS TO THE THREAD --
+       DOES NOT OVERWRITE ANYTHING, SO THE
+       ADMIN CAN REPLY AS MANY TIMES AS
+       THE CONVERSATION NEEDS)
     ===================================== */
 
     if ($action === "reply") {
 
-        $admin_reply = trim(
-            $_POST["admin_reply"] ?? ""
-        );
+        $reply_text = trim($_POST["admin_reply"] ?? "");
 
 
-        if ($admin_reply === "") {
+        if ($reply_text === "") {
 
             $_SESSION["admin_message_error"] =
                 "Please enter a reply.";
 
-        } elseif (strlen($admin_reply) < 2) {
+        } elseif (strlen($reply_text) < 2) {
 
             $_SESSION["admin_message_error"] =
                 "Reply must be at least 2 characters.";
 
-        } elseif (strlen($admin_reply) > 5000) {
+        } elseif (strlen($reply_text) > 5000) {
 
             $_SESSION["admin_message_error"] =
                 "Reply must not exceed 5000 characters.";
 
         } else {
 
-            /*
-             * Only allow replying to an existing message.
-             */
+            /* Confirm the thread exists first */
 
-            $stmt = $conn->prepare(
-                "UPDATE contact_messages
-                 SET
-                    admin_reply = ?,
-                    status = 'Replied',
-                    replied_at = NOW()
-                 WHERE message_id = ?"
+            $check_stmt = $conn->prepare(
+                "SELECT message_id FROM contact_messages WHERE message_id = ?"
             );
+            $check_stmt->bind_param("i", $message_id);
+            $check_stmt->execute();
+            $exists = $check_stmt->get_result()->num_rows > 0;
+            $check_stmt->close();
 
-            if (!$stmt) {
+            if (!$exists) {
 
                 $_SESSION["admin_message_error"] =
-                    "Something went wrong. Please try again.";
+                    "That conversation no longer exists.";
 
             } else {
 
-                $stmt->bind_param(
-                    "si",
-                    $admin_reply,
-                    $message_id
+                $conn->begin_transaction();
+
+                $insert_stmt = $conn->prepare(
+                    "INSERT INTO message_replies
+                        (message_id, sender_type, reply_text)
+                     VALUES (?, 'admin', ?)"
                 );
 
-                if ($stmt->execute()) {
+                $insert_stmt->bind_param("is", $message_id, $reply_text);
+                $insert_ok = $insert_stmt->execute();
+                $insert_stmt->close();
 
-                    if ($stmt->affected_rows >= 1) {
+                if ($insert_ok) {
 
-                        $_SESSION["admin_message_success"] =
-                            "Reply sent successfully.";
+                    $update_stmt = $conn->prepare(
+                        "UPDATE contact_messages
+                         SET status = 'Replied',
+                             replied_at = NOW()
+                         WHERE message_id = ?"
+                    );
 
-                    } else {
+                    $update_stmt->bind_param("i", $message_id);
+                    $update_stmt->execute();
+                    $update_stmt->close();
 
-                        $_SESSION["admin_message_error"] =
-                            "The message could not be updated.";
-                    }
+                    $conn->commit();
+
+                    $_SESSION["admin_message_success"] =
+                        "Reply sent successfully.";
 
                 } else {
+
+                    $conn->rollback();
 
                     $_SESSION["admin_message_error"] =
                         "Something went wrong. Please try again.";
                 }
-
-                $stmt->close();
             }
         }
     }
@@ -163,10 +172,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         } else {
 
-            $stmt->bind_param(
-                "i",
-                $message_id
-            );
+            $stmt->bind_param("i", $message_id);
 
             if ($stmt->execute()) {
 
@@ -192,61 +198,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 
 
-    /* =====================================
-       MARK AS REPLIED
-    ===================================== */
-
-    elseif ($action === "replied") {
-
-        $stmt = $conn->prepare(
-            "UPDATE contact_messages
-             SET
-                status = 'Replied',
-                replied_at = COALESCE(replied_at, NOW())
-             WHERE message_id = ?
-               AND status <> 'Replied'"
-        );
-
-        if (!$stmt) {
-
-            $_SESSION["admin_message_error"] =
-                "Something went wrong. Please try again.";
-
-        } else {
-
-            $stmt->bind_param(
-                "i",
-                $message_id
-            );
-
-            if ($stmt->execute()) {
-
-                if ($stmt->affected_rows === 1) {
-
-                    $_SESSION["admin_message_success"] =
-                        "Message marked as replied.";
-
-                } else {
-
-                    $_SESSION["admin_message_error"] =
-                        "The message could not be updated.";
-                }
-
-            } else {
-
-                $_SESSION["admin_message_error"] =
-                    "Something went wrong. Please try again.";
-            }
-
-            $stmt->close();
-        }
-    }
-
-
-    /* =====================================
-       REFRESH PAGE
-    ===================================== */
-
     header("Location: admin_messages.php");
     exit();
 }
@@ -264,30 +215,61 @@ unset($_SESSION["admin_message_error"]);
 
 
 /* =====================================
-   GET CUSTOMER MESSAGES
+   GET CONVERSATION THREADS
+   (ordered by most recent activity, so
+   threads with a new customer reply
+   bubble back to the top)
 ===================================== */
+
+$threads = [];
 
 $result = $conn->query(
     "SELECT
-        message_id,
-        name,
-        email,
-        subject,
-        message,
-        status,
-        admin_reply,
-        created_at,
-        replied_at
-     FROM contact_messages
-     ORDER BY created_at DESC"
+        cm.message_id,
+        cm.name,
+        cm.email,
+        cm.subject,
+        cm.message,
+        cm.status,
+        cm.created_at,
+        COALESCE(MAX(mr.created_at), cm.created_at) AS last_activity
+     FROM contact_messages cm
+     LEFT JOIN message_replies mr ON mr.message_id = cm.message_id
+     GROUP BY cm.message_id
+     ORDER BY last_activity DESC"
 );
 
-if (!$result) {
+if ($result) {
 
-    $result = false;
+    while ($row = $result->fetch_assoc()) {
+        $threads[] = $row;
+    }
 
-    if ($error === "") {
-        $error = "Unable to load customer messages.";
+} elseif ($error === "") {
+
+    $error = "Unable to load customer messages.";
+}
+
+
+/* =====================================
+   GET ALL REPLIES FOR EACH THREAD
+===================================== */
+
+$replies_by_message = [];
+
+if (!empty($threads)) {
+
+    $reply_result = $conn->query(
+        "SELECT message_id, sender_type, reply_text, created_at
+         FROM message_replies
+         ORDER BY created_at ASC"
+    );
+
+    if ($reply_result) {
+
+        while ($row = $reply_result->fetch_assoc()) {
+            $replies_by_message[$row["message_id"]][] = $row;
+        }
     }
 }
 
@@ -309,25 +291,10 @@ if (!$result) {
         Messages - Maturan's Art Cafe
     </title>
 
-    <link
-        rel="stylesheet"
-        href="Css/style.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="Css/admin.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="Css/admin_messages.css"
-    >
-
-    <link
-        rel="stylesheet"
-        href="Css/admin_dashboard.css"
-    >
+    <link rel="stylesheet" href="Css/style.css">
+    <link rel="stylesheet" href="Css/admin.css">
+    <link rel="stylesheet" href="Css/admin_messages.css">
+    <link rel="stylesheet" href="Css/admin_dashboard.css">
 
 </head>
 
@@ -343,336 +310,160 @@ if (!$result) {
 
             <header class="dash-topbar">
                 <div class="dash-admin-chip">
-                    <?php
-                        echo htmlspecialchars(
-                            $_SESSION["user_name"]
-                        );
-                    ?>
+                    <?php echo htmlspecialchars($_SESSION["user_name"]); ?>
                 </div>
             </header>
 
 
+            <main class="messages-page">
 
-    <!-- =====================================
-         CUSTOMER MESSAGES
-    ====================================== -->
 
-    <main class="messages-page">
-
-
-        <div class="messages-header">
-
-            <h1>
-                CUSTOMER
-                <span>MESSAGES.</span>
-            </h1>
-
-            <p>
-                Messages submitted through the Contact page.
-            </p>
-
-        </div>
-
-
-
-        <?php if (
-            $result &&
-            $result->num_rows > 0
-        ): ?>
-
-
-            <?php while (
-                $row = $result->fetch_assoc()
-            ): ?>
-
-
-                <div
-                    class="message-card
-                    <?php
-                    echo $row["status"] === "Unread"
-                        ? "unread"
-                        : "";
-                    ?>"
-                >
-
-
-                    <!-- MESSAGE HEADER -->
-
-                    <div class="message-top">
-
-                        <div class="message-subject">
-
-                            <?php
-                            echo htmlspecialchars(
-                                $row["subject"]
-                            );
-                            ?>
-
-                        </div>
-
-
-                        <div class="message-status">
-
-                            <?php
-                            echo htmlspecialchars(
-                                $row["status"]
-                            );
-                            ?>
-
-                        </div>
-
-                    </div>
-
-
-
-                    <!-- CUSTOMER INFORMATION -->
-
-                    <div class="message-info">
-
-
-                        <div>
-
-                            <strong>
-                                From:
-                            </strong>
-
-                            <?php
-                            echo htmlspecialchars(
-                                $row["name"]
-                            );
-                            ?>
-
-                        </div>
-
-
-                        <div>
-
-                            <strong>
-                                Email:
-                            </strong>
-
-                            <?php
-                            echo htmlspecialchars(
-                                $row["email"]
-                            );
-                            ?>
-
-                        </div>
-
-
-                        <div>
-
-                            <strong>
-                                Date:
-                            </strong>
-
-                            <?php
-                            echo htmlspecialchars(
-                                $row["created_at"]
-                            );
-                            ?>
-
-                        </div>
-
-
-                    </div>
-
-
-
-                    <!-- CUSTOMER MESSAGE -->
-
-                    <div class="message-body">
-
-                        <?php
-                        echo nl2br(
-                            htmlspecialchars(
-                                $row["message"]
-                            )
-                        );
-                        ?>
-
-                    </div>
-
-
-
-                    <!-- =================================
-                         ADMIN REPLY
-                    ================================== -->
-
-                    <?php if (
-                        !empty($row["admin_reply"])
-                    ): ?>
-
-                        <div class="admin-reply-display">
-
-                            <strong>
-                                ADMIN REPLY
-                            </strong>
-
-                            <p>
-
-                                <?php
-                                echo nl2br(
-                                    htmlspecialchars(
-                                        $row["admin_reply"]
-                                    )
-                                );
-                                ?>
-
-                            </p>
-
-                        </div>
-
-                    <?php endif; ?>
-
-
-
-                    <!-- =================================
-                         REPLY FORM
-                    ================================== -->
-
-                    <?php if (
-                        empty($row["admin_reply"])
-                    ): ?>
-
-                        <form
-                            method="POST"
-                            class="reply-form"
-                        >
-
-                            <input
-                                type="hidden"
-                                name="message_id"
-                                value="<?php
-                                echo $row["message_id"];
-                                ?>"
-                            >
-
-
-                            <input
-                                type="hidden"
-                                name="action"
-                                value="reply"
-                            >
-
-
-                            <textarea
-                                name="admin_reply"
-                                class="admin-reply-input"
-                                placeholder="Write your reply to this customer..."
-                                required
-                            ></textarea>
-
-
-                            <button
-                                type="submit"
-                                class="message-button"
-                            >
-                                SEND REPLY
-                            </button>
-
-                        </form>
-
-                    <?php endif; ?>
-
-
-
-                    <!-- =================================
-                         MESSAGE ACTIONS
-                    ================================== -->
-
-                    <div class="message-actions">
-
-
-                        <?php if (
-                            $row["status"] === "Unread"
-                        ): ?>
-
-                            <form method="POST">
-
-                                <input
-                                    type="hidden"
-                                    name="message_id"
-                                    value="<?php
-                                    echo $row["message_id"];
-                                    ?>"
-                                >
-
-                                <input
-                                    type="hidden"
-                                    name="action"
-                                    value="read"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="message-button secondary"
-                                >
-                                    MARK AS READ
-                                </button>
-
-                            </form>
-
-                        <?php endif; ?>
-
-
-
-                        <?php if (
-                            $row["status"] !== "Replied"
-                        ): ?>
-
-                            <form method="POST">
-
-                                <input
-                                    type="hidden"
-                                    name="message_id"
-                                    value="<?php
-                                    echo $row["message_id"];
-                                    ?>"
-                                >
-
-                                <input
-                                    type="hidden"
-                                    name="action"
-                                    value="replied"
-                                >
-
-                                <button
-                                    type="submit"
-                                    class="message-button secondary"
-                                >
-                                    MARK AS REPLIED
-                                </button>
-
-                            </form>
-
-                        <?php endif; ?>
-
-
-                    </div>
-
-
+                <div class="messages-header">
+                    <h1>CUSTOMER <span>MESSAGES.</span></h1>
+                    <p>Messages submitted through the Contact page.</p>
                 </div>
 
 
-            <?php endwhile; ?>
+                <?php if ($success !== ""): ?>
+                    <div class="admin-message success"><?php echo htmlspecialchars($success); ?></div>
+                <?php endif; ?>
+
+                <?php if ($error !== ""): ?>
+                    <div class="admin-message error"><?php echo htmlspecialchars($error); ?></div>
+                <?php endif; ?>
 
 
-        <?php else: ?>
+                <?php if (!empty($threads)): ?>
+
+                    <?php foreach ($threads as $thread): ?>
+
+                        <?php $mid = (int) $thread["message_id"]; ?>
+
+                        <div class="message-card<?php echo $thread["status"] === "Unread" ? " unread" : ""; ?>">
+
+                            <div class="message-top">
+                                <div class="message-subject">
+                                    <?php echo htmlspecialchars($thread["subject"]); ?>
+                                </div>
+
+                                <div class="message-status">
+                                    <?php echo htmlspecialchars($thread["status"]); ?>
+                                </div>
+                            </div>
 
 
-            <div class="no-messages">
-
-                No customer messages yet.
-
-            </div>
-
-
-        <?php endif; ?>
+                            <div class="message-info">
+                                <div><strong>From:</strong> <?php echo htmlspecialchars($thread["name"]); ?></div>
+                                <div><strong>Email:</strong> <?php echo htmlspecialchars($thread["email"]); ?></div>
+                                <div><strong>Started:</strong> <?php echo htmlspecialchars($thread["created_at"]); ?></div>
+                            </div>
 
 
-    </main>
+                            <!-- =================================
+                                 CONVERSATION THREAD
+                            ================================== -->
 
+                            <div class="conversation-thread">
+
+                                <!-- ORIGINAL CUSTOMER MESSAGE -->
+                                <div class="thread-bubble thread-customer">
+                                    <div class="thread-bubble-meta">
+                                        <?php echo htmlspecialchars($thread["name"]); ?>
+                                        &middot;
+                                        <?php echo date("M j, Y g:i A", strtotime($thread["created_at"])); ?>
+                                    </div>
+                                    <div class="thread-bubble-text">
+                                        <?php echo nl2br(htmlspecialchars($thread["message"])); ?>
+                                    </div>
+                                </div>
+
+                                <!-- ALL FOLLOW-UP REPLIES, IN ORDER -->
+                                <?php if (!empty($replies_by_message[$mid])): ?>
+
+                                    <?php foreach ($replies_by_message[$mid] as $reply): ?>
+
+                                        <?php $is_admin = $reply["sender_type"] === "admin"; ?>
+
+                                        <div class="thread-bubble <?php echo $is_admin ? 'thread-admin' : 'thread-customer'; ?>">
+                                            <div class="thread-bubble-meta">
+                                                <?php echo $is_admin ? "Maturan's Art Cafe (You)" : htmlspecialchars($thread["name"]); ?>
+                                                &middot;
+                                                <?php echo date("M j, Y g:i A", strtotime($reply["created_at"])); ?>
+                                            </div>
+                                            <div class="thread-bubble-text">
+                                                <?php echo nl2br(htmlspecialchars($reply["reply_text"])); ?>
+                                            </div>
+                                        </div>
+
+                                    <?php endforeach; ?>
+
+                                <?php endif; ?>
+
+                            </div>
+
+
+                            <!-- =================================
+                                 ALWAYS-AVAILABLE REPLY FORM
+                            ================================== -->
+
+                            <form method="POST" class="reply-form">
+
+                                <input type="hidden" name="message_id" value="<?php echo $mid; ?>">
+                                <input type="hidden" name="action" value="reply">
+
+                                <textarea
+                                    name="admin_reply"
+                                    class="admin-reply-input"
+                                    placeholder="Write a reply..."
+                                    required
+                                ></textarea>
+
+                                <button type="submit" class="message-button">
+                                    SEND REPLY
+                                </button>
+
+                            </form>
+
+
+                            <!-- =================================
+                                 MESSAGE ACTIONS
+                            ================================== -->
+
+                            <?php if ($thread["status"] === "Unread"): ?>
+
+                                <div class="message-actions">
+
+                                    <form method="POST">
+                                        <input type="hidden" name="message_id" value="<?php echo $mid; ?>">
+                                        <input type="hidden" name="action" value="read">
+
+                                        <button type="submit" class="message-button secondary">
+                                            MARK AS READ
+                                        </button>
+                                    </form>
+
+                                </div>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                    <?php endforeach; ?>
+
+                <?php else: ?>
+
+                    <div class="no-messages">
+                        No customer messages yet.
+                    </div>
+
+                <?php endif; ?>
+
+
+            </main>
+
+        </main>
+
+    </div>
 
     <script src="JS/script.js"></script>
 

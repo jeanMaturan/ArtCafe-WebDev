@@ -252,3 +252,13 @@
 .logged-user strong {
     color: var(--orange);
 }
+.tables-left-msg {
+    margin: 6px 0 0;
+    font-size: 12px;
+    color: var(--dark-text);
+}
+
+.tables-left-msg.tables-left-warning {
+    color: #c0392b;
+    font-weight: bold;
+}

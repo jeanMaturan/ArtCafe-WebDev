@@ -144,3 +144,66 @@
 .admin-reply-input::placeholder {
     color: #999999;
 }
+
+/* ===== CONVERSATION THREAD ===== */
+
+.conversation-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.thread-bubble {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.6;
+}
+
+.thread-bubble-meta {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #8a7566;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.thread-bubble-text {
+    color: var(--dark-text);
+    white-space: pre-wrap;
+}
+
+.thread-customer {
+    align-self: flex-start;
+    background: var(--pink);
+    border-top-left-radius: 2px;
+}
+
+.thread-admin {
+    align-self: flex-end;
+    background: #fff3e6;
+    border-top-right-radius: 2px;
+}
+
+
+/* ===== ADMIN MESSAGE ALERTS ===== */
+
+.admin-message {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.admin-message.success {
+    background: #e6f7ec;
+    color: #1e7a3d;
+}
+
+.admin-message.error {
+    background: #fdeceb;
+    color: #b3261e;
+}

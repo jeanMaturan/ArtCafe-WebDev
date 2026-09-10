@@ -2,6 +2,7 @@
 
 session_start();
 require_once "db.php";
+require_once "reservation_config.php";
 
 
 /* =========================
@@ -135,55 +136,94 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     /* =========================
+       CHECK TABLE AVAILABILITY
+    ========================= */
+
+    elseif (
+        (count_tables_used_in_slot($conn, $date, $time) + tables_needed_for_guests($guests))
+        > MAX_TABLES
+    ) {
+
+        $error = "Sorry, that time slot doesn't have enough tables for your party size. Please choose another date, time, or a smaller group.";
+
+    }
+
+
+    /* =========================
        INSERT RESERVATION
     ========================= */
 
     else {
 
-        $stmt = $conn->prepare(
-            "INSERT INTO reservations
-            (
-                user_id,
-                reservation_name,
-                reservation_phone,
-                reservation_date,
-                reservation_time,
-                guests
-            )
-            VALUES (?, ?, ?, ?, ?, ?)"
-        );
+        /* Re-check capacity inside a transaction right before
+           inserting, so two people submitting at the same
+           instant can't both slip past the check above. */
 
+        $conn->begin_transaction();
 
-        if (!$stmt) {
+        $tables_needed = tables_needed_for_guests($guests);
 
-            $error = "Unable to process your reservation.";
+        $tables_used = count_tables_used_in_slot($conn, $date, $time);
+
+        if (($tables_used + $tables_needed) > MAX_TABLES) {
+
+            $conn->rollback();
+
+            $error = "Sorry, that time slot just filled up for a party your size. Please choose another date, time, or a smaller group.";
 
         } else {
 
-            $stmt->bind_param(
-                "issssi",
-                $user_id,
-                $name,
-                $phone,
-                $date,
-                $time,
-                $guests
+            $stmt = $conn->prepare(
+                "INSERT INTO reservations
+                (
+                    user_id,
+                    reservation_name,
+                    reservation_phone,
+                    reservation_date,
+                    reservation_time,
+                    guests
+                )
+                VALUES (?, ?, ?, ?, ?, ?)"
             );
 
 
-            if ($stmt->execute()) {
+            if (!$stmt) {
 
-                $message =
-                    "Your table has been reserved successfully!";
+                $conn->rollback();
+
+                $error = "Unable to process your reservation.";
 
             } else {
 
-                $error =
-                    "Unable to save your reservation. Please try again.";
+                $stmt->bind_param(
+                    "issssi",
+                    $user_id,
+                    $name,
+                    $phone,
+                    $date,
+                    $time,
+                    $guests
+                );
+
+
+                if ($stmt->execute()) {
+
+                    $conn->commit();
+
+                    $message =
+                        "Your table has been reserved successfully!";
+
+                } else {
+
+                    $conn->rollback();
+
+                    $error =
+                        "Unable to save your reservation. Please try again.";
+                }
+
+
+                $stmt->close();
             }
-
-
-            $stmt->close();
         }
     }
 }
@@ -297,24 +337,6 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <form
     class="reservation-form"
     method="POST"
->
-
-    <?php if (!empty($message)): ?>
-
-        <p class="login-success">
-            <?= htmlspecialchars($message) ?>
-        </p>
-
-    <?php endif; ?>
-
-
-    <?php if (!empty($error)): ?>
-
-        <p class="login-error">
-            <?= htmlspecialchars($error) ?>
-        </p>
-
-    <?php endif; ?>
 
 
     <!-- NAME + PHONE -->
@@ -397,6 +419,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     required
                 >
 
+                <p id="tables-left-msg" class="tables-left-msg"></p>
+
             </div>
 
         </div>
@@ -410,6 +434,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             <label for="guests">
                 NUMBER OF GUESTS
             </label>
+
+            <p class="guests-hint">
+                Each table seats 4 — larger groups may be split across
+                a couple of tables so everyone has a seat.
+            </p>
 
 
             <select
@@ -472,6 +501,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <button
             type="submit"
+            id="reservation-submit-btn"
             class="reservation-submit"
         >
             RESERVE NOW
@@ -488,6 +518,101 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 ========================= -->
 
 <?php include "footer.php"; ?>
+
+
+<!-- =========================
+     LIVE "TABLES LEFT" CHECK
+========================= -->
+
+<script>
+(function () {
+
+    const dateInput = document.getElementById("date");
+    const timeInput = document.getElementById("time");
+    const guestsInput = document.getElementById("guests");
+    const msgEl = document.getElementById("tables-left-msg");
+    const submitBtn = document.getElementById("reservation-submit-btn");
+
+    async function checkAvailability() {
+
+        const date = dateInput.value;
+        const time = timeInput.value;
+        const guests = guestsInput.value;
+
+        if (!date || !time) {
+            msgEl.textContent = "";
+            submitBtn.disabled = false;
+            return;
+        }
+
+        msgEl.textContent = "Checking availability...";
+        msgEl.classList.remove("tables-left-warning");
+
+        try {
+
+            let url =
+                "check_availability.php?date=" +
+                encodeURIComponent(date) +
+                "&time=" +
+                encodeURIComponent(time);
+
+            if (guests) {
+                url += "&guests=" + encodeURIComponent(guests);
+            }
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (!response.ok || data.error) {
+                msgEl.textContent = "";
+                submitBtn.disabled = false;
+                return;
+            }
+
+            if (!data.fits) {
+
+                if (guests && data.tables_needed > 1) {
+
+                    msgEl.textContent =
+                        "Your group needs " + data.tables_needed +
+                        " tables, but only " + data.tables_left +
+                        " of " + data.max_tables + " are left for this time.";
+
+                } else {
+
+                    msgEl.textContent =
+                        "This time slot is fully booked. Please choose another date or time.";
+                }
+
+                msgEl.classList.add("tables-left-warning");
+                submitBtn.disabled = true;
+
+            } else {
+
+                let text =
+                    data.tables_left + " of " + data.max_tables + " tables left for this time.";
+
+                if (guests && data.tables_needed > 1) {
+                    text += " Your group will need " + data.tables_needed + " tables.";
+                }
+
+                msgEl.textContent = text;
+                submitBtn.disabled = false;
+            }
+
+        } catch (err) {
+
+            msgEl.textContent = "";
+            submitBtn.disabled = false;
+        }
+    }
+
+    dateInput.addEventListener("change", checkAvailability);
+    timeInput.addEventListener("change", checkAvailability);
+    guestsInput.addEventListener("change", checkAvailability);
+
+})();
+</script>
 
 </body>
 

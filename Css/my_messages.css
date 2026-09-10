@@ -1,4 +1,4 @@
- .my-messages-page {
+.my-messages-page {
             min-height: 80vh;
             padding: 60px 8%;
             background: #f8f3ee;
@@ -120,3 +120,112 @@
                 align-items: flex-start;
             }
         }
+
+/* ===== CONVERSATION THREAD ===== */
+
+.conversation-thread {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.thread-bubble {
+    max-width: 85%;
+    padding: 12px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.thread-bubble-meta {
+    font-size: 10px;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+    color: #8a7566;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+}
+
+.thread-bubble-text {
+    color: var(--dark-text);
+    white-space: pre-wrap;
+}
+
+.thread-mine {
+    align-self: flex-end;
+    background: #fff3e6;
+    border-top-right-radius: 2px;
+}
+
+.thread-cafe {
+    align-self: flex-start;
+    background: var(--pink);
+    border-left: 4px solid var(--orange);
+    border-top-left-radius: 2px;
+}
+
+
+/* ===== REPLY FORM ===== */
+
+.my-reply-form {
+    margin-top: 10px;
+}
+
+.my-reply-input {
+    width: 100%;
+    min-height: 80px;
+    padding: 12px 14px;
+    border: 1px solid #d8c7ba;
+    border-radius: 8px;
+    background: var(--white);
+    color: var(--dark-text);
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+    resize: vertical;
+    outline: none;
+    margin-bottom: 10px;
+    box-sizing: border-box;
+}
+
+.my-reply-input:focus {
+    border-color: var(--orange);
+}
+
+.my-reply-button {
+    padding: 9px 20px;
+    border: none;
+    border-radius: 6px;
+    background: var(--orange);
+    color: var(--white);
+    font-size: 11px;
+    font-weight: bold;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.my-reply-button:hover {
+    background: var(--orange-dark);
+}
+
+
+/* ===== ALERTS ===== */
+
+.my-message-alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    margin-bottom: 20px;
+}
+
+.my-message-alert.success {
+    background: #e6f7ec;
+    color: #1e7a3d;
+}
+
+.my-message-alert.error {
+    background: #fdeceb;
+    color: #b3261e;
+}

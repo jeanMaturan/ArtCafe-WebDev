@@ -231,11 +231,11 @@ if ($result) {
    past date still shows up if you switch filters.
 ===================================== */
 
-$slot_counts = [];      // "date|slot_start" => count of reservations
+$slot_counts = [];      // "date|slot_start" => tables used (accounts for party size)
 $reservation_slot = []; // reservation_id => "date|slot_start"
 
 $slot_result = $conn->query(
-    "SELECT reservation_id, reservation_date, reservation_time
+    "SELECT reservation_id, reservation_date, reservation_time, guests
      FROM reservations
      WHERE status IN ('Pending', 'Seated')"
 );
@@ -247,7 +247,9 @@ if ($slot_result) {
         $slot_start = get_slot_start($row["reservation_time"]);
         $key = $row["reservation_date"] . "|" . $slot_start;
 
-        $slot_counts[$key] = ($slot_counts[$key] ?? 0) + 1;
+        $tables_for_this_reservation = tables_needed_for_guests((int) $row["guests"]);
+
+        $slot_counts[$key] = ($slot_counts[$key] ?? 0) + $tables_for_this_reservation;
         $reservation_slot[$row["reservation_id"]] = $key;
     }
 }
@@ -255,6 +257,41 @@ if ($slot_result) {
 $conflict_slots = array_filter(
     $slot_counts,
     fn($count) => $count > MAX_TABLES
+);
+
+
+/* =====================================
+   AVAILABILITY SUMMARY (UPCOMING SLOTS)
+
+   Shows, for every slot from today onward that
+   has at least one active reservation, how many
+   tables are booked and how many are still left.
+===================================== */
+
+$today = date("Y-m-d");
+
+$availability_slots = [];
+
+foreach ($slot_counts as $key => $count) {
+
+    [$slot_date, $slot_time] = explode("|", $key);
+
+    if ($slot_date < $today) {
+        continue;
+    }
+
+    $availability_slots[] = [
+        "date" => $slot_date,
+        "time" => $slot_time,
+        "booked" => $count,
+        "left" => max(0, MAX_TABLES - $count),
+    ];
+}
+
+usort(
+    $availability_slots,
+    fn($a, $b) =>
+        [$a["date"], $a["time"]] <=> [$b["date"], $b["time"]]
 );
 
 ?>
@@ -299,8 +336,72 @@ $conflict_slots = array_filter(
                     <p>View and manage all table reservations.</p>
                     <p class="capacity-note">
                         Table capacity: <strong><?php echo MAX_TABLES; ?> tables</strong>
-                        per <?php echo SLOT_MINUTES; ?>-minute slot.
+                        per <?php echo SLOT_MINUTES; ?>-minute slot
+                        (<?php echo GUESTS_PER_TABLE; ?> guests per table —
+                        larger parties use more than one table).
                     </p>
+                </div>
+
+
+                <!-- =====================================
+                     AVAILABILITY BY TIME SLOT
+                ===================================== -->
+
+                <div class="availability-summary">
+
+                    <h3>Availability by Time Slot</h3>
+
+                    <?php if (empty($availability_slots)): ?>
+
+                        <p class="availability-empty">
+                            No upcoming reservations yet —
+                            all <?php echo MAX_TABLES; ?> tables are open
+                            for every slot.
+                        </p>
+
+                    <?php else: ?>
+
+                        <div class="availability-table">
+
+                            <div class="availability-row availability-head">
+                                <span>Date</span>
+                                <span>Time</span>
+                                <span>Booked</span>
+                                <span>Tables Left</span>
+                            </div>
+
+                            <?php foreach ($availability_slots as $slot): ?>
+
+                                <div class="availability-row<?php echo $slot['left'] === 0 ? ' availability-full' : ''; ?>">
+
+                                    <span>
+                                        <?php echo date("F j, Y", strtotime($slot["date"])); ?>
+                                    </span>
+
+                                    <span>
+                                        <?php echo date("g:i A", strtotime($slot["time"])); ?>
+                                    </span>
+
+                                    <span>
+                                        <?php echo $slot["booked"]; ?> / <?php echo MAX_TABLES; ?>
+                                    </span>
+
+                                    <span class="availability-left-value">
+                                        <?php if ($slot["left"] === 0): ?>
+                                            FULL
+                                        <?php else: ?>
+                                            <?php echo $slot["left"]; ?> left
+                                        <?php endif; ?>
+                                    </span>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    <?php endif; ?>
+
                 </div>
 
 
