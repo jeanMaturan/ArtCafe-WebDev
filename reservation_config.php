@@ -18,6 +18,26 @@ if (!defined("GUESTS_PER_TABLE")) {
 }
 
 
+/* =========================
+   RESERVATION PAYMENT
+========================= */
+
+/* Reservation fee charged per guest, in PHP. */
+if (!defined("RESERVATION_FEE_PER_GUEST")) {
+    define("RESERVATION_FEE_PER_GUEST", 150);
+}
+
+/* What percentage of the total fee counts as a downpayment. */
+if (!defined("DOWNPAYMENT_PERCENT")) {
+    define("DOWNPAYMENT_PERCENT", 50);
+}
+
+/* The only payment types a reservation may be saved with. */
+if (!defined("VALID_PAYMENT_TYPES")) {
+    define("VALID_PAYMENT_TYPES", ["Downpayment", "Full"]);
+}
+
+
 /**
  * How many tables a party of this size needs.
  * A table seats GUESTS_PER_TABLE guests, so parties
@@ -32,6 +52,38 @@ function tables_needed_for_guests(int $guests): int
     }
 
     return (int) ceil($guests / GUESTS_PER_TABLE);
+}
+
+
+/**
+ * The total reservation fee for a party of this size,
+ * before any downpayment discount is applied.
+ */
+function total_reservation_fee(int $guests): float
+{
+    if ($guests < 1) {
+        return 0;
+    }
+
+    return $guests * RESERVATION_FEE_PER_GUEST;
+}
+
+
+/**
+ * The amount actually due for a given payment type.
+ * "Downpayment" is DOWNPAYMENT_PERCENT of the total fee;
+ * "Full" is the whole fee. Computed server-side so the
+ * amount can't be tampered with client-side.
+ */
+function calculate_payment_amount(int $guests, string $payment_type): float
+{
+    $total = total_reservation_fee($guests);
+
+    if ($payment_type === "Downpayment") {
+        return round($total * (DOWNPAYMENT_PERCENT / 100), 2);
+    }
+
+    return round($total, 2);
 }
 
 function expire_stale_reservations(mysqli $conn): void

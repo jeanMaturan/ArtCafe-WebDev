@@ -63,6 +63,26 @@
 }
 
 
+/* ===== PAYMENT INFO ===== */
+
+.payment-detail {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.payment-badge-downpayment {
+    background-color: #fff3e6;
+    color: #a1461f;
+}
+
+.payment-badge-full {
+    background-color: #e6f7ec;
+    color: #1e7a3d;
+}
+
+
 /* ===== CAPACITY NOTE ===== */
 
 .capacity-note {

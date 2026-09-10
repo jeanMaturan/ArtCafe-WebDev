@@ -243,6 +243,9 @@ $sql = "SELECT
             r.reservation_time,
             r.guests,
             r.status,
+            r.payment_type,
+            r.payment_amount,
+            r.payment_reference,
             u.email AS user_email
         FROM reservations r
         LEFT JOIN users u ON u.user_id = r.user_id
@@ -569,6 +572,20 @@ usort(
                                             </span>
                                         <?php endif; ?>
                                     </div>
+
+                                    <?php if (!empty($r["payment_type"])): ?>
+                                        <div class="artist-detail payment-detail">
+                                            <strong>Payment:</strong>
+                                            <span class="artist-status payment-badge-<?php echo strtolower($r["payment_type"]); ?>">
+                                                <?php echo htmlspecialchars($r["payment_type"]); ?>
+                                            </span>
+                                            ₱<?php echo number_format((float) $r["payment_amount"], 2); ?>
+                                            <?php if (!empty($r["payment_reference"])): ?>
+                                                — Ref#
+                                                <?php echo htmlspecialchars($r["payment_reference"]); ?>
+                                            <?php endif; ?>
+                                        </div>
+                                    <?php endif; ?>
 
                                     <div class="artist-detail">
                                         <strong>Date:</strong>

@@ -46,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         "guests",
         FILTER_VALIDATE_INT
     );
+    $payment_type = trim($_POST["payment_type"] ?? "");
+    $payment_reference = trim($_POST["payment_reference"] ?? "");
 
 
     /* =========================
@@ -58,7 +60,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $date === "" ||
         $time === "" ||
         $guests === false ||
-        $guests === null
+        $guests === null ||
+        $payment_type === "" ||
+        $payment_reference === ""
     ) {
 
         $error = "Please complete all required fields.";
@@ -95,6 +99,30 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif ($guests < 1 || $guests > 10) {
 
         $error = "Number of guests must be between 1 and 10.";
+
+    }
+
+
+    /* =========================
+       VALIDATE PAYMENT TYPE
+    ========================= */
+
+    elseif (!in_array($payment_type, VALID_PAYMENT_TYPES, true)) {
+
+        $error = "Please choose a valid payment option.";
+
+    }
+
+
+    /* =========================
+       VALIDATE PAYMENT REFERENCE NUMBER
+    ========================= */
+
+    elseif (
+        !preg_match("/^[A-Za-z0-9\-\_ ]{4,50}$/", $payment_reference)
+    ) {
+
+        $error = "Please enter a valid payment reference number (4-50 characters).";
 
     }
 
@@ -176,6 +204,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         } else {
 
+            /* Amount due is computed server-side from the guest
+               count and payment type -- never trust a client-posted
+               amount. */
+            $payment_amount = calculate_payment_amount($guests, $payment_type);
+
             $stmt = $conn->prepare(
                 "INSERT INTO reservations
                 (
@@ -184,9 +217,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     reservation_phone,
                     reservation_date,
                     reservation_time,
-                    guests
+                    guests,
+                    payment_type,
+                    payment_amount,
+                    payment_reference
                 )
-                VALUES (?, ?, ?, ?, ?, ?)"
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
             );
 
 
@@ -199,13 +235,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             } else {
 
                 $stmt->bind_param(
-                    "issssi",
+                    "issssisds",
                     $user_id,
                     $name,
                     $phone,
                     $date,
                     $time,
-                    $guests
+                    $guests,
+                    $payment_type,
+                    $payment_amount,
+                    $payment_reference
                 );
 
 
@@ -214,7 +253,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     $conn->commit();
 
                     $message =
-                        "Your table has been reserved successfully!";
+                        "Your table has been reserved successfully! " .
+                        ($payment_type === "Downpayment" ? "Downpayment" : "Full payment") .
+                        " of ₱" . number_format($payment_amount, 2) .
+                        " (Ref# " . $payment_reference . ") received.";
 
                 } else {
 
@@ -340,7 +382,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <form
     class="reservation-form"
     method="POST"
-
+    >
 
     <!-- NAME + PHONE -->
 
@@ -500,6 +542,68 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
 
+        <!-- PAYMENT -->
+
+        <div class="form-row">
+
+            <div class="form-group">
+
+                <label for="payment_type">
+                    PAYMENT
+                </label>
+
+                <select
+                    id="payment_type"
+                    name="payment_type"
+                    required
+                >
+
+                    <option value="">
+                        Select payment option
+                    </option>
+
+                    <option value="Downpayment">
+                        Downpayment (<?= DOWNPAYMENT_PERCENT ?>%)
+                    </option>
+
+                    <option value="Full">
+                        Full Payment
+                    </option>
+
+                </select>
+
+                <p id="payment-amount-msg" class="form-hint">
+                    Select number of guests and a payment option to see the amount due.
+                </p>
+
+            </div>
+
+            <div class="form-group">
+
+                <label for="payment_reference">
+                    PAYMENT REFERENCE NUMBER
+                </label>
+
+                <input
+                    type="text"
+                    id="payment_reference"
+                    name="payment_reference"
+                    placeholder="GCash / bank transfer reference no."
+                    maxlength="50"
+                    required
+                >
+
+                <p class="form-hint">
+                    Please pay via GCash/bank transfer first, then enter the
+                    reference number shown on your receipt.
+                </p>
+
+            </div>
+
+        </div>
+
+
+
         <!-- SUBMIT -->
 
         <button
@@ -530,11 +634,47 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <script>
 (function () {
 
+    const FEE_PER_GUEST = <?= (int) RESERVATION_FEE_PER_GUEST ?>;
+    const DOWNPAYMENT_PERCENT = <?= (int) DOWNPAYMENT_PERCENT ?>;
+
     const dateInput = document.getElementById("date");
     const timeInput = document.getElementById("time");
     const guestsInput = document.getElementById("guests");
     const msgEl = document.getElementById("tables-left-msg");
     const submitBtn = document.getElementById("reservation-submit-btn");
+
+    const paymentTypeInput = document.getElementById("payment_type");
+    const paymentAmountMsgEl = document.getElementById("payment-amount-msg");
+
+    function formatPeso(amount) {
+        return "₱" + amount.toLocaleString("en-PH", {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
+    }
+
+    function updatePaymentAmount() {
+
+        const guests = parseInt(guestsInput.value, 10);
+        const paymentType = paymentTypeInput.value;
+
+        if (!guests || !paymentType) {
+            paymentAmountMsgEl.textContent =
+                "Select number of guests and a payment option to see the amount due.";
+            return;
+        }
+
+        const total = guests * FEE_PER_GUEST;
+        const amount = paymentType === "Downpayment"
+            ? total * (DOWNPAYMENT_PERCENT / 100)
+            : total;
+
+        paymentAmountMsgEl.textContent =
+            "Amount due (" + paymentType + "): " + formatPeso(amount);
+    }
+
+    guestsInput.addEventListener("change", updatePaymentAmount);
+    paymentTypeInput.addEventListener("change", updatePaymentAmount);
 
     async function checkAvailability() {
 
