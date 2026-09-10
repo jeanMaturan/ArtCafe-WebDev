@@ -229,3 +229,211 @@
     background: #fdeceb;
     color: #b3261e;
 }
+
+/* ===== MESSENGER-STYLE INBOX ===== */
+
+.msgr-app {
+    display: flex;
+    align-items: stretch;
+    height: 640px;
+    max-height: 75vh;
+    background: var(--white);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.msgr-list {
+    width: 340px;
+    flex-shrink: 0;
+    border-right: 1px solid #eee0d6;
+    overflow-y: auto;
+}
+
+.msgr-list-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid #f2e8dd;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+.msgr-list-item:hover {
+    background: #fbf5ef;
+}
+
+.msgr-list-item.active {
+    background: var(--pink);
+}
+
+.msgr-unread-dot {
+    flex-shrink: 0;
+    width: 9px;
+    height: 9px;
+    margin-top: 5px;
+    border-radius: 50%;
+    background: var(--orange);
+    visibility: hidden;
+}
+
+.msgr-list-item.unread .msgr-unread-dot {
+    visibility: visible;
+}
+
+.msgr-item-body {
+    min-width: 0;
+    flex: 1;
+}
+
+.msgr-item-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+}
+
+.msgr-item-subject {
+    color: var(--brown);
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.msgr-item-time {
+    flex-shrink: 0;
+    color: #999;
+    font-size: 10px;
+}
+
+.msgr-item-preview {
+    margin-top: 4px;
+    color: #8f8175;
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.msgr-list-item.unread .msgr-item-subject {
+    color: var(--dark);
+}
+
+.msgr-list-item.unread .msgr-item-preview {
+    color: var(--dark-text);
+    font-weight: bold;
+}
+
+.msgr-view {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.msgr-placeholder {
+    display: none;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+    color: #aa9a8c;
+    font-size: 13px;
+    text-align: center;
+    padding: 20px;
+}
+
+.msgr-placeholder.active {
+    display: flex;
+}
+
+.msgr-panel {
+    display: none;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    padding: 20px 24px;
+    overflow-y: auto;
+}
+
+.msgr-panel.active {
+    display: flex;
+}
+
+.msgr-panel-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 14px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #f2e8dd;
+}
+
+.msgr-back-btn {
+    display: none;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 50%;
+    background: var(--pink);
+    color: var(--brown);
+    font-size: 18px;
+    line-height: 1;
+    cursor: pointer;
+}
+
+.msgr-panel-heading {
+    flex: 1;
+    min-width: 0;
+}
+
+.msgr-panel-subject {
+    color: var(--brown);
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.msgr-panel-meta {
+    margin-top: 3px;
+    color: #8a7566;
+    font-size: 11px;
+}
+
+.msgr-panel .conversation-thread {
+    flex: 1;
+}
+
+@media (max-width: 860px) {
+
+    .msgr-app {
+        height: auto;
+        max-height: none;
+        flex-direction: column;
+    }
+
+    .msgr-list {
+        width: 100%;
+        border-right: none;
+        max-height: 70vh;
+    }
+
+    .msgr-view {
+        display: none;
+    }
+
+    .msgr-app.chat-open .msgr-list {
+        display: none;
+    }
+
+    .msgr-app.chat-open .msgr-view {
+        display: flex;
+    }
+
+    .msgr-back-btn {
+        display: inline-block;
+    }
+}

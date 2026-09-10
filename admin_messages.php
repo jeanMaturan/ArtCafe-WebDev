@@ -29,6 +29,15 @@ $admin_id = (int) $_SESSION["user_id"];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
+    /* A background "mark as read" call fired when the admin
+       opens a conversation, messenger-style. It should not
+       redirect or leave a banner for the next real page view. */
+
+    $is_ajax = (
+        isset($_SERVER["HTTP_X_REQUESTED_WITH"]) &&
+        strtolower($_SERVER["HTTP_X_REQUESTED_WITH"]) === "xmlhttprequest"
+    );
+
     $action = trim($_POST["action"] ?? "");
 
     $message_id = filter_input(
@@ -48,6 +57,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         $message_id <= 0
     ) {
 
+        if ($is_ajax) {
+            http_response_code(400);
+            exit();
+        }
+
         $_SESSION["admin_message_error"] = "Invalid message.";
 
         header("Location: admin_messages.php");
@@ -56,6 +70,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     if (!in_array($action, ["reply", "read"], true)) {
+
+        if ($is_ajax) {
+            http_response_code(400);
+            exit();
+        }
 
         $_SESSION["admin_message_error"] = "Invalid action.";
 
@@ -165,35 +184,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                AND status = 'Unread'"
         );
 
-        if (!$stmt) {
+        $read_ok = false;
+        $rows_changed = 0;
 
-            $_SESSION["admin_message_error"] =
-                "Something went wrong. Please try again.";
-
-        } else {
+        if ($stmt) {
 
             $stmt->bind_param("i", $message_id);
 
             if ($stmt->execute()) {
-
-                if ($stmt->affected_rows === 1) {
-
-                    $_SESSION["admin_message_success"] =
-                        "Message marked as read.";
-
-                } else {
-
-                    $_SESSION["admin_message_error"] =
-                        "The message could not be updated.";
-                }
-
-            } else {
-
-                $_SESSION["admin_message_error"] =
-                    "Something went wrong. Please try again.";
+                $read_ok = true;
+                $rows_changed = $stmt->affected_rows;
             }
 
             $stmt->close();
+        }
+
+        /* Opening a conversation fires this in the background --
+           just acknowledge it and stop, no redirect or banner. */
+
+        if ($is_ajax) {
+
+            http_response_code($read_ok ? 200 : 500);
+            exit();
+        }
+
+        if ($read_ok && $rows_changed === 1) {
+
+            $_SESSION["admin_message_success"] =
+                "Message marked as read.";
+
+        } elseif ($read_ok) {
+
+            $_SESSION["admin_message_error"] =
+                "The message could not be updated.";
+
+        } else {
+
+            $_SESSION["admin_message_error"] =
+                "Something went wrong. Please try again.";
         }
     }
 
@@ -273,6 +301,39 @@ if (!empty($threads)) {
     }
 }
 
+
+/* =====================================
+   BUILD INBOX PREVIEWS
+   (last message in each thread, plus a
+   running count of unread threads)
+===================================== */
+
+$unread_count = 0;
+
+foreach ($threads as &$t) {
+
+    $mid = (int) $t["message_id"];
+
+    if ($t["status"] === "Unread") {
+        $unread_count++;
+    }
+
+    if (!empty($replies_by_message[$mid])) {
+
+        $last_reply = end($replies_by_message[$mid]);
+
+        $t["preview_is_admin"] = $last_reply["sender_type"] === "admin";
+        $t["preview_text"] = $last_reply["reply_text"];
+
+    } else {
+
+        $t["preview_is_admin"] = false;
+        $t["preview_text"] = $t["message"];
+    }
+}
+
+unset($t);
+
 ?>
 
 <!DOCTYPE html>
@@ -321,6 +382,12 @@ if (!empty($threads)) {
                 <div class="messages-header">
                     <h1>CUSTOMER <span>MESSAGES.</span></h1>
                     <p>Messages submitted through the Contact page.</p>
+
+                    <span
+                        class="msgr-unread-badge"
+                        data-count="<?php echo $unread_count; ?>"
+                        style="<?php echo $unread_count > 0 ? '' : 'display:none;'; ?>"
+                    ><?php echo $unread_count; ?> unread</span>
                 </div>
 
 
@@ -335,120 +402,150 @@ if (!empty($threads)) {
 
                 <?php if (!empty($threads)): ?>
 
-                    <?php foreach ($threads as $thread): ?>
+                    <div class="msgr-app" data-mode="admin">
 
-                        <?php $mid = (int) $thread["message_id"]; ?>
+                        <!-- =================================
+                             CONVERSATION LIST
+                        ================================== -->
 
-                        <div class="message-card<?php echo $thread["status"] === "Unread" ? " unread" : ""; ?>">
+                        <div class="msgr-list">
 
-                            <div class="message-top">
-                                <div class="message-subject">
-                                    <?php echo htmlspecialchars($thread["subject"]); ?>
+                            <?php foreach ($threads as $thread): ?>
+
+                                <?php $mid = (int) $thread["message_id"]; ?>
+
+                                <div
+                                    class="msgr-list-item<?php echo $thread["status"] === "Unread" ? " unread" : ""; ?>"
+                                    data-message-id="<?php echo $mid; ?>"
+                                >
+
+                                    <span class="msgr-unread-dot"></span>
+
+                                    <div class="msgr-item-body">
+
+                                        <div class="msgr-item-top">
+                                            <span class="msgr-item-subject"><?php echo htmlspecialchars($thread["subject"]); ?></span>
+                                            <span class="msgr-item-time"><?php echo date("M j", strtotime($thread["last_activity"])); ?></span>
+                                        </div>
+
+                                        <div class="msgr-item-from">
+                                            <?php echo htmlspecialchars($thread["name"]); ?>
+                                        </div>
+
+                                        <div class="msgr-item-preview">
+                                            <?php echo $thread["preview_is_admin"] ? "You: " : ""; ?><?php echo htmlspecialchars(mb_strimwidth($thread["preview_text"], 0, 70, "…")); ?>
+                                        </div>
+
+                                    </div>
+
                                 </div>
 
-                                <div class="message-status">
-                                    <?php echo htmlspecialchars($thread["status"]); ?>
-                                </div>
+                            <?php endforeach; ?>
+
+                        </div>
+
+
+                        <!-- =================================
+                             CONVERSATION VIEW
+                        ================================== -->
+
+                        <div class="msgr-view">
+
+                            <div class="msgr-placeholder active">
+                                <p>Select a conversation to view messages</p>
                             </div>
 
+                            <?php foreach ($threads as $thread): ?>
 
-                            <div class="message-info">
-                                <div><strong>From:</strong> <?php echo htmlspecialchars($thread["name"]); ?></div>
-                                <div><strong>Email:</strong> <?php echo htmlspecialchars($thread["email"]); ?></div>
-                                <div><strong>Started:</strong> <?php echo htmlspecialchars($thread["created_at"]); ?></div>
-                            </div>
+                                <?php $mid = (int) $thread["message_id"]; ?>
 
+                                <div class="msgr-panel" data-message-id="<?php echo $mid; ?>">
 
-                            <!-- =================================
-                                 CONVERSATION THREAD
-                            ================================== -->
+                                    <div class="msgr-panel-header">
 
-                            <div class="conversation-thread">
+                                        <button type="button" class="msgr-back-btn">‹</button>
 
-                                <!-- ORIGINAL CUSTOMER MESSAGE -->
-                                <div class="thread-bubble thread-customer">
-                                    <div class="thread-bubble-meta">
-                                        <?php echo htmlspecialchars($thread["name"]); ?>
-                                        &middot;
-                                        <?php echo date("M j, Y g:i A", strtotime($thread["created_at"])); ?>
-                                    </div>
-                                    <div class="thread-bubble-text">
-                                        <?php echo nl2br(htmlspecialchars($thread["message"])); ?>
-                                    </div>
-                                </div>
-
-                                <!-- ALL FOLLOW-UP REPLIES, IN ORDER -->
-                                <?php if (!empty($replies_by_message[$mid])): ?>
-
-                                    <?php foreach ($replies_by_message[$mid] as $reply): ?>
-
-                                        <?php $is_admin = $reply["sender_type"] === "admin"; ?>
-
-                                        <div class="thread-bubble <?php echo $is_admin ? 'thread-admin' : 'thread-customer'; ?>">
-                                            <div class="thread-bubble-meta">
-                                                <?php echo $is_admin ? "Maturan's Art Cafe (You)" : htmlspecialchars($thread["name"]); ?>
-                                                &middot;
-                                                <?php echo date("M j, Y g:i A", strtotime($reply["created_at"])); ?>
-                                            </div>
-                                            <div class="thread-bubble-text">
-                                                <?php echo nl2br(htmlspecialchars($reply["reply_text"])); ?>
+                                        <div class="msgr-panel-heading">
+                                            <div class="msgr-panel-subject"><?php echo htmlspecialchars($thread["subject"]); ?></div>
+                                            <div class="msgr-panel-meta">
+                                                <?php echo htmlspecialchars($thread["name"]); ?> &middot;
+                                                <?php echo htmlspecialchars($thread["email"]); ?>
                                             </div>
                                         </div>
 
-                                    <?php endforeach; ?>
+                                        <div class="message-status"><?php echo htmlspecialchars($thread["status"]); ?></div>
 
-                                <?php endif; ?>
-
-                            </div>
+                                    </div>
 
 
-                            <!-- =================================
-                                 ALWAYS-AVAILABLE REPLY FORM
-                            ================================== -->
+                                    <!-- CONVERSATION THREAD -->
 
-                            <form method="POST" class="reply-form">
+                                    <div class="conversation-thread">
 
-                                <input type="hidden" name="message_id" value="<?php echo $mid; ?>">
-                                <input type="hidden" name="action" value="reply">
+                                        <!-- ORIGINAL CUSTOMER MESSAGE -->
+                                        <div class="thread-bubble thread-customer">
+                                            <div class="thread-bubble-meta">
+                                                <?php echo htmlspecialchars($thread["name"]); ?>
+                                                &middot;
+                                                <?php echo date("M j, Y g:i A", strtotime($thread["created_at"])); ?>
+                                            </div>
+                                            <div class="thread-bubble-text">
+                                                <?php echo nl2br(htmlspecialchars($thread["message"])); ?>
+                                            </div>
+                                        </div>
 
-                                <textarea
-                                    name="admin_reply"
-                                    class="admin-reply-input"
-                                    placeholder="Write a reply..."
-                                    required
-                                ></textarea>
+                                        <!-- ALL FOLLOW-UP REPLIES, IN ORDER -->
+                                        <?php if (!empty($replies_by_message[$mid])): ?>
 
-                                <button type="submit" class="message-button">
-                                    SEND REPLY
-                                </button>
+                                            <?php foreach ($replies_by_message[$mid] as $reply): ?>
 
-                            </form>
+                                                <?php $is_admin = $reply["sender_type"] === "admin"; ?>
+
+                                                <div class="thread-bubble <?php echo $is_admin ? 'thread-admin' : 'thread-customer'; ?>">
+                                                    <div class="thread-bubble-meta">
+                                                        <?php echo $is_admin ? "Maturan's Art Cafe (You)" : htmlspecialchars($thread["name"]); ?>
+                                                        &middot;
+                                                        <?php echo date("M j, Y g:i A", strtotime($reply["created_at"])); ?>
+                                                    </div>
+                                                    <div class="thread-bubble-text">
+                                                        <?php echo nl2br(htmlspecialchars($reply["reply_text"])); ?>
+                                                    </div>
+                                                </div>
+
+                                            <?php endforeach; ?>
+
+                                        <?php endif; ?>
+
+                                    </div>
 
 
-                            <!-- =================================
-                                 MESSAGE ACTIONS
-                            ================================== -->
+                                    <!-- ALWAYS-AVAILABLE REPLY FORM -->
 
-                            <?php if ($thread["status"] === "Unread"): ?>
+                                    <form method="POST" class="reply-form">
 
-                                <div class="message-actions">
-
-                                    <form method="POST">
                                         <input type="hidden" name="message_id" value="<?php echo $mid; ?>">
-                                        <input type="hidden" name="action" value="read">
+                                        <input type="hidden" name="action" value="reply">
 
-                                        <button type="submit" class="message-button secondary">
-                                            MARK AS READ
+                                        <textarea
+                                            name="admin_reply"
+                                            class="admin-reply-input"
+                                            placeholder="Write a reply..."
+                                            required
+                                        ></textarea>
+
+                                        <button type="submit" class="message-button">
+                                            SEND REPLY
                                         </button>
+
                                     </form>
 
                                 </div>
 
-                            <?php endif; ?>
+                            <?php endforeach; ?>
 
                         </div>
 
-                    <?php endforeach; ?>
+                    </div>
 
                 <?php else: ?>
 
