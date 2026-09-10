@@ -82,6 +82,7 @@ if ($guests_param !== null && $guests_param !== "") {
 ========================= */
 
 expire_stale_reservations($conn);
+complete_past_reservations($conn);
 
 
 /* =========================

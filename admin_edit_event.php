@@ -20,72 +20,95 @@ if (
     exit();
 }
 
+$event_id = filter_input(INPUT_GET, "id", FILTER_VALIDATE_INT);
 
-$valid_categories = ["Coffee", "Pastries", "Merch"];
-
-$category = $_GET["category"] ?? "Coffee";
-if (!in_array($category, $valid_categories, true)) {
-    $category = "Coffee";
+if ($event_id === false || $event_id === null || $event_id <= 0) {
+    header("Location: admin_events.php");
+    exit();
 }
 
-$name = "";
-$description = "";
-$price = "";
 $error = "";
 $success = "";
 
 
 /* =====================================
-   ADD PRODUCT
+   LOAD EXISTING EVENT
+===================================== */
+
+$stmt = $conn->prepare(
+    "SELECT event_id, event_name, description, event_date, event_time, location, image, status
+     FROM events WHERE event_id = ?"
+);
+$stmt->bind_param("i", $event_id);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows !== 1) {
+    header("Location: admin_events.php");
+    exit();
+}
+
+$event = $result->fetch_assoc();
+$stmt->close();
+
+$event_name = $event["event_name"];
+$description = $event["description"];
+$event_date = $event["event_date"];
+$event_time = $event["event_time"];
+$location = $event["location"];
+$current_image = $event["image"] ?? "";
+$make_active = $event["status"] === "Active";
+
+
+/* =====================================
+   UPDATE EVENT
 ===================================== */
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $category = trim($_POST["category"] ?? "");
-    $name = trim($_POST["name"] ?? "");
+    $event_name = trim($_POST["event_name"] ?? "");
     $description = trim($_POST["description"] ?? "");
-    $price = trim($_POST["price"] ?? "");
+    $event_date = trim($_POST["event_date"] ?? "");
+    $event_time = trim($_POST["event_time"] ?? "");
+    $location = trim($_POST["location"] ?? "");
+    $make_active = isset($_POST["make_active"]);
 
-    $image_name = "";
+    $image_name = $current_image;
 
 
     /* =================================
-       VALIDATE TEXT FIELDS
+       VALIDATE
     ================================= */
 
-    if (!in_array($category, $valid_categories, true)) {
+    if ($event_name === "") {
 
-        $error = "Please choose a valid category.";
+        $error = "Please enter an event name.";
 
-    } elseif ($name === "") {
+    } elseif (strlen($event_name) > 150) {
 
-        $error = "Please enter a product name.";
+        $error = "Event name must not exceed 150 characters.";
 
-    } elseif (strlen($name) > 100) {
+    } elseif ($event_date === "" || !preg_match('/^\d{4}-\d{2}-\d{2}$/', $event_date)) {
 
-        $error = "Product name must not exceed 100 characters.";
+        $error = "Please enter a valid event date.";
 
-    } elseif ($price === "" || !is_numeric($price)) {
+    } elseif ($event_time === "" || !preg_match('/^\d{2}:\d{2}$/', $event_time)) {
 
-        $error = "Please enter a valid price.";
-
-    } elseif ((float) $price < 0) {
-
-        $error = "Price cannot be negative.";
+        $error = "Please enter a valid event time.";
     }
 
 
     /* =================================
-       HANDLE IMAGE (OPTIONAL)
+       HANDLE NEW IMAGE (OPTIONAL REPLACE)
     ================================= */
 
     if (
         $error === "" &&
-        isset($_FILES["product_image"]) &&
-        $_FILES["product_image"]["error"] !== UPLOAD_ERR_NO_FILE
+        isset($_FILES["event_image"]) &&
+        $_FILES["event_image"]["error"] !== UPLOAD_ERR_NO_FILE
     ) {
 
-        $file = $_FILES["product_image"];
+        $file = $_FILES["event_image"];
 
         if ($file["error"] !== UPLOAD_ERR_OK) {
 
@@ -103,18 +126,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             } else {
 
                 $extension = strtolower(pathinfo($file["name"], PATHINFO_EXTENSION));
-                $image_name = uniqid("product_", true) . "." . $extension;
+                $new_image_name = uniqid("event_", true) . "." . $extension;
 
-                $upload_directory = "product_images/";
+                $upload_directory = "event_images/";
 
                 if (!is_dir($upload_directory)) {
                     mkdir($upload_directory, 0777, true);
                 }
 
-                $upload_path = $upload_directory . $image_name;
+                if (move_uploaded_file($file["tmp_name"], $upload_directory . $new_image_name)) {
 
-                if (!move_uploaded_file($file["tmp_name"], $upload_path)) {
-                    $error = "Failed to upload the product image.";
+                    /* Delete the old image now that the new one is saved */
+
+                    if (!empty($current_image) && file_exists($upload_directory . $current_image)) {
+                        unlink($upload_directory . $current_image);
+                    }
+
+                    $image_name = $new_image_name;
+
+                } else {
+
+                    $error = "Failed to upload the event image.";
                 }
             }
         }
@@ -122,42 +154,45 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
 
     /* =================================
-       INSERT PRODUCT
+       SAVE CHANGES
     ================================= */
 
     if ($error === "") {
 
+        $status = $make_active ? "Active" : "Inactive";
+        $location_value = $location !== "" ? $location : null;
+
+        if ($make_active) {
+            $conn->query("UPDATE events SET status = 'Inactive' WHERE event_id != $event_id");
+        }
+
         $stmt = $conn->prepare(
-            "INSERT INTO products
-            (category, name, description, price, image, status)
-            VALUES (?, ?, ?, ?, ?, 'Active')"
+            "UPDATE events
+             SET event_name = ?, description = ?, event_date = ?, event_time = ?,
+                 location = ?, image = ?, status = ?
+             WHERE event_id = ?"
         );
 
-        $price_value = (float) $price;
-
         $stmt->bind_param(
-            "sssds",
-            $category,
-            $name,
+            "sssssssi",
+            $event_name,
             $description,
-            $price_value,
-            $image_name
+            $event_date,
+            $event_time,
+            $location_value,
+            $image_name,
+            $status,
+            $event_id
         );
 
         if ($stmt->execute()) {
 
-            $success = "Product added successfully.";
-            $name = "";
-            $description = "";
-            $price = "";
+            $success = "Event updated successfully.";
+            $current_image = $image_name;
 
         } else {
 
-            if ($image_name !== "" && file_exists("product_images/" . $image_name)) {
-                unlink("product_images/" . $image_name);
-            }
-
-            $error = "Failed to save product: " . $stmt->error;
+            $error = "Failed to update event: " . $stmt->error;
         }
 
         $stmt->close();
@@ -174,7 +209,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Add Product | Maturan's Art Cafe</title>
+    <title>Edit Event | Maturan's Art Cafe</title>
 
     <link rel="stylesheet" href="Css/style.css">
     <link rel="stylesheet" href="Css/admin.css">
@@ -189,7 +224,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 <div class="dash-layout">
 
     <?php
-    $admin_active = "products";
+    $admin_active = "events";
     include "admin_sidebar.php";
     ?>
 
@@ -198,8 +233,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         <main class="admin-content">
 
             <div class="admin-page-title">
-                <h2>ADD PRODUCT</h2>
-                <p>Add a new coffee, pastry, or merch item to the catalog.</p>
+                <h2>EDIT EVENT</h2>
+                <p>Update the details for this event.</p>
             </div>
 
             <?php if ($error !== ""): ?>
@@ -212,27 +247,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             <div class="admin-form-card">
 
+                <?php if (!empty($current_image) && file_exists("event_images/" . $current_image)): ?>
+
+                    <img
+                        src="event_images/<?php echo htmlspecialchars($current_image); ?>"
+                        alt="<?php echo htmlspecialchars($event_name); ?>"
+                        class="product-current-image"
+                    >
+
+                <?php endif; ?>
+
                 <form method="POST" enctype="multipart/form-data">
 
                     <div class="admin-form-group">
-                        <label for="category">CATEGORY</label>
-                        <select id="category" name="category" required>
-                            <?php foreach ($valid_categories as $cat): ?>
-                                <option value="<?php echo $cat; ?>" <?php echo $category === $cat ? "selected" : ""; ?>>
-                                    <?php echo strtoupper($cat); ?>
-                                </option>
-                            <?php endforeach; ?>
-                        </select>
-                    </div>
-
-                    <div class="admin-form-group">
-                        <label for="name">PRODUCT NAME</label>
+                        <label for="event_name">EVENT NAME</label>
                         <input
                             type="text"
-                            id="name"
-                            name="name"
-                            value="<?php echo htmlspecialchars($name); ?>"
-                            placeholder="e.g. Caramel Macchiato"
+                            id="event_name"
+                            name="event_name"
+                            value="<?php echo htmlspecialchars($event_name); ?>"
                             required
                         >
                     </div>
@@ -243,38 +276,51 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                             id="description"
                             name="description"
                             rows="4"
-                            placeholder="Short description shown on the menu"
-                        ><?php echo htmlspecialchars($description); ?></textarea>
+                        ><?php echo htmlspecialchars($description ?? ""); ?></textarea>
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="price">PRICE (₱)</label>
+                        <label for="event_date">DATE</label>
+                        <input type="date" id="event_date" name="event_date" value="<?php echo htmlspecialchars($event_date); ?>" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="event_time">TIME</label>
+                        <input type="time" id="event_time" name="event_time" value="<?php echo htmlspecialchars($event_time); ?>" required>
+                    </div>
+
+                    <div class="admin-form-group">
+                        <label for="location">LOCATION</label>
                         <input
-                            type="number"
-                            id="price"
-                            name="price"
-                            value="<?php echo htmlspecialchars($price); ?>"
-                            placeholder="0.00"
-                            min="0"
-                            step="0.01"
-                            required
+                            type="text"
+                            id="location"
+                            name="location"
+                            value="<?php echo htmlspecialchars($location ?? ""); ?>"
                         >
                     </div>
 
                     <div class="admin-form-group">
-                        <label for="product_image">PRODUCT IMAGE</label>
+                        <label for="event_image">REPLACE IMAGE</label>
                         <input
                             type="file"
-                            id="product_image"
-                            name="product_image"
+                            id="event_image"
+                            name="event_image"
                             accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp"
                         >
-                        <small class="admin-file-help">JPG, PNG, or WEBP. Optional.</small>
+                        <small class="admin-file-help">Leave empty to keep the current image.</small>
+                    </div>
+
+                    <div class="admin-form-group admin-checkbox-group">
+                        <label>
+                            <input type="checkbox" name="make_active" <?php echo $make_active ? "checked" : ""; ?>>
+                            Make this the active event
+                        </label>
+                        <small class="admin-file-help">Only one event can be active at a time. This is the event artists apply to join.</small>
                     </div>
 
                     <div class="admin-form-actions">
-                        <a href="admin_products.php?category=<?php echo urlencode($category); ?>" class="admin-cancel-button">CANCEL</a>
-                        <button type="submit" class="admin-login-button">ADD PRODUCT</button>
+                        <a href="admin_events.php" class="admin-cancel-button">CANCEL</a>
+                        <button type="submit" class="admin-login-button">SAVE CHANGES</button>
                     </div>
 
                 </form>

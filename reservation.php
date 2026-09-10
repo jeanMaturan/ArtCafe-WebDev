@@ -34,7 +34,10 @@ $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
-    $name = trim($_POST["reservation_name"] ?? "");
+    // The reservation name is always the logged-in user's account name.
+    // It's locked in the UI, but we also ignore whatever is posted here
+    // so it can't be tampered with client-side.
+    $name = trim($_SESSION["user_name"] ?? "");
     $phone = trim($_POST["reservation_phone"] ?? "");
     $date = trim($_POST["date"] ?? "");
     $time = trim($_POST["time"] ?? "");
@@ -349,15 +352,15 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 NAME
             </label>
 
-            <input
-                type="text"
-                id="reservation-name"
-                name="reservation_name"
-                placeholder="Your name"
-                value="<?= htmlspecialchars($_SESSION["user_name"]) ?>"
-                required
-            >
+            <p id="reservation-name" class="reservation-name-display">
+                <?= htmlspecialchars($_SESSION["user_name"]) ?>
+            </p>
 
+            <input
+                type="hidden"
+                name="reservation_name"
+                value="<?= htmlspecialchars($_SESSION["user_name"]) ?>"
+            >
         </div>
 
         

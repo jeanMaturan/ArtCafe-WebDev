@@ -25,6 +25,9 @@ if (
 /* Free up any tables from no-shows before showing the list */
 expire_stale_reservations($conn);
 
+/* Close out seated reservations whose date has fully passed */
+complete_past_reservations($conn);
+
 
 /* =====================================
    HANDLE DELETE / CANCEL RESERVATION
@@ -97,6 +100,43 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 $_SESSION["admin_reservation_success"] =
                     "Reservation marked as seated.";
+
+            } else {
+
+                $_SESSION["admin_reservation_error"] =
+                    "The reservation could not be updated.";
+            }
+
+            $stmt->close();
+
+        } else {
+
+            $_SESSION["admin_reservation_error"] =
+                "Something went wrong. Please try again.";
+        }
+
+    } elseif (
+        $action === "complete" &&
+        $reservation_id !== false &&
+        $reservation_id !== null &&
+        $reservation_id > 0
+    ) {
+
+        $stmt = $conn->prepare(
+            "UPDATE reservations
+             SET status = 'Completed'
+             WHERE reservation_id = ?
+               AND status = 'Seated'"
+        );
+
+        if ($stmt) {
+
+            $stmt->bind_param("i", $reservation_id);
+
+            if ($stmt->execute() && $stmt->affected_rows > 0) {
+
+                $_SESSION["admin_reservation_success"] =
+                    "Reservation marked as completed.";
 
             } else {
 
@@ -568,6 +608,26 @@ usort(
                                             <input type="hidden" name="action" value="seated">
                                             <button type="submit" class="approve-button">
                                                 MARK AS SEATED
+                                            </button>
+                                        </form>
+
+                                        <form method="POST">
+                                            <input type="hidden" name="reservation_id" value="<?php echo (int) $r['reservation_id']; ?>">
+                                            <input type="hidden" name="action" value="cancel">
+                                            <button type="submit" class="reject-button">
+                                                CANCEL
+                                            </button>
+                                        </form>
+
+                                    <?php endif; ?>
+
+                                    <?php if ($r["status"] === "Seated"): ?>
+
+                                        <form method="POST">
+                                            <input type="hidden" name="reservation_id" value="<?php echo (int) $r['reservation_id']; ?>">
+                                            <input type="hidden" name="action" value="complete">
+                                            <button type="submit" class="approve-button">
+                                                MARK AS COMPLETED
                                             </button>
                                         </form>
 

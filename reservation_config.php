@@ -47,6 +47,24 @@ function expire_stale_reservations(mysqli $conn): void
 
 
 /**
+ * A table that was checked in ("Seated") but whose reservation
+ * date has fully passed is done -- there's no realistic scenario
+ * where the guest is still sitting there. Close it out as
+ * "Completed" so it stops showing as an active/occupied table
+ * once it lands in the Past filter.
+ */
+function complete_past_reservations(mysqli $conn): void
+{
+    $conn->query(
+        "UPDATE reservations
+         SET status = 'Completed'
+         WHERE status = 'Seated'
+           AND reservation_date < CURDATE()"
+    );
+}
+
+
+/**
  * Round a time string ("H:i" or "H:i:s") down to the
  * start of the slot it belongs to.
  *

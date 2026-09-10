@@ -7,12 +7,22 @@ require_once "db.php";
 $error = "";
 $success = "";
 
+$name = "";
+$email = "";
+$password = "";
+$confirm_password = "";
+
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     $name = trim($_POST["name"] ?? "");
     $email = trim($_POST["email"] ?? "");
     $password = $_POST["password"] ?? "";
     $confirm_password = $_POST["confirm_password"] ?? "";
+
+    // Whether to keep the typed password(s) on the reload after this
+    // submission. Cleared for password-strength failures and mismatches.
+    $keep_password = true;
+    $keep_confirm_password = true;
 
 
     // =====================================
@@ -78,6 +88,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (strlen($password) < 8) {
 
         $error = "Password must be at least 8 characters.";
+        $keep_password = false;
+        $keep_confirm_password = false;
 
     }
 
@@ -89,6 +101,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!preg_match("/[A-Z]/", $password)) {
 
         $error = "Password must contain at least one uppercase letter.";
+        $keep_password = false;
+        $keep_confirm_password = false;
 
     }
 
@@ -100,6 +114,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!preg_match("/[a-z]/", $password)) {
 
         $error = "Password must contain at least one lowercase letter.";
+        $keep_password = false;
+        $keep_confirm_password = false;
 
     }
 
@@ -111,6 +127,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!preg_match("/[0-9]/", $password)) {
 
         $error = "Password must contain at least one number.";
+        $keep_password = false;
+        $keep_confirm_password = false;
 
     }
 
@@ -122,6 +140,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif (!preg_match("/[^A-Za-z0-9]/", $password)) {
 
         $error = "Password must contain at least one special character.";
+        $keep_password = false;
+        $keep_confirm_password = false;
 
     }
 
@@ -133,6 +153,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     elseif ($password !== $confirm_password) {
 
         $error = "Passwords do not match.";
+        $keep_confirm_password = false;
 
     }
 
@@ -202,8 +223,34 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                     if ($stmt->execute()) {
 
-                        $success =
-                            "Account created successfully! You can now log in.";
+                        $new_user_id = $stmt->insert_id;
+
+
+                        // =====================================
+                        // LOG THE NEW USER IN RIGHT AWAY
+                        // =====================================
+
+                        $user_stmt = $conn->prepare(
+                            "SELECT user_id, name, email, role
+                             FROM users
+                             WHERE user_id = ?
+                             LIMIT 1"
+                        );
+                        $user_stmt->bind_param("i", $new_user_id);
+                        $user_stmt->execute();
+                        $new_user = $user_stmt->get_result()->fetch_assoc();
+                        $user_stmt->close();
+
+                        session_regenerate_id(true);
+
+                        $_SESSION["user_logged_in"] = true;
+                        $_SESSION["user_id"] = (int) $new_user["user_id"];
+                        $_SESSION["user_name"] = $new_user["name"];
+                        $_SESSION["user_email"] = $new_user["email"];
+                        $_SESSION["role"] = $new_user["role"];
+
+                        header("Location: reservation.php");
+                        exit();
 
                     } else {
 
@@ -217,6 +264,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $check->close();
         }
+    }
+
+    if (!$keep_password) {
+        $password = "";
+        $confirm_password = "";
+    } elseif (!$keep_confirm_password) {
+        $confirm_password = "";
     }
 }
 
@@ -282,6 +336,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input
                     type="text"
                     name="name"
+                    value="<?php echo htmlspecialchars($name); ?>"
                     required
                 >
 
@@ -297,6 +352,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input
                     type="email"
                     name="email"
+                    value="<?php echo htmlspecialchars($email); ?>"
                     required
                 >
 
@@ -312,8 +368,16 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input
                     type="password"
                     name="password"
+                    value="<?php echo htmlspecialchars($password); ?>"
+                    minlength="8"
+                    pattern="(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}"
+                    title="Password should contain at least one uppercase letter, one lowercase letter, one number, and one special character."
                     required
                 >
+
+                <small class="login-hint">
+                    Password should contain at least 8 characters, including one uppercase letter, one lowercase letter, one number, and one special character.
+                </small>
 
             </div>
 
@@ -327,6 +391,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 <input
                     type="password"
                     name="confirm_password"
+                    value="<?php echo htmlspecialchars($confirm_password); ?>"
                     required
                 >
 

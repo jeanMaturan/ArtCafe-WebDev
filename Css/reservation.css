@@ -117,6 +117,24 @@
     border-color: var(--orange);
 }
 
+.reservation-name-display {
+    margin: 0;
+    padding: 10px 0;
+    color: var(--dark-text);
+    font-family: var(--font);
+    font-size: 15px;
+    font-weight: 600;
+    user-select: none;
+    cursor: default;
+}
+
+.reservation-form .form-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    color: #8a7a6d;
+}
+
 .reservation-form input::placeholder {
     color: #aaa09a;
 }

@@ -71,6 +71,14 @@
     border-color: var(--orange);
 }
 
+.login-hint {
+    display: block;
+    margin-top: 6px;
+    font-size: 12px;
+    color: #8a7a6d;
+    line-height: 1.4;
+}
+
 .login-button {
     width: 100%;
     padding: 14px;
